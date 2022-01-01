@@ -11,7 +11,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with: 
-        version: '6.2.2'
+        version: '5.1.2'
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
