@@ -13,7 +13,7 @@ void ROSPkg::System::createCache_() {
     QFile file_(cache_file_);
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
-        stream_ << ros_loc_;
+        stream_ << QFileInfo(ros_loc_).absolutePath();
     }
 }
 
@@ -72,7 +72,7 @@ void ROSPkg::System::populateInstalled_() {
     const QString ros_dir_ = QFileInfo(ros_loc_).absolutePath();
     QDir meta_dir_(QDir(ros_dir_).filePath("Metadata"));
 
-    QStringList filters_ = {"*.toml"};
+    QList<QString> filters_ = {"*.toml"};
     meta_dir_.setNameFilters(filters_);
 
     QFileInfoList file_info_ = meta_dir_.entryInfoList();
@@ -101,11 +101,53 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
 
 void ROSPkg::System::unzipFile(const QString& file_name) const {
     AbZip zip_(file_name);
-    const QString home_dir_ = QDir::homePath();
-    const QString out_dir_ = home_dir_ + QDir::separator() + "temp_dir";
-    qDebug() << out_dir_;
-    if(!zip_.extractAll(out_dir_)) {
+    QTemporaryDir temp_dir_;
+    if(!zip_.extractAll(temp_dir_.path())) {
         qDebug() << zip_.errorCount() << "errors occurred:" << zip_.errorString();
     }
+    QList<QString> filter_ssn_{"*.ssn"};
+    QList<QString> filter_rly_{"*.rly"};
+    QList<QString> filter_ttb_{"*.ttb"};
+    QList<QString> filter_toml_{"*.toml"};
+    QList<QString> files_ssn_, files_rly_, files_ttb_, files_toml_;
+    QDirIterator it_ssn(temp_dir_.path(), filter_ssn_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_rly(temp_dir_.path(), filter_rly_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ttb(temp_dir_.path(), filter_ttb_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_toml(temp_dir_.path(), filter_toml_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+    while(it_ssn.hasNext()) {
+        files_ssn_ << it_ssn.next();
+    }
+    while(it_rly.hasNext()) {
+        files_rly_ << it_rly.next();
+    }
+    while(it_ttb.hasNext()) {
+        files_ttb_ << it_ttb.next();
+    }
+    while(it_toml.hasNext()) {
+        files_toml_ << it_toml.next();
+    }
+
+    for(const QString& rly_file : files_rly_ ) {
+        QString base_name_ = QFileInfo(rly_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Railways" + QDir::separator() + base_name_;
+        qDebug() << "Copying: " << rly_file << " to " << new_path_;
+        QFile(rly_file).copy(new_path_);
+    }
+
+    for(const QString& ttb_file : files_ttb_ ) {
+        QString base_name_ = QFileInfo(ttb_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Program timetables" + QDir::separator() + base_name_;
+        qDebug() << "Copying: " << ttb_file << " to " << new_path_;
+        QFile(ttb_file).copy(new_path_);
+    }
+
+    for(const QString& ssn_file : files_ssn_ ) {
+        QString base_name_ = QFileInfo(ssn_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Sessions" + QDir::separator() + base_name_;
+        qDebug() << "Copying: " << ssn_file << " to " << new_path_;
+        QFile(ssn_file).copy(new_path_);
+    }
+
     zip_.close();
 }

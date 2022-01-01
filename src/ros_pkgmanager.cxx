@@ -70,4 +70,5 @@ void ROSPkg::Manager::on_InstallButtonClicked() {
         QString(QStandardPaths::HomeLocation), QFileDialog::tr("Add-ons (*.zip)")
     );
     system_->unzipFile(zip_file_);
+    populateTable_();
 }

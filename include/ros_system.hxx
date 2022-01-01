@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QTableWidgetItem>
+#include <QDirIterator>
 
 #include "toml.hpp"
 #include "digestpp.hpp"

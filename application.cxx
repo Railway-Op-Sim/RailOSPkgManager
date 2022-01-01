@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    const QList<QString> uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
         const QString baseName = "ROSPkgManager_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
