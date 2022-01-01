@@ -1,0 +1,3 @@
+[submodule "AbZip"]
+	path = AbZip
+	url = https://github.com/abelayer/AbZip.git
