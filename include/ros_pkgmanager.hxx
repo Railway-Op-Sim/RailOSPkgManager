@@ -1,5 +1,5 @@
-#ifndef ROSPKGMANAGER_HXX
-#define ROSPKGMANAGER_HXX
+#ifndef __ROSPKGMANAGER_HXX__
+#define __ROSPKGMANAGER_HXX__
 
 #include <QWidget>
 #include <QFileDialog>
@@ -26,7 +26,7 @@ namespace ROSPkg {
         const int TABLE_NCOLS = 4;
         const int BUTTON_WIDTH = 150;
         const int BUTTON_HEIGHT = 30;
-        const System* system_ = new System(this);
+        System* system_ = new System(this);
         QMap<QString, QPushButton*> buttons_ = {
             {"install", new QPushButton(QPushButton::tr("Install Package"), this)},
             {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
@@ -37,6 +37,7 @@ namespace ROSPkg {
         void populateTable_();
     private slots:
         void on_InstallButtonClicked();
+        void on_UninstallButtonClicked();
     public:
         Manager();
         ~Manager();

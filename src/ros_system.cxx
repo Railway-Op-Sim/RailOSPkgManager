@@ -19,6 +19,12 @@ void ROSPkg::System::createCache_() {
 
 ROSPkg::System::System(QWidget* parent) {
     parent_ = parent;
+    info_dialog_ = new QWidget(parent, Qt::SubWindow);
+    info_dialog_->setFixedSize(110, 110);
+    info_text_box_ = new QTextEdit(info_dialog_);
+    info_text_box_->setReadOnly(true);
+    info_text_box_->setGeometry(10, 10, 100, 100);
+    info_text_box_->hide();
 
     if(ros_loc_.isEmpty() && QFile::exists(cache_file_)) {
         QFile file_(cache_file_);
@@ -35,7 +41,7 @@ ROSPkg::System::System(QWidget* parent) {
         }
     }
 
-    populateInstalled_();
+    populateInstalled();
 }
 
 void ROSPkg::System::parseMetaFile_(const QString& file_name) {
@@ -45,15 +51,7 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
         return;
     }
 
-    toml::table meta_data_;
-
-    try
-    {
-        meta_data_ = toml::parse_file(file_name.toStdString());
-    }
-    catch ( const toml::parse_error& err ) {
-        return;
-    }
+    const ROSTools::Metadata meta_data_(std::filesystem::path(file_name.toStdString()));
 
     QFile file_(file_name);
     QString hash_ = "";
@@ -64,21 +62,24 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
 
     qDebug() << "Registering add-on: " << hash_;
 
-    installed_[hash_] = meta_data_;
+    installed_.insert(hash_, meta_data_);
 
 }
 
-void ROSPkg::System::populateInstalled_() {
-    const QString ros_dir_ = QFileInfo(ros_loc_).absolutePath();
-    QDir meta_dir_(QDir(ros_dir_).filePath("Metadata"));
-
+void ROSPkg::System::populateInstalled() {
+    QDir meta_dir_(ros_loc_ + QDir::separator() + "Metadata");
     QList<QString> filters_ = {"*.toml"};
-    meta_dir_.setNameFilters(filters_);
+    QList<QString> toml_files_;
+    QDirIterator iter_toml_(meta_dir_.path(), filters_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
-    QFileInfoList file_info_ = meta_dir_.entryInfoList();
+    while(iter_toml_.hasNext()) {
+        toml_files_ << iter_toml_.next();
+    }
 
-    for(QFileInfo& info_ : file_info_) {
-        parseMetaFile_(info_.absoluteFilePath());
+    qDebug() << toml_files_;
+
+    for(const QString& file_ : toml_files_) {
+        parseMetaFile_(file_);
     }
 }
 
@@ -86,14 +87,17 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
     QList<QList<QTableWidgetItem*>> info_;
 
     for(auto& table : installed_.toStdMap()) {
+        std::stringstream ss;
+        ss << table.second.version();
         QList<QTableWidgetItem*> row_;
-        std::optional<std::string> name = table.second["name"].value<std::string>();
-        std::optional<std::string> version = table.second["version"].value<std::string>();
-        std::optional<std::string> author = table.second["author"].value<std::string>();
-        row_.push_back(new QTableWidgetItem(QString::fromStdString((name.value_or("Unknown")))));
-        row_.push_back(new QTableWidgetItem(QString::fromStdString((version.value_or("Latest")))));
-        row_.push_back(new QTableWidgetItem(QString::fromStdString((author.value_or("")))));
+        row_.push_back(new QTableWidgetItem(QString::fromStdString(table.second.name())));
+        row_[row_.size()-1]->setFlags(row_[row_.size()-1]->flags() & ~Qt::ItemIsEditable);
+        row_.push_back(new QTableWidgetItem(QString::fromStdString(ss.str())));
+        row_[row_.size()-1]->setFlags(row_[row_.size()-1]->flags() & ~Qt::ItemIsEditable);
+        row_.push_back(new QTableWidgetItem(QString::fromStdString(table.second.author())));
+        row_[row_.size()-1]->setFlags(row_[row_.size()-1]->flags() & ~Qt::ItemIsEditable);
         row_.push_back(new QTableWidgetItem(table.first));
+        row_[row_.size()-1]->setFlags(row_[row_.size()-1]->flags() & ~Qt::ItemIsEditable);
         info_.push_back(row_);
     }
     return info_;
@@ -105,27 +109,95 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     if(!zip_.extractAll(temp_dir_.path())) {
         qDebug() << zip_.errorCount() << "errors occurred:" << zip_.errorString();
     }
-    QList<QString> filter_ssn_{"*.ssn"};
-    QList<QString> filter_rly_{"*.rly"};
-    QList<QString> filter_ttb_{"*.ttb"};
+
+    // File path filters
+    QList<QString> filter_ssn_{"*.ssn", "*.SSN"};
+    QList<QString> filter_rly_{"*.rly", "*.RLY"};
+    QList<QString> filter_ttb_{"*.ttb", "*.TTB"};
     QList<QString> filter_toml_{"*.toml"};
-    QList<QString> files_ssn_, files_rly_, files_ttb_, files_toml_;
-    QDirIterator it_ssn(temp_dir_.path(), filter_ssn_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_rly(temp_dir_.path(), filter_rly_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_ttb(temp_dir_.path(), filter_ttb_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_toml(temp_dir_.path(), filter_toml_, QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QList<QString> filter_docs_{"*.md", "*.pdf"};
+
+    // File result containers
+    QList<QString> files_ssn_, files_rly_, files_ttb_, files_toml_, files_docs_;
+
+    // Directory iterators for each file type
+    QDirIterator it_ssn(temp_dir_.path(), filter_ssn_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_rly(temp_dir_.path(), filter_rly_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ttb(temp_dir_.path(), filter_ttb_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_toml(temp_dir_.path(), filter_toml_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_docs(temp_dir_.path(), filter_docs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+    // For each file type search recursively for the needed file types
+    while(it_toml.hasNext()) {
+        files_toml_ << it_toml.next();
+    }
 
     while(it_ssn.hasNext()) {
         files_ssn_ << it_ssn.next();
     }
+
     while(it_rly.hasNext()) {
         files_rly_ << it_rly.next();
     }
+
     while(it_ttb.hasNext()) {
         files_ttb_ << it_ttb.next();
     }
-    while(it_toml.hasNext()) {
-        files_toml_ << it_toml.next();
+
+    while(it_docs.hasNext()) {
+        files_docs_ << it_docs.next();
+    }
+
+    // If no TOML file is found then archive is not an ROS package yet so one needs to be created
+    if(files_toml_.empty()) {
+        const QString package_name_ = QString(QFileInfo(file_name).baseName()).replace("_", " ");
+        ROSPkg::Packager packager_{parent_, ros_loc_, package_name_};
+        if(files_rly_.size() != 1) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("Package definition ambiguous"),
+                QMessageBox::tr("Expected single RLY file from archive.")
+            );
+            zip_.close();
+            return;
+        }
+        if(files_ttb_.empty()) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("Missing timetables"),
+                QMessageBox::tr("Expected one or more TTB files within archive.")
+            );
+            zip_.close();
+            return;
+        }
+        for(const QString& ttb_file : files_ttb_) packager_.addTTBFile(ttb_file);
+        if(!files_ssn_.empty()) {
+            for(const QString& ssn_file : files_ssn_) packager_.addSSNFile(ssn_file);
+        }
+        if(!files_docs_.empty()) {
+            for(const QString& doc_file : files_docs_) packager_.addDocFile(doc_file);
+        }
+        packager_.setRLYFile(QFileInfo(files_rly_[0]).fileName());
+        const QString new_toml_ = packager_.buildTOML();
+        if(new_toml_.isEmpty()) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("TOML creation failure"),
+                QMessageBox::tr("TOML creation for non-project archive failed.")
+            );
+            zip_.close();
+            return;
+        }
+        files_toml_.push_back(new_toml_);
+    }
+    else if(files_toml_.size() > 1) {
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Package Definition Ambiguous"),
+            QMessageBox::tr("Expected single metadata (TOML) file in package, but multiple candidates found.")
+        );
+        zip_.close();
+        return;
     }
 
     for(const QString& rly_file : files_rly_ ) {
@@ -149,5 +221,86 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         QFile(ssn_file).copy(new_path_);
     }
 
+    // If the Documentation directory does not yet exist create it
+    if(!QDir(ros_loc_ + QDir::separator() + "Documentation").exists()) {
+        QDir().mkdir(ros_loc_ + QDir::separator() + "Documentation");
+    }
+
+    QString doc_dir_ = ros_loc_ + QDir::separator() + "Documentation";
+
+    ROSTools::Metadata package_data_;
+
+    try {
+        package_data_ = ROSTools::Metadata(std::filesystem::path(files_toml_[0].toStdString()));
+    }
+    catch(std::runtime_error& e) {
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Missing Package Metadata"),
+            QMessageBox::tr("Cannot install selected package, missing package metadata.")
+        );
+        zip_.close();
+        return;
+    }
+    if(!files_docs_.empty()) {
+        // Create directory for add-on docs
+        doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
+        QDir().mkdir(doc_dir_);
+    }
+
+    for(const QString& doc_file : files_docs_ ) {
+        QString base_name_;
+        QFileInfo(doc_file).fileName();
+        QString new_path_ = doc_dir_ + QDir::separator() + base_name_;
+        qDebug() << "Copying: " << doc_file << " to " << new_path_;
+        QFile(doc_file).copy(new_path_);
+    }
     zip_.close();
+}
+
+void ROSPkg::System::uninstall(const QString& sha) {
+    QString info_text_ = "";
+    info_text_box_->show();
+    const ROSTools::Metadata meta_data_ = installed_[sha];
+    const QString data_dir_ = ros_loc_ + QDir::separator();
+    const QString toml_file_ = QFileInfo(QString::fromStdString(meta_data_.toml_file().string())).fileName();
+
+    qDebug() << data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string());
+    info_text_ += "Removing '" + data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string()) + "'";
+    info_text_box_->setText(info_text_);
+    info_text_box_->update();
+    QFile(data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string())).remove();
+
+    qDebug() << data_dir_ + "Metadata" + QDir::separator() + toml_file_;
+    info_text_ += "\nRemoving '" + data_dir_ + "Metadata" + QDir::separator() + toml_file_ + "'";
+    info_text_box_->setText(info_text_);
+    info_text_box_->update();
+    QFile(data_dir_ + "Metadata" + QDir::separator() + toml_file_).remove();
+
+    const QList<QString> ttb_files_;
+
+    for(const std::filesystem::path& ttb_file: meta_data_.ttb_files()){
+        qDebug() << data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string());
+        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
+        info_text_box_->setText(info_text_);
+        info_text_box_->update();
+        QFile(data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string())).remove();
+    }
+
+    for(const std::filesystem::path& doc_file: meta_data_.doc_files()){
+        qDebug() << data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string());
+        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string()) + "'";
+        info_text_box_->setText(info_text_);
+        info_text_box_->update();
+        QFile(data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string())).remove();
+    }
+
+    for(const std::filesystem::path& ssn_file: meta_data_.ssn_files()){
+        qDebug() << data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string());
+        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
+        info_text_box_->setText(info_text_);
+        info_text_box_->update();
+        QFile(data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
+    }
+    installed_.remove(sha);
 }
