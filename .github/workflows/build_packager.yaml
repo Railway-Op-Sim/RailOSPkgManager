@@ -54,8 +54,9 @@ jobs:
         path: rostools
     - name: Install ROSTools
       run: |
-        cmake -Bbuild
-        sudo cmake --build build/ --target install
+        mkdir install
+        cmake -Bbuild -DCMAKE_INSTALL_PREFIX=install
+        cmake --build build/ --target install
       working-directory: rostools/cpp
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -63,7 +64,7 @@ jobs:
         version: '5.15.2'
     - name: Build ROSPackageManager   
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -DROSTOOLS_DIR=../rostools/cpp/install
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
