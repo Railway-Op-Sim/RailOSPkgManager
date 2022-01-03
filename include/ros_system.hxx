@@ -30,8 +30,6 @@ namespace ROSPkg {
     class System {
         private:
             QWidget* parent_ = nullptr;
-            QWidget* info_dialog_;
-            QTextEdit* info_text_box_;
             QMap<QString, ROSTools::Metadata> installed_;
             QString ros_loc_ = "";
             const QString cache_file_ = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("ros_cfg");

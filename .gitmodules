@@ -1,0 +1,3 @@
+[submodule "external/AbZip"]
+	path = external/AbZip
+	url = https://github.com/artemis-beta/AbZip.git

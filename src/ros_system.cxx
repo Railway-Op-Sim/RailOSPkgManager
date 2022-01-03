@@ -19,12 +19,6 @@ void ROSPkg::System::createCache_() {
 
 ROSPkg::System::System(QWidget* parent) {
     parent_ = parent;
-    info_dialog_ = new QWidget(parent, Qt::SubWindow);
-    info_dialog_->setFixedSize(110, 110);
-    info_text_box_ = new QTextEdit(info_dialog_);
-    info_text_box_->setReadOnly(true);
-    info_text_box_->setGeometry(10, 10, 100, 100);
-    info_text_box_->hide();
 
     if(ros_loc_.isEmpty() && QFile::exists(cache_file_)) {
         QFile file_(cache_file_);
@@ -76,8 +70,6 @@ void ROSPkg::System::populateInstalled() {
         toml_files_ << iter_toml_.next();
     }
 
-    qDebug() << toml_files_;
-
     for(const QString& file_ : toml_files_) {
         parseMetaFile_(file_);
     }
@@ -104,6 +96,7 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
 }
 
 void ROSPkg::System::unzipFile(const QString& file_name) const {
+    QString info_text_ = "";
     AbZip zip_(file_name);
     QTemporaryDir temp_dir_;
     if(!zip_.extractAll(temp_dir_.path())) {
@@ -203,6 +196,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     for(const QString& rly_file : files_rly_ ) {
         QString base_name_ = QFileInfo(rly_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Railways" + QDir::separator() + base_name_;
+        info_text_ += "Added " + new_path_;
         qDebug() << "Copying: " << rly_file << " to " << new_path_;
         QFile(rly_file).copy(new_path_);
     }
@@ -210,6 +204,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     for(const QString& ttb_file : files_ttb_ ) {
         QString base_name_ = QFileInfo(ttb_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Program timetables" + QDir::separator() + base_name_;
+        info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << ttb_file << " to " << new_path_;
         QFile(ttb_file).copy(new_path_);
     }
@@ -217,6 +212,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     for(const QString& ssn_file : files_ssn_ ) {
         QString base_name_ = QFileInfo(ssn_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Sessions" + QDir::separator() + base_name_;
+        info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << ssn_file << " to " << new_path_;
         QFile(ssn_file).copy(new_path_);
     }
@@ -252,55 +248,44 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         QString base_name_;
         QFileInfo(doc_file).fileName();
         QString new_path_ = doc_dir_ + QDir::separator() + base_name_;
-        qDebug() << "Copying: " << doc_file << " to " << new_path_;
+        info_text_ += "\n\nAdded " + new_path_;
         QFile(doc_file).copy(new_path_);
     }
     zip_.close();
+    QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
 void ROSPkg::System::uninstall(const QString& sha) {
     QString info_text_ = "";
-    info_text_box_->show();
     const ROSTools::Metadata meta_data_ = installed_[sha];
     const QString data_dir_ = ros_loc_ + QDir::separator();
     const QString toml_file_ = QFileInfo(QString::fromStdString(meta_data_.toml_file().string())).fileName();
 
-    qDebug() << data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string());
-    info_text_ += "Removing '" + data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string()) + "'";
-    info_text_box_->setText(info_text_);
-    info_text_box_->update();
+    info_text_ += "Removed '" + data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string()) + "'";
     QFile(data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string())).remove();
 
-    qDebug() << data_dir_ + "Metadata" + QDir::separator() + toml_file_;
-    info_text_ += "\nRemoving '" + data_dir_ + "Metadata" + QDir::separator() + toml_file_ + "'";
-    info_text_box_->setText(info_text_);
-    info_text_box_->update();
+    info_text_ += "\n\nRemoved '" + data_dir_ + "Metadata" + QDir::separator() + toml_file_ + "'";
     QFile(data_dir_ + "Metadata" + QDir::separator() + toml_file_).remove();
 
     const QList<QString> ttb_files_;
 
     for(const std::filesystem::path& ttb_file: meta_data_.ttb_files()){
-        qDebug() << data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string());
-        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
-        info_text_box_->setText(info_text_);
-        info_text_box_->update();
+        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
+
         QFile(data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string())).remove();
     }
 
     for(const std::filesystem::path& doc_file: meta_data_.doc_files()){
-        qDebug() << data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string());
-        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string()) + "'";
-        info_text_box_->setText(info_text_);
-        info_text_box_->update();
+        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string()) + "'";
+
         QFile(data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string())).remove();
     }
 
     for(const std::filesystem::path& ssn_file: meta_data_.ssn_files()){
-        qDebug() << data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string());
-        info_text_ += "\nRemoving '" + data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
-        info_text_box_->setText(info_text_);
-        info_text_box_->update();
+        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
+
         QFile(data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
     }
     installed_.remove(sha);
+    QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
