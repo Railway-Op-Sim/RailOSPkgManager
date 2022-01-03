@@ -18,10 +18,15 @@ jobs:
         repository: Railway-Op-Sim/rostools
         ref: v0.4.0
         path: rostools
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 11
+        platform: x64
     - name: Install ROSTools
       env:
-        CC: gcc-10
-        CXX: g++-10
+        CC: gcc-11
+        CXX: g++-11
       run: |
         cmake -Bbuild
         sudo cmake --build build/ --target install
@@ -30,7 +35,6 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: '5.15.2'
-        arch: 'win64_mingw81'
     - name: Build ROSPackageManager
       env:
         CC: gcc-10
@@ -50,6 +54,16 @@ jobs:
       with:
         submodules: recursive
         path: rospkgmanager
+    - name: Set up Cygwin
+      uses: egor-tensin/setup-cygwin@v3
+      with:
+        platform: x64
+        packages: cmake gcc-g++
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        cygwin: 1
+        platform: x64
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
@@ -63,8 +77,8 @@ jobs:
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     - name: Install ROSTools
       env:
-        CC: gcc-10
-        CXX: g++-10
+        CC: gcc
+        CXX: g++
       run: |
         mkdir install
         cmake -Bbuild
@@ -74,12 +88,12 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: '5.15.2'
-    - name: Build ROSPackageManager   
+    - name: Build ROSPackageManager 
       env:
-        CC: gcc-10
-        CXX: g++-10
+        CC: gcc
+        CXX: g++  
       run: |
-            cmake -Bbuild -G "MinGW Makefiles"
+            cmake -Bbuild
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
