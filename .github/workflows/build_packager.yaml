@@ -30,6 +30,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: '5.15.2'
+        arch: 'win64_mingw81'
     - name: Build ROSPackageManager   
       run: |
             cmake -Bbuild
@@ -72,7 +73,7 @@ jobs:
         version: '5.15.2'
     - name: Build ROSPackageManager   
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
