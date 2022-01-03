@@ -16,10 +16,11 @@ set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
 
 # ------------------------- AbZip ---------------------------- #
 file( GLOB_RECURSE ABZIP_SRCS ${EXTERNAL_SOURCES}/AbZip/*.cpp )
+file( GLOB_RECURSE ABZIP_HEADERS ${EXTERNAL_SOURCES}/AbZip/*.h )
 find_package( ZLIB REQUIRED )
 set( ABZIP abzip )
 set( ABZIP_INCLUDE_DIR ${EXTERNAL_SOURCES}/AbZip )
-add_library( ${ABZIP} ${ABZIP_SRCS} )
+add_library( ${ABZIP} ${ABZIP_SRCS} ${ABZIP_HEADERS} )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR} )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Compressors )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Encryption )
