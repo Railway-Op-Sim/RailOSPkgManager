@@ -65,7 +65,6 @@ jobs:
         platform: x64
         cygwin: 1
         cc: 1
-
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
