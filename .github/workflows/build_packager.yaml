@@ -32,3 +32,41 @@ jobs:
             cmake -Bbuild
             cmake --build build
       working-directory: rospkgmanager
+    - uses: actions/upload-artifact@v1
+      with:
+          name: unix_rospkg
+          path: build/ROSPkgManager
+  build-test-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        path: rospkgmanager
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.9
+      with:
+        cmake-version: '3.20.x'
+    - uses: actions/checkout@v2
+      with:
+        repository: Railway-Op-Sim/rostools
+        ref: v0.4.0
+        path: rostools
+    - name: Install ROSTools
+      run: |
+        cmake -Bbuild
+        sudo cmake --build build/ --target install
+      working-directory: rostools/cpp
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with: 
+        version: '5.15.2'
+    - name: Build ROSPackageManager   
+      run: |
+            cmake -Bbuild
+            cmake --build build
+      working-directory: rospkgmanager
+    - uses: actions/upload-artifact@v1
+      with:
+          name: win_rospkg
+          path: build/ROSPkgManager.exe
