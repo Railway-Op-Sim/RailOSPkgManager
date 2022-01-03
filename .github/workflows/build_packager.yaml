@@ -59,11 +59,13 @@ jobs:
       with:
         platform: x64
         packages: cmake gcc-g++
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
+    - name: Set up MinGW
+      uses: egor-tensin/setup-mingw@v2
       with:
-        cygwin: 1
         platform: x64
+        cygwin: 1
+        cc: 1
+
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
