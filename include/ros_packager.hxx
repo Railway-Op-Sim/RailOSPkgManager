@@ -12,6 +12,8 @@
 #include <QStandardPaths>
 #include <QList>
 
+#include "AbZip/AbZip.h"
+
 namespace ROSPkg {
     class Packager {
         private:
@@ -49,7 +51,7 @@ namespace ROSPkg {
             void setDisplayName(const QString& display_name) {display_name_ = display_name;}
             QString buildTOML();
             void packageFailure();
-            void createPackage(const QString& package_name);
+            QString createPackage();
     };
 };
 

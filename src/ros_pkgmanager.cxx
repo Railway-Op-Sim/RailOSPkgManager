@@ -17,6 +17,16 @@ void ROSPkg::Manager::buildPackageForm_() {
     year_box_label_->setText("Year");
     year_box_->setValue(2022);
 
+    country_code_ = new QComboBox(subwindow_);
+
+    for(std::map<std::string, std::string>::const_iterator it = ROSTools::COUNTRY_CODES.begin(); it != ROSTools::COUNTRY_CODES.end(); it++) {
+        country_code_->addItem(QString::fromStdString(it->first));
+    }
+    country_code_->setCurrentText("GB");
+
+    country_code_label_= new QLabel(subwindow_);
+    country_code_label_->setText("Country Code");
+
     buttons_["confirm_create"] = new QPushButton(QPushButton::tr("Ok"), subwindow_);
     buttons_["confirm_cancel"] = new QPushButton(QPushButton::tr("Cancel"), subwindow_);
     buttons_["browse_rly"] = new QPushButton(QPushButton::tr("..."), subwindow_);
@@ -31,7 +41,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     connect(buttons_["browse_ssn"], &QPushButton::clicked, this, &Manager::on_BrowseSSNFilesClicked);
     connect(buttons_["browse_doc"], &QPushButton::clicked, this, &Manager::on_BrowseDocFilesClicked);
 
-    subwindow_->setGeometry(window_x_, window_y_, 700, 500);
+    subwindow_->setGeometry(window_x_, window_y_, 700, 600);
     subwindow_->setWindowTitle("Create Package");
     subwindow_->hide();
 
@@ -40,13 +50,14 @@ void ROSPkg::Manager::buildPackageForm_() {
 
     const QMap<QString, QString> entries_ = {
         {"package_name", "Name of package"},
+        {"version", "Semantic version (x.y.z)"},
         {"author", "Author"},
         {"description", "Description"},
         {"display_name", "Display name/Title"},
         {"contributors", "Contributors"},
         {"rly_file_path", "Railway file (*.rly)"},
         {"ttb_file_paths", "Timetable files (*.ttb)"},
-        {"ssn_file_paths", "Session giles (*.ssn)"},
+        {"ssn_file_paths", "Session files (*.ssn)"},
         {"doc_file_paths", "Manual files (*.pdf,*.md)"}
     };
 
@@ -59,130 +70,152 @@ void ROSPkg::Manager::buildPackageForm_() {
 
     package_form_labels_["package_name"]->move(
         subwindow_->width()/11,
-        subwindow_->height()/(package_form_entry_.size()+5)
+        subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["package_name"]->move(
         subwindow_->width()/3,
-        subwindow_->height()/(package_form_entry_.size()+5)
+        subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["display_name"]->move(
         subwindow_->width()/11,
-        2*subwindow_->height()/(package_form_entry_.size()+5)
+        2*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["display_name"]->move(
         subwindow_->width()/3,
-        2*subwindow_->height()/(package_form_entry_.size()+5)
+        2*subwindow_->height()/(package_form_entry_.size()+7)
+    );
+
+    package_form_labels_["version"]->move(
+        subwindow_->width()/11,
+        3*subwindow_->height()/(package_form_entry_.size()+7)
+    );
+
+    package_form_entry_["version"]->setText("1.0.0");
+    package_form_entry_["version"]->move(
+        subwindow_->width()/3,
+        3*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["description"]->move(
         subwindow_->width()/11,
-        3*subwindow_->height()/(package_form_entry_.size()+5)
+        4*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["description"]->move(
         subwindow_->width()/3,
-        3*subwindow_->height()/(package_form_entry_.size()+5)
+        4*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["author"]->move(
         subwindow_->width()/11,
-        4*subwindow_->height()/(package_form_entry_.size()+5)
+        5*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["author"]->move(
         subwindow_->width()/3,
-        4*subwindow_->height()/(package_form_entry_.size()+5)
+        5*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["contributors"]->move(
         subwindow_->width()/11,
-        5*subwindow_->height()/(package_form_entry_.size()+5)
+        6*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["contributors"]->move(
         subwindow_->width()/3,
-        5*subwindow_->height()/(package_form_entry_.size()+5)
+        6*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["rly_file_path"]->move(
         subwindow_->width()/11,
-        6*subwindow_->height()/(package_form_entry_.size()+5)
+        7*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["rly_file_path"]->move(
         subwindow_->width()/3,
-        6*subwindow_->height()/(package_form_entry_.size()+5)
+        7*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["ttb_file_paths"]->move(
         subwindow_->width()/11,
-        7*subwindow_->height()/(package_form_entry_.size()+5)
+        8*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["ttb_file_paths"]->move(
         subwindow_->width()/3,
-        7*subwindow_->height()/(package_form_entry_.size()+5)
+        8*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["ssn_file_paths"]->move(
         subwindow_->width()/11,
-        8*subwindow_->height()/(package_form_entry_.size()+5)
+        9*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["ssn_file_paths"]->move(
         subwindow_->width()/3,
-        8*subwindow_->height()/(package_form_entry_.size()+5)
+        9*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["doc_file_paths"]->move(
         subwindow_->width()/11,
-        9*subwindow_->height()/(package_form_entry_.size()+5)
+        10*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["doc_file_paths"]->move(
         subwindow_->width()/3,
-        9*subwindow_->height()/(package_form_entry_.size()+5)
+        10*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_rly"]->move(
         9*subwindow_->width()/11,
-        6*subwindow_->height()/(package_form_entry_.size()+5)
+        7*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_ttb"]->move(
         9*subwindow_->width()/11,
-        7*subwindow_->height()/(package_form_entry_.size()+5)
+        8*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_ssn"]->move(
         9*subwindow_->width()/11,
-        8*subwindow_->height()/(package_form_entry_.size()+5)
+        9*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_doc"]->move(
         9*subwindow_->width()/11,
-        9*subwindow_->height()/(package_form_entry_.size()+5)
+        10*subwindow_->height()/(package_form_entry_.size()+7)
+    );
+
+    country_code_->move(
+        subwindow_->width()/3,
+        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+7)
+    );
+
+    country_code_label_->move(
+        subwindow_->width()/11,
+        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     factual_box_->move(
         subwindow_->width()/3,
-        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+5)
+        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+7)
     );
     factual_box_label_->move(
         subwindow_->width()/11,
-        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+5)
+        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+7)
     );
+
     year_box_->move(
         subwindow_->width()/3,
-        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+5)
+        (package_form_entry_.size()+3)*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     year_box_label_->move(
         subwindow_->width()/11,
-        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+5)
+        (package_form_entry_.size()+3)*subwindow_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["package_name"]->setMaxLength(100);
@@ -299,7 +332,53 @@ void ROSPkg::Manager::on_CreateCancelClicked() {
 }
 
 void ROSPkg::Manager::on_CreateConfirmClicked() {
+    QMap<QString,QString> data_;
+    try {
+        data_ = checkPackageForm_();
+    }
+    catch(std::runtime_error& e) {
+        return;
+    }
+    ROSPkg::Packager* package_ = new ROSPkg::Packager(this, system_->getROSLocation(), data_["package_name"]);
+    package_->setAuthor(data_["author"]);
+    package_->setCountryCode(data_["country_code"]);
+    package_->setDisplayName(data_["display_name"]);
+    package_->setFactual(data_["factual"] == "true");
+    package_->setYear(data_["year"].toInt());
+    package_->setVersion(data_["version"]);
+    package_->setDescription(data_["description"]);
+    package_->setRLYFile(data_["rly_file_path"]);
 
+    QList<QString> ttb_files_ = data_["ttb_file_paths"].split(",");
+    QList<QString> doc_files_ = data_["doc_file_paths"].split(",");
+
+    if(!data_["ssn_files_paths"].isEmpty()) {
+        QList<QString> ssn_files_ = data_["ssn_file_paths"].split(",");
+        for(const QString& ssn_file : ssn_files_) {
+            package_->addSSNFile(ssn_file);
+        }
+    }
+
+    if(!data_["contributors"].isEmpty()) {
+        QList<QString> contribs_ = data_["contributors"].split(",");
+        for(const QString& contrib : contribs_) {
+            package_->addContributor(contrib);
+        }
+    }
+
+    for(const QString& ttb_file : ttb_files_) {
+        package_->addTTBFile(ttb_file);
+    }
+
+    for(const QString& doc_file : doc_files_) {
+        package_->addDocFile(doc_file);
+    }
+
+    package_->createPackage();
+    subwindow_->close();
+    clearPackageForm_();
+    system_->populateInstalled();
+    populateTable_();
 }
 
 void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
@@ -353,4 +432,31 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
     }
     package_form_entry_["doc_file_paths"]->setText(doc_file_path_);
     package_form_entry_["doc_file_paths"]->update();
+}
+
+QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
+    QMap<QString,QString> data_;
+    for(const auto& e : package_form_entry_.toStdMap()) {
+        // Session files are not mandatory
+        if(e.first == "ssn_files") continue;
+
+        // Contributor list not mandatory
+        if(e.first == "contributors") continue;
+
+        if(e.second->text().isEmpty()) {
+            QMessageBox::critical(
+                this,
+                QMessageBox::tr("Incomplete Package"),
+                QMessageBox::tr("Package is missing required information"));
+            throw std::runtime_error("");
+        }
+    }
+    for(const auto& le : package_form_entry_.toStdMap()) {
+        data_[le.first] = le.second->text();
+    }
+    data_["factual"] = (factual_box_->isChecked()) ? "true" : "false";
+    data_["year"] = QString::number(year_box_->value());
+    data_["country_code"] = country_code_->currentText();
+
+    return data_;
 }

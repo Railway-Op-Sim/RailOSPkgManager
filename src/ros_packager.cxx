@@ -7,12 +7,13 @@ void ROSPkg::Packager::packageFailure() {
 QString ROSPkg::Packager::buildTOML() {
     QString file_name_ = QString(package_name_);
     file_name_.replace(" ", "_");
-    const QString toml_file_ = ros_loc_ + QDir::separator() + "Metadata" + QDir::separator() + file_name_ + ".toml";
+    toml_file_ = ros_loc_ + QDir::separator() + "Metadata" + QDir::separator() + file_name_ + ".toml";
 
     if(version_.isEmpty()) {
         const QDate now_ = QDate::currentDate();
         version_ = now_.toString(Qt::ISODate);
     }
+
     // Builds a TOML file manually using strings
     QFile file_(toml_file_);
     if(file_.open(QIODevice::WriteOnly)) {
@@ -22,8 +23,7 @@ QString ROSPkg::Packager::buildTOML() {
         if(!display_name_.isEmpty()) stream_ << "display_name = \"" << display_name_ << "\"" << Qt::endl;
         if(rly_file_.isEmpty()) {packageFailure(); return "";}
         if(ttb_files_.empty()) {packageFailure(); return "";}
-        stream_ << "display_name = \"" << display_name_ << "\"" << Qt::endl;
-        stream_ << "rly_file = \"" << rly_file_ << "\"" << Qt::endl;
+        stream_ << "rly_file = \"" << QFileInfo(rly_file_).fileName() << "\"" << Qt::endl;
         stream_ << "ttb_files = [";
         for(const QString& ttb_file : ttb_files_) {
             stream_ << "\"" << QFileInfo(ttb_file).fileName() << "\",";
@@ -57,4 +57,66 @@ QString ROSPkg::Packager::buildTOML() {
     }
 
     return toml_file_;
+}
+
+QString ROSPkg::Packager::createPackage() {
+    buildTOML();
+    const QString build_dir_ = ros_loc_ + QDir::separator() + "Packages";
+    if(!QDir(build_dir_).exists()) {
+        QDir().mkdir(build_dir_);
+    }
+    QString package_file_name_ = package_name_;
+    QString package_name_version_ = version_;
+    version_.replace(".", "_");
+    package_file_name_ += version_;
+    package_file_name_.replace(" ", "_");
+
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_);
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Railway");
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Program_Timetables");
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Sessions");
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Documentation");
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Images");
+    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Metadata");
+
+    QFile(rly_file_).copy(
+        build_dir_ + QDir::separator() + package_file_name_ +
+        QDir::separator() + "Railway" + QDir::separator() + QFileInfo(rly_file_).fileName()
+    );
+
+    QFile(toml_file_).copy(
+        build_dir_ + QDir::separator() + package_file_name_ +
+        QDir::separator() + "Metadata" + QDir::separator() + QFileInfo(toml_file_).fileName()
+    );
+
+    for(const QString& ttb_file : ttb_files_) {
+        QFile(ttb_file).copy(
+            build_dir_ + QDir::separator() + package_file_name_ +
+            QDir::separator() + "Program_Timetables" + QDir::separator() + QFileInfo(ttb_file).fileName()
+        );
+    }
+
+    for(const QString& ssn_file : ssn_files_) {
+        QFile(ssn_file).copy(
+            build_dir_ + QDir::separator() + package_file_name_ +
+            QDir::separator() + "Sessions" + QDir::separator() + QFileInfo(ssn_file).fileName()
+        );
+    }
+
+    for(const QString& doc_file : doc_files_) {
+        QFile(doc_file).copy(
+            build_dir_ + QDir::separator() + package_file_name_ +
+            QDir::separator() + "Documentation" + QDir::separator() + QFileInfo(doc_file).fileName()
+        );
+    }
+
+    AbZip zip(build_dir_ + QDir::separator() + package_file_name_+".zip");
+
+    zip.addDirectory(build_dir_ + QDir::separator() + package_file_name_, AbZip::Recursive);
+
+    zip.close();
+
+    QDir(build_dir_ + QDir::separator() + package_file_name_).removeRecursively();
+
+    return build_dir_ + QDir::separator() + package_file_name_+".zip";
 }

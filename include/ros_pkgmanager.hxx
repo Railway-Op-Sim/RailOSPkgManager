@@ -11,11 +11,13 @@
 #include <QCheckBox>
 #include <QtCore>
 #include <QLabel>
+#include <QComboBox>
 #include <QMap>
 #include <QLabel>
 #include <QPushButton>
 
 #include "ros_system.hxx"
+#include "rostools/country_codes.hxx"
 
 namespace ROSPkg {
     class Manager : public QWidget
@@ -36,7 +38,9 @@ namespace ROSPkg {
         QSpinBox* year_box_;
         QCheckBox* factual_box_;
         QLabel* factual_box_label_;
+        QComboBox* country_code_;
         QLabel* year_box_label_;
+        QLabel* country_code_label_;
         QMap<QString, QLineEdit*> package_form_entry_;
         QMap<QString, QLabel*> package_form_labels_;
         QMap<QString, QPushButton*> buttons_ = {
@@ -49,6 +53,7 @@ namespace ROSPkg {
         void populateTable_();
         void buildPackageForm_();
         void clearPackageForm_();
+        QMap<QString,QString> checkPackageForm_();
     private slots:
         void on_InstallButtonClicked();
         void on_UninstallButtonClicked();
