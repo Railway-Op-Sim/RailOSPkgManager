@@ -31,7 +31,10 @@ jobs:
       with: 
         version: '5.15.2'
         arch: 'win64_mingw81'
-    - name: Build ROSPackageManager   
+    - name: Build ROSPackageManager
+      env:
+        CC: gcc-10
+        CXX: g++-10 
       run: |
             cmake -Bbuild
             cmake --build build
@@ -72,6 +75,9 @@ jobs:
       with: 
         version: '5.15.2'
     - name: Build ROSPackageManager   
+      env:
+        CC: gcc-10
+        CXX: g++-10
       run: |
             cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
