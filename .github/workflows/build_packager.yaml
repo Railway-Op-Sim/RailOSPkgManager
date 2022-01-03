@@ -100,7 +100,7 @@ jobs:
         version: '5.15.2'
     - name: Build ROSPackageManager   
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
