@@ -10,6 +10,7 @@ void ROSPkg::System::createCache_() {
         QFileDialog::tr("Locate") + QString(" Railway Operation Simulator"),
         QString(QStandardPaths::HomeLocation), QFileDialog::tr("ROS Exe (railway.exe)")
     );
+    if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
     QFile file_(cache_file_);
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
