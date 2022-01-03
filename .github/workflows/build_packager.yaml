@@ -19,6 +19,9 @@ jobs:
         ref: v0.4.0
         path: rostools
     - name: Install ROSTools
+      env:
+        CC: gcc-10
+        CXX: g++-10
       run: |
         cmake -Bbuild
         sudo cmake --build build/ --target install
@@ -43,10 +46,6 @@ jobs:
       with:
         submodules: recursive
         path: rospkgmanager
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v2
-      with:
-        platform: x64
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
@@ -59,6 +58,9 @@ jobs:
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     - name: Install ROSTools
+      env:
+        CC: gcc-10
+        CXX: g++-10
       run: |
         mkdir install
         cmake -Bbuild
