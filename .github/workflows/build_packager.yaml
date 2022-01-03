@@ -35,10 +35,11 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: '5.15.2'
+        setup-python: false
     - name: Build ROSPackageManager
       env:
-        CC: gcc-10
-        CXX: g++-10 
+        CC: gcc-11
+        CXX: g++-11 
       run: |
             cmake -Bbuild
             cmake --build build
@@ -54,6 +55,13 @@ jobs:
       with:
         submodules: recursive
         path: rospkgmanager
+    - uses: actions/checkout@v2
+      with:
+        repository: Railway-Op-Sim/rostools
+        ref: v0.4.0
+        path: rostools
+    - name: Install ZLIB
+      run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     - name: Set up Cygwin
       uses: egor-tensin/setup-cygwin@v3
       with:
@@ -65,21 +73,7 @@ jobs:
         platform: x64
         cygwin: 1
         cc: 1
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
-      with:
-        cmake-version: '3.20.x'
-    - uses: actions/checkout@v2
-      with:
-        repository: Railway-Op-Sim/rostools
-        ref: v0.4.0
-        path: rostools
-    - name: Install ZLIB
-      run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     - name: Install ROSTools
-      env:
-        CC: gcc
-        CXX: g++
       run: |
         mkdir install
         cmake -Bbuild
@@ -89,10 +83,8 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with: 
         version: '5.15.2'
+        setup-python: false
     - name: Build ROSPackageManager 
-      env:
-        CC: gcc
-        CXX: g++  
       run: |
             cmake -Bbuild
             cmake --build build
