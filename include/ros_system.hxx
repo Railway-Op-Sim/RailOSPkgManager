@@ -51,6 +51,7 @@ namespace ROSPkg {
             void unzipFile(const QString& file_name) const;
             void populateInstalled();
             void uninstall(const QString& sha);
+            QString getROSLocation() const {return ros_loc_;}
     };
 }; 
 

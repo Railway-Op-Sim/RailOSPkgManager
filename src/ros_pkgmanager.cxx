@@ -1,7 +1,202 @@
 #include "ros_pkgmanager.hxx"
 
+void ROSPkg::Manager::buildPackageForm_() {
+
+    const int window_x_ = this->geometry().x()+this->width()/4;
+    const int window_y_ = this->geometry().y()+this->height()/4;
+
+    factual_box_ = new QCheckBox(subwindow_);
+    factual_box_label_ = new QLabel(subwindow_);
+    factual_box_label_->setText("Factual");
+
+    year_box_ = new QSpinBox(subwindow_);
+    year_box_->clear();
+    year_box_->setMinimum(1800);
+    year_box_->setMaximum(2200);
+    year_box_label_ = new QLabel(subwindow_);
+    year_box_label_->setText("Year");
+    year_box_->setValue(2022);
+
+    buttons_["confirm_create"] = new QPushButton(QPushButton::tr("Ok"), subwindow_);
+    buttons_["confirm_cancel"] = new QPushButton(QPushButton::tr("Cancel"), subwindow_);
+    buttons_["browse_rly"] = new QPushButton(QPushButton::tr("..."), subwindow_);
+    buttons_["browse_ttb"] = new QPushButton(QPushButton::tr("..."), subwindow_);
+    buttons_["browse_ssn"] = new QPushButton(QPushButton::tr("..."), subwindow_);
+    buttons_["browse_doc"] = new QPushButton(QPushButton::tr("..."), subwindow_);
+
+    connect(buttons_["confirm_cancel"], &QPushButton::clicked, this, &Manager::on_CreateCancelClicked);
+    connect(buttons_["confirm_create"], &QPushButton::clicked, this, &Manager::on_CreateConfirmClicked);
+    connect(buttons_["browse_rly"], &QPushButton::clicked, this, &Manager::on_BrowseRlyFilesClicked);
+    connect(buttons_["browse_ttb"], &QPushButton::clicked, this, &Manager::on_BrowseTTBFilesClicked);
+    connect(buttons_["browse_ssn"], &QPushButton::clicked, this, &Manager::on_BrowseSSNFilesClicked);
+    connect(buttons_["browse_doc"], &QPushButton::clicked, this, &Manager::on_BrowseDocFilesClicked);
+
+    subwindow_->setGeometry(window_x_, window_y_, 700, 500);
+    subwindow_->setWindowTitle("Create Package");
+    subwindow_->hide();
+
+    buttons_["confirm_create"]->move(subwindow_->width()/2-120, subwindow_->height()-40);
+    buttons_["confirm_cancel"]->move(subwindow_->width()/2+30, subwindow_->height()-40);
+
+    const QMap<QString, QString> entries_ = {
+        {"package_name", "Name of package"},
+        {"author", "Author"},
+        {"description", "Description"},
+        {"display_name", "Display name/Title"},
+        {"contributors", "Contributors"},
+        {"rly_file_path", "Railway file (*.rly)"},
+        {"ttb_file_paths", "Timetable files (*.ttb)"},
+        {"ssn_file_paths", "Session giles (*.ssn)"},
+        {"doc_file_paths", "Manual files (*.pdf,*.md)"}
+    };
+
+    for(const auto& entry : entries_.toStdMap()) {
+        package_form_entry_[entry.first] = new QLineEdit(subwindow_);
+        package_form_entry_[entry.first]->setFixedSize(300, package_form_entry_[entry.first]->height());
+        package_form_labels_[entry.first] = new QLabel(subwindow_);
+        package_form_labels_[entry.first]->setText(entry.second);
+    }
+
+    package_form_labels_["package_name"]->move(
+        subwindow_->width()/11,
+        subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["package_name"]->move(
+        subwindow_->width()/3,
+        subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["display_name"]->move(
+        subwindow_->width()/11,
+        2*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["display_name"]->move(
+        subwindow_->width()/3,
+        2*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["description"]->move(
+        subwindow_->width()/11,
+        3*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["description"]->move(
+        subwindow_->width()/3,
+        3*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["author"]->move(
+        subwindow_->width()/11,
+        4*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["author"]->move(
+        subwindow_->width()/3,
+        4*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["contributors"]->move(
+        subwindow_->width()/11,
+        5*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["contributors"]->move(
+        subwindow_->width()/3,
+        5*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["rly_file_path"]->move(
+        subwindow_->width()/11,
+        6*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["rly_file_path"]->move(
+        subwindow_->width()/3,
+        6*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["ttb_file_paths"]->move(
+        subwindow_->width()/11,
+        7*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["ttb_file_paths"]->move(
+        subwindow_->width()/3,
+        7*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["ssn_file_paths"]->move(
+        subwindow_->width()/11,
+        8*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["ssn_file_paths"]->move(
+        subwindow_->width()/3,
+        8*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_labels_["doc_file_paths"]->move(
+        subwindow_->width()/11,
+        9*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["doc_file_paths"]->move(
+        subwindow_->width()/3,
+        9*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    buttons_["browse_rly"]->move(
+        9*subwindow_->width()/11,
+        6*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    buttons_["browse_ttb"]->move(
+        9*subwindow_->width()/11,
+        7*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    buttons_["browse_ssn"]->move(
+        9*subwindow_->width()/11,
+        8*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    buttons_["browse_doc"]->move(
+        9*subwindow_->width()/11,
+        9*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    factual_box_->move(
+        subwindow_->width()/3,
+        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+    factual_box_label_->move(
+        subwindow_->width()/11,
+        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+    year_box_->move(
+        subwindow_->width()/3,
+        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    year_box_label_->move(
+        subwindow_->width()/11,
+        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+5)
+    );
+
+    package_form_entry_["package_name"]->setMaxLength(100);
+}
+
+void ROSPkg::Manager::clearPackageForm_() {
+    for(const auto& entry : package_form_entry_) {
+        entry->clear();
+    }
+}
+
 ROSPkg::Manager::Manager()
-{    
+{ 
+
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     this->setWindowTitle("Railway Operation Simulator Package Manager");
@@ -30,19 +225,21 @@ ROSPkg::Manager::Manager()
 
     // Arrange buttons
     buttons_["install"]->setGeometry(table_x_, WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
-    buttons_["create"]->setGeometry(table_x_ + (TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
-    buttons_["create"]->setVisible(false);
-    buttons_["create"]->setEnabled(false);
-    buttons_["uninstall"]->setGeometry(table_x_ + 2*(TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
 
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
+    connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
 
     installed_->update();
     populateTable_();
     installed_->show();
     info_str_->update();
     info_str_->show();
+
+    buildPackageForm_();
+
 }
 
 void ROSPkg::Manager::populateTable_() {
@@ -90,4 +287,70 @@ void ROSPkg::Manager::on_UninstallButtonClicked() {
     system_->uninstall(sha_);
     system_->populateInstalled();
     populateTable_();
+}
+
+void ROSPkg::Manager::on_CreateButtonClicked() {
+    subwindow_->show();
+}
+
+void ROSPkg::Manager::on_CreateCancelClicked() {
+    clearPackageForm_();
+    subwindow_->hide();
+}
+
+void ROSPkg::Manager::on_CreateConfirmClicked() {
+
+}
+
+void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
+    const QString rly_file_ = QFileDialog::getOpenFileName(
+        this,
+        QFileDialog::tr("Find Railway File"),
+        QString(system_->getROSLocation() + QDir::separator() + "Railways"), QFileDialog::tr("Railway Files (*.rly)")
+    );
+    if(rly_file_.isEmpty() || rly_file_.isNull()) return;
+    package_form_entry_["rly_file_path"]->setText(rly_file_);
+    package_form_entry_["rly_file_path"]->update();
+}
+
+void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
+    QString ssn_file_path_ = QFileDialog::getOpenFileName(
+        this,
+        QFileDialog::tr("Find Session File"),
+        QString(system_->getROSLocation() + QDir::separator() + "Sessions"), QFileDialog::tr("Session Files (*.ssn)")
+    );
+    if(ssn_file_path_.isEmpty() || ssn_file_path_.isNull()) return;
+    if(!package_form_entry_["ssn_file_paths"]->text().isEmpty()) {
+        ssn_file_path_ = package_form_entry_["ttb_file_paths"]->text() + "," + ssn_file_path_;
+    }
+    package_form_entry_["ssn_file_paths"]->setText(ssn_file_path_);
+    package_form_entry_["ssn_file_paths"]->update();
+}
+
+void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
+    QString ttb_file_path_ = QFileDialog::getOpenFileName(
+        this,
+        QFileDialog::tr("Find Timetable File"),
+        QString(system_->getROSLocation() + QDir::separator() + "Program timetables"), QFileDialog::tr("Timetable Files (*.ttb)")
+    );
+    if(ttb_file_path_.isEmpty() || ttb_file_path_.isNull()) return;
+    if(!package_form_entry_["ttb_file_paths"]->text().isEmpty()) {
+        ttb_file_path_ = package_form_entry_["ttb_file_paths"]->text() + "," + ttb_file_path_;
+    }
+    package_form_entry_["ttb_file_paths"]->setText(ttb_file_path_);
+    package_form_entry_["ttb_file_paths"]->update();
+}
+
+void ROSPkg::Manager::on_BrowseDocFilesClicked() {
+    QString doc_file_path_ = QFileDialog::getOpenFileName(
+        this,
+        QFileDialog::tr("Find Documentation File"),
+        QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf, *.md)")
+    );
+    if(doc_file_path_.isEmpty() || doc_file_path_.isNull()) return;
+    if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
+        doc_file_path_ = package_form_entry_["doc_file_paths"]->text() + "," + doc_file_path_;
+    }
+    package_form_entry_["doc_file_paths"]->setText(doc_file_path_);
+    package_form_entry_["doc_file_paths"]->update();
 }

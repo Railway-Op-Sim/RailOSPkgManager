@@ -290,3 +290,11 @@ void ROSPkg::System::uninstall(const QString& sha) {
     installed_.remove(sha);
     QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
+
+void ROSPkg::Packager::createPackage(const QString& package_name) {
+    QString package_dir_name_ = package_name;
+    package_dir_name_.replace(" ", "_");
+    const QString out_dir_ = QString(QStandardPaths::CacheLocation) + QDir::separator() + package_dir_name_;
+
+    QDir().mkdir(out_dir_);
+}
