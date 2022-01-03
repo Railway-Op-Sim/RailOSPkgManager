@@ -23,15 +23,8 @@ add_library( ${ABZIP} ${ABZIP_SRCS} )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR} )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Compressors )
 target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Encryption )
-target_link_libraries( ${ABZIP} PUBLIC ${ZLIB_LIBRARIES} )
+target_link_libraries( ${ABZIP} PRIVATE ${ZLIB_LIBRARIES} )
 target_link_libraries( ${ABZIP} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
-
-# AbZip assumes QtZlib/zlib.h exists when it does not so have to dummy it
-add_custom_target( MOCK_QTLZIB 
-    COMMAND ${CMAKE_COMMAND} -E copy ${ZLIB_INCLUDE_DIRS}/zlib.h ${CMAKE_BINARY_DIR}/QtZlib/zlib.h
-)
-target_include_directories( ${ABZIP} PUBLIC ${CMAKE_BINARY_DIR}/zlib )
-add_dependencies( ${ABZIP} MOCK_QTLZIB )
 
 # ------------------------------------------------------------ #
 
@@ -42,7 +35,6 @@ file( GLOB TS_FILES ${CMAKE_SOURCE_DIR}/lang/*.ts )
 file( GLOB HEADERS ${CMAKE_SOURCE_DIR}/include/*.hxx )
 
 set( DIGESTPP digestpp )
-set( LIBZIP libzip )
 
 set( ROSTOOLS rostools )
 find_package( ${ROSTOOLS} 0.4.0 REQUIRED )
