@@ -16,7 +16,7 @@ jobs:
       run: |
         cmake -Bbuild
         sudo cmake --build build/ --target install
-      working-directory: rostools
+      working-directory: rostools/cpp
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with: 
