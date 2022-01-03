@@ -1,4 +1,4 @@
-name: Build & Test Linux
+name: Build & Test
 
 on: [push]
 jobs:
@@ -52,6 +52,8 @@ jobs:
         repository: Railway-Op-Sim/rostools
         ref: v0.4.0
         path: rostools
+    - name: Install ZLIB
+      run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     - name: Install ROSTools
       run: |
         mkdir install
