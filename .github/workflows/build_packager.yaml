@@ -35,7 +35,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
           name: unix_rospkg
-          path: build/ROSPkgManager
+          path: rospkgmanager/build/ROSPkgManager
   build-test-windows:
     runs-on: windows-latest
     steps:
@@ -55,7 +55,7 @@ jobs:
     - name: Install ROSTools
       run: |
         mkdir install
-        cmake -Bbuild -DCMAKE_INSTALL_PREFIX=install
+        cmake -Bbuild
         cmake --build build/ --target install
       working-directory: rostools/cpp
     - name: Install Qt
@@ -64,10 +64,10 @@ jobs:
         version: '5.15.2'
     - name: Build ROSPackageManager   
       run: |
-            cmake -Bbuild -DROSTOOLS_DIR=../rostools/cpp/install
+            cmake -Bbuild
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
       with:
           name: win_rospkg
-          path: build/ROSPkgManager.exe
+          path: rospkgmanager/build/ROSPkgManager.exe
