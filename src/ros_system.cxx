@@ -8,7 +8,7 @@ void ROSPkg::System::createCache_() {
     ros_loc_ = QFileDialog::getOpenFileName(
         parent_,
         QFileDialog::tr("Locate") + QString(" Railway Operation Simulator"),
-        QString(QStandardPaths::HomeLocation), QFileDialog::tr("ROS Exe (railway.exe)")
+        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
     );
     if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
     QFile file_(cache_file_);
@@ -98,11 +98,9 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
 
 void ROSPkg::System::unzipFile(const QString& file_name) const {
     QString info_text_ = "";
-    AbZip zip_(file_name);
     QTemporaryDir temp_dir_;
-    if(!zip_.extractAll(temp_dir_.path())) {
-        qDebug() << zip_.errorCount() << "errors occurred:" << zip_.errorString();
-    }
+    QDir().mkdir(temp_dir_.path());
+    elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
 
     // File path filters
     QList<QString> filter_ssn_{"*.ssn", "*.SSN"};
@@ -152,7 +150,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
                 QMessageBox::tr("Package definition ambiguous"),
                 QMessageBox::tr("Expected single RLY file from archive.")
             );
-            zip_.close();
+            
             return;
         }
         if(files_ttb_.empty()) {
@@ -161,7 +159,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
                 QMessageBox::tr("Missing timetables"),
                 QMessageBox::tr("Expected one or more TTB files within archive.")
             );
-            zip_.close();
+            
             return;
         }
         for(const QString& ttb_file : files_ttb_) packager_.addTTBFile(ttb_file);
@@ -179,7 +177,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
                 QMessageBox::tr("TOML creation failure"),
                 QMessageBox::tr("TOML creation for non-project archive failed.")
             );
-            zip_.close();
+            
             return;
         }
         files_toml_.push_back(new_toml_);
@@ -190,7 +188,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
             QMessageBox::tr("Package Definition Ambiguous"),
             QMessageBox::tr("Expected single metadata (TOML) file in package, but multiple candidates found.")
         );
-        zip_.close();
+        
         return;
     }
 
@@ -236,7 +234,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
             QMessageBox::tr("Missing Package Metadata"),
             QMessageBox::tr("Cannot install selected package, missing package metadata.")
         );
-        zip_.close();
+        
         return;
     }
     if(!files_docs_.empty()) {
@@ -252,7 +250,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         info_text_ += "\n\nAdded " + new_path_;
         QFile(doc_file).copy(new_path_);
     }
-    zip_.close();
+    
     QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
