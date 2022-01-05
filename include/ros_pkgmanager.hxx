@@ -50,7 +50,7 @@ class Manager : public QWidget
 
 private:
     const int WINDOW_WIDTH = 600;
-    const int WINDOW_HEIGHT = 480;
+    const int WINDOW_HEIGHT = 500;
     const int TABLE_WIDTH = 510;
     const int TABLE_HEIGHT = 330;
     const int TABLE_NCOLS = 4;
@@ -61,8 +61,10 @@ private:
     QWidget* subwindow_ = new QWidget(this, Qt::Tool);
     QSpinBox* year_box_;
     QCheckBox* factual_box_;
+    QCheckBox* advanced_ = new QCheckBox(this);
     QLabel* factual_box_label_;
     QComboBox* country_code_;
+    QLabel* advanced_str_ = new QLabel(this);
     QLabel* year_box_label_;
     QLabel* country_code_label_;
     QMap<QString, QLineEdit*> package_form_entry_;
@@ -71,6 +73,7 @@ private:
         {"install", new QPushButton(QPushButton::tr("Install Package"), this)},
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
+        {"github", new QPushButton(QPushButton::tr("GitHub"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);
@@ -141,6 +144,8 @@ private slots:
  * @brief Action associated with the "Create Package/Docs Browse" button
  * **************************************************************************/
     void on_BrowseDocFilesClicked();
+
+    void on_CheckBoxClicked();
 public:
 /*! **************************************************************************
  * @brief Initialise an instance of the application GUI definition

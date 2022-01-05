@@ -41,7 +41,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     connect(buttons_["browse_ssn"], &QPushButton::clicked, this, &Manager::on_BrowseSSNFilesClicked);
     connect(buttons_["browse_doc"], &QPushButton::clicked, this, &Manager::on_BrowseDocFilesClicked);
 
-    subwindow_->setGeometry(window_x_, window_y_, 700, 600);
+    subwindow_->setGeometry(window_x_, window_y_, 700, 700);
     subwindow_->setWindowTitle("Create Package");
     subwindow_->hide();
 
@@ -236,7 +236,7 @@ ROSPkg::Manager::Manager()
 
     // Define the installed add-on table offsets
     const int table_x_ = (WINDOW_WIDTH-TABLE_WIDTH)/2;
-    const int table_y_ = 1.1*(WINDOW_HEIGHT-TABLE_HEIGHT)/2;
+    const int table_y_ = (WINDOW_HEIGHT-TABLE_HEIGHT)/3;
 
     // Title string setup
     info_str_->setText("Installed Packages");
@@ -257,13 +257,22 @@ ROSPkg::Manager::Manager()
     installed_->setAlternatingRowColors(true);
 
     // Arrange buttons
-    buttons_["install"]->setGeometry(table_x_, WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
-    buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
-    buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), WINDOW_HEIGHT-50, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["install"]->setGeometry(table_x_, table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
+
+    // Enable Advanced Features
+    advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
+    advanced_str_->move(table_x_+20, table_y_+TABLE_HEIGHT+70);
+    advanced_str_->setText("Advanced");
+    advanced_->setChecked(false);
+    buttons_["github"]->hide();
 
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
+    connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
     installed_->update();
     populateTable_();
@@ -459,4 +468,9 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
     data_["country_code"] = country_code_->currentText();
 
     return data_;
+}
+
+void ROSPkg::Manager::on_CheckBoxClicked() {
+    buttons_["github"]->setVisible(advanced_->isChecked());
+    buttons_["github"]->setEnabled(advanced_->isChecked());
 }

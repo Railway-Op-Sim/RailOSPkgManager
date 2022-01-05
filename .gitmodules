@@ -1,3 +1,6 @@
 [submodule "external/11Zip"]
 	path = external/11Zip
 	url = https://github.com/artemis-beta/11Zip.git
+[submodule "external/curl"]
+	path = external/curl
+	url = https://github.com/curl/curl.git
