@@ -118,7 +118,7 @@ QString ROSPkg::Packager::createPackage() {
 
     if(!QFile::exists(zip_file_)) {
         QMessageBox::critical(parent_, QMessageBox::tr("Archive creation failure"), QMessageBox::tr("Failed to create package archive"));
-        throw std::runtime_error("");
+        return "";
     }
 
     QDir(out_dir_).removeRecursively();
