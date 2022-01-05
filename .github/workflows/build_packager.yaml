@@ -46,7 +46,53 @@ jobs:
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
       with:
-          name: unix_rospkg
+          name: ubuntu_rospkg
+          path: rospkgmanager/build/ROSPkgManager
+  build-test-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        path: rospkgmanager
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.9
+      with:
+        cmake-version: '3.20.x'
+    - uses: actions/checkout@v2
+      with:
+        repository: Railway-Op-Sim/rostools
+        ref: v0.4.0
+        path: rostools
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 11
+        platform: x64
+    - name: Install ROSTools
+      env:
+        CC: gcc-11
+        CXX: g++-11
+      run: |
+        cmake -Bbuild
+        sudo cmake --build build/ --target install
+      working-directory: rostools/cpp
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '6.2.2'
+        setup-python: false
+    - name: Build ROSPackageManager
+      env:
+        CC: gcc-11
+        CXX: g++-11 
+      run: |
+            cmake -Bbuild
+            cmake --build build
+      working-directory: rospkgmanager
+    - uses: actions/upload-artifact@v1
+      with:
+          name: darwin_rospkg
           path: rospkgmanager/build/ROSPkgManager
   build-test-windows:
     runs-on: windows-latest
