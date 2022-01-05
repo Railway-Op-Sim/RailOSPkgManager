@@ -110,11 +110,7 @@ QString ROSPkg::Packager::createPackage() {
         );
     }
 
-    AbZip zip(build_dir_ + QDir::separator() + package_file_name_+".zip");
-
-    zip.addDirectory(build_dir_ + QDir::separator() + package_file_name_, AbZip::Recursive);
-
-    zip.close();
+    elz::zipFolder((build_dir_ + QDir::separator() + package_file_name_).toStdString());
 
     QDir(build_dir_ + QDir::separator() + package_file_name_).removeRecursively();
 

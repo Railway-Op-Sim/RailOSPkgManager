@@ -22,7 +22,7 @@
 
 #include "rostools/metadata.hxx"
 #include "digestpp.hpp"
-#include "AbZip/AbZip.h"
+#include "elzip.hpp"
 
 #include "ros_packager.hxx"
 

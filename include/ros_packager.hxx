@@ -12,7 +12,7 @@
 #include <QStandardPaths>
 #include <QList>
 
-#include "AbZip/AbZip.h"
+#include "elzip.hpp"
 
 namespace ROSPkg {
     class Packager {

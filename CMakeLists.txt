@@ -14,21 +14,6 @@ find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui RE
 set( MAIN_SRC ${CMAKE_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
 
-# ------------------------- AbZip ---------------------------- #
-file( GLOB_RECURSE ABZIP_SRCS ${EXTERNAL_SOURCES}/AbZip/*.cpp )
-file( GLOB_RECURSE ABZIP_HEADERS ${EXTERNAL_SOURCES}/AbZip/*.h )
-find_package( ZLIB REQUIRED )
-set( ABZIP abzip )
-set( ABZIP_INCLUDE_DIR ${EXTERNAL_SOURCES}/AbZip )
-add_library( ${ABZIP} ${ABZIP_SRCS} ${ABZIP_HEADERS} )
-target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR} )
-target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Compressors )
-target_include_directories( ${ABZIP} PRIVATE ${ABZIP_INCLUDE_DIR}/Encryption )
-target_link_libraries( ${ABZIP} PRIVATE ${ZLIB_LIBRARIES} )
-target_link_libraries( ${ABZIP} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
-
-# ------------------------------------------------------------ #
-
 file( GLOB SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cxx )
 file( GLOB TS_FILES ${CMAKE_SOURCE_DIR}/lang/*.ts )
 
@@ -36,11 +21,12 @@ file( GLOB TS_FILES ${CMAKE_SOURCE_DIR}/lang/*.ts )
 file( GLOB HEADERS ${CMAKE_SOURCE_DIR}/include/*.hxx )
 
 set( DIGESTPP digestpp )
-
+set( 11ZIP elzip )
 set( ROSTOOLS rostools )
 find_package( ${ROSTOOLS} 0.4.0 REQUIRED )
 
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
+add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
 include(FetchContent)
 FetchContent_Declare(
@@ -50,10 +36,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${ABZIP} ${ROSTOOLS_LIBRARIES} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${ROSTOOLS_LIBRARIES} ${11ZIP} )
 target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
-target_include_directories( ${LIBRARY_NAME} PUBLIC ${EXTERNAL_SOURCES} )
 target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${digestpp_SOURCE_DIR} )
 
