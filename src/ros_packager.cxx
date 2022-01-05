@@ -71,48 +71,57 @@ QString ROSPkg::Packager::createPackage() {
     package_file_name_ += version_;
     package_file_name_.replace(" ", "_");
 
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_);
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Railway");
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Program_Timetables");
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Sessions");
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Documentation");
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Images");
-    QDir().mkdir(build_dir_ + QDir::separator() + package_file_name_ + QDir::separator() + "Metadata");
+    const QString out_dir_ = build_dir_ + QDir::separator() + package_file_name_;
+
+    QDir().mkdir(out_dir_);
+    QDir().mkdir(out_dir_+ QDir::separator() + "Railway");
+    QDir().mkdir(out_dir_+ QDir::separator() + "Program_Timetables");
+    QDir().mkdir(out_dir_+ QDir::separator() + "Sessions");
+    QDir().mkdir(out_dir_+ QDir::separator() + "Documentation");
+    QDir().mkdir(out_dir_+ QDir::separator() + "Images");
+    QDir().mkdir(out_dir_+ QDir::separator() + "Metadata");
 
     QFile(rly_file_).copy(
-        build_dir_ + QDir::separator() + package_file_name_ +
+        out_dir_+
         QDir::separator() + "Railway" + QDir::separator() + QFileInfo(rly_file_).fileName()
     );
 
     QFile(toml_file_).copy(
-        build_dir_ + QDir::separator() + package_file_name_ +
+        out_dir_+
         QDir::separator() + "Metadata" + QDir::separator() + QFileInfo(toml_file_).fileName()
     );
 
     for(const QString& ttb_file : ttb_files_) {
         QFile(ttb_file).copy(
-            build_dir_ + QDir::separator() + package_file_name_ +
+            out_dir_+
             QDir::separator() + "Program_Timetables" + QDir::separator() + QFileInfo(ttb_file).fileName()
         );
     }
 
     for(const QString& ssn_file : ssn_files_) {
         QFile(ssn_file).copy(
-            build_dir_ + QDir::separator() + package_file_name_ +
+            out_dir_+
             QDir::separator() + "Sessions" + QDir::separator() + QFileInfo(ssn_file).fileName()
         );
     }
 
     for(const QString& doc_file : doc_files_) {
         QFile(doc_file).copy(
-            build_dir_ + QDir::separator() + package_file_name_ +
+            out_dir_+
             QDir::separator() + "Documentation" + QDir::separator() + QFileInfo(doc_file).fileName()
         );
     }
 
-    elz::zipFolder((build_dir_ + QDir::separator() + package_file_name_).toStdString());
+    const QString zip_file_ = out_dir_ + ".zip";
 
-    QDir(build_dir_ + QDir::separator() + package_file_name_).removeRecursively();
+    elz::zipFolder(out_dir_.toStdString(), zip_file_.toStdString());
 
-    return build_dir_ + QDir::separator() + package_file_name_+".zip";
+    if(!QFile::exists(zip_file_)) {
+        QMessageBox::critical(parent_, QMessageBox::tr("Archive creation failure"), QMessageBox::tr("Failed to create package archive"));
+        throw std::runtime_error("");
+    }
+
+    QDir(out_dir_).removeRecursively();
+
+    return zip_file_;
 }

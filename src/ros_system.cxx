@@ -99,7 +99,8 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
 void ROSPkg::System::unzipFile(const QString& file_name) const {
     QString info_text_ = "";
     QTemporaryDir temp_dir_;
-    elz::extractFile(file_name.toStdString(), temp_dir_.path().toStdString());
+    QDir().mkdir(temp_dir_.path());
+    elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
 
     // File path filters
     QList<QString> filter_ssn_{"*.ssn", "*.SSN"};
