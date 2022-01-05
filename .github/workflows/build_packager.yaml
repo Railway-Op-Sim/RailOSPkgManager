@@ -33,8 +33,8 @@ jobs:
       working-directory: rostools/cpp
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
-      with: 
-        version: '5.15.2'
+      with:
+        version: '6.2.2'
         setup-python: false
     - name: Build ROSPackageManager
       env:
@@ -62,28 +62,21 @@ jobs:
         path: rostools
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
-    - name: Set up Cygwin
-      uses: egor-tensin/setup-cygwin@v3
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
       with:
-        platform: x64
-        packages: cmake gcc-g++
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v2
+        version: '6.2.2'
+        setup-python: false
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.9
       with:
-        platform: x64
-        cygwin: 1
-        cc: 1
+        cmake-version: '3.20.x'
     - name: Install ROSTools
       run: |
         mkdir install
         cmake -Bbuild
         cmake --build build/ --target install
       working-directory: rostools/cpp
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with: 
-        version: '5.15.2'
-        setup-python: false
     - name: Build ROSPackageManager 
       run: |
             cmake -Bbuild
