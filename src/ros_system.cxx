@@ -8,7 +8,7 @@ void ROSPkg::System::createCache_() {
     ros_loc_ = QFileDialog::getOpenFileName(
         parent_,
         QFileDialog::tr("Locate") + QString(" Railway Operation Simulator"),
-        QString(QStandardPaths::HomeLocation), QFileDialog::tr("ROS Exe (railway.exe)")
+        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
     );
     if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
     QFile file_(cache_file_);
