@@ -28,7 +28,7 @@ jobs:
         CC: gcc-11
         CXX: g++-11
       run: |
-        cmake -Bbuild
+        cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
         sudo cmake --build build/ --target install
       working-directory: rostools/cpp
     - name: Install Qt
@@ -76,13 +76,13 @@ jobs:
         setup-python: false
     - name: Build ROSPackageManager
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
             cmake --build build
       working-directory: rospkgmanager
     - uses: actions/upload-artifact@v1
       with:
           name: darwin_rospkg
-          path: rospkgmanager/build/ROSPkgManager
+          path: rospkgmanager/build/ROSPkgManager.app
   build-test-windows:
     runs-on: windows-latest
     steps:
@@ -109,7 +109,7 @@ jobs:
     - name: Install ROSTools
       run: |
         mkdir install
-        cmake -Bbuild
+        cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
         cmake --build build/ --target install
       working-directory: rostools/cpp
     - name: Build ROSPackageManager 
