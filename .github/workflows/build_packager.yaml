@@ -64,15 +64,7 @@ jobs:
         repository: Railway-Op-Sim/rostools
         ref: v0.4.0
         path: rostools
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 11
-        platform: x64
     - name: Install ROSTools
-      env:
-        CC: gcc-11
-        CXX: g++-11
       run: |
         cmake -Bbuild
         sudo cmake --build build/ --target install
@@ -83,9 +75,6 @@ jobs:
         version: '6.2.2'
         setup-python: false
     - name: Build ROSPackageManager
-      env:
-        CC: gcc-11
-        CXX: g++-11 
       run: |
             cmake -Bbuild
             cmake --build build
