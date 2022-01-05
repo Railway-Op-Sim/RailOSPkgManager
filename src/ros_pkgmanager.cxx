@@ -345,7 +345,7 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     try {
         data_ = checkPackageForm_();
     }
-    catch(std::runtime_error& e) {
+    catch(const std::invalid_argument&) {
         return;
     }
     ROSPkg::Packager* package_ = new ROSPkg::Packager(this, system_->getROSLocation(), data_["package_name"]);
@@ -457,7 +457,7 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
                 this,
                 QMessageBox::tr("Incomplete Package"),
                 QMessageBox::tr("Package is missing required information"));
-            throw std::runtime_error("");
+            throw std::invalid_argument("Invalid package form data specified");
         }
     }
     for(const auto& le : package_form_entry_.toStdMap()) {

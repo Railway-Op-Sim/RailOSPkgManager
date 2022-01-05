@@ -96,12 +96,7 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
     return info_;
 }
 
-void ROSPkg::System::unzipFile(const QString& file_name) const {
-    QString info_text_ = "";
-    QTemporaryDir temp_dir_;
-    QDir().mkdir(temp_dir_.path());
-    elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
-
+QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& unzip_directory) const {
     // File path filters
     QList<QString> filter_ssn_{"*.ssn", "*.SSN"};
     QList<QString> filter_rly_{"*.rly", "*.RLY"};
@@ -110,89 +105,53 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     QList<QString> filter_docs_{"*.md", "*.pdf"};
 
     // File result containers
-    QList<QString> files_ssn_, files_rly_, files_ttb_, files_toml_, files_docs_;
+    QMap<QString, QList<QString>> files_ ={
+        {"ssn", {}},
+        {"toml", {}},
+        {"docs", {}},
+        {"ttb", {}},
+        {"rly", {}}
+    };
 
     // Directory iterators for each file type
-    QDirIterator it_ssn(temp_dir_.path(), filter_ssn_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_rly(temp_dir_.path(), filter_rly_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_ttb(temp_dir_.path(), filter_ttb_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_toml(temp_dir_.path(), filter_toml_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QDirIterator it_docs(temp_dir_.path(), filter_docs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ssn(unzip_directory, filter_ssn_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_rly(unzip_directory, filter_rly_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ttb(unzip_directory, filter_ttb_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_toml(unzip_directory, filter_toml_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_docs(unzip_directory, filter_docs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
     // For each file type search recursively for the needed file types
     while(it_toml.hasNext()) {
-        files_toml_ << it_toml.next();
+        const QString toml_file_{it_toml.next()};
+        files_["toml"] << toml_file_;
     }
 
     while(it_ssn.hasNext()) {
-        files_ssn_ << it_ssn.next();
+        const QString ssn_file_{it_ssn.next()};
+        files_["ssn"] << ssn_file_;
     }
 
     while(it_rly.hasNext()) {
-        files_rly_ << it_rly.next();
+        const QString rly_file_{it_rly.next()};
+        files_["rly"] << rly_file_;
     }
 
     while(it_ttb.hasNext()) {
-        files_ttb_ << it_ttb.next();
+        const QString ttb_file_{it_ttb.next()};
+        files_["ttb"] << ttb_file_;
     }
 
     while(it_docs.hasNext()) {
-        files_docs_ << it_docs.next();
+        const QString docs_file_{it_docs.next()};
+        files_["docs"] << docs_file_;
     }
 
-    // If no TOML file is found then archive is not an ROS package yet so one needs to be created
-    if(files_toml_.empty()) {
-        const QString package_name_ = QString(QFileInfo(file_name).baseName()).replace("_", " ");
-        ROSPkg::Packager packager_{parent_, ros_loc_, package_name_};
-        if(files_rly_.size() != 1) {
-            QMessageBox::critical(
-                parent_,
-                QMessageBox::tr("Package definition ambiguous"),
-                QMessageBox::tr("Expected single RLY file from archive.")
-            );
-            
-            return;
-        }
-        if(files_ttb_.empty()) {
-            QMessageBox::critical(
-                parent_,
-                QMessageBox::tr("Missing timetables"),
-                QMessageBox::tr("Expected one or more TTB files within archive.")
-            );
-            
-            return;
-        }
-        for(const QString& ttb_file : files_ttb_) packager_.addTTBFile(ttb_file);
-        if(!files_ssn_.empty()) {
-            for(const QString& ssn_file : files_ssn_) packager_.addSSNFile(ssn_file);
-        }
-        if(!files_docs_.empty()) {
-            for(const QString& doc_file : files_docs_) packager_.addDocFile(doc_file);
-        }
-        packager_.setRLYFile(QFileInfo(files_rly_[0]).fileName());
-        const QString new_toml_ = packager_.buildTOML();
-        if(new_toml_.isEmpty()) {
-            QMessageBox::critical(
-                parent_,
-                QMessageBox::tr("TOML creation failure"),
-                QMessageBox::tr("TOML creation for non-project archive failed.")
-            );
-            
-            return;
-        }
-        files_toml_.push_back(new_toml_);
-    }
-    else if(files_toml_.size() > 1) {
-        QMessageBox::critical(
-            parent_,
-            QMessageBox::tr("Package Definition Ambiguous"),
-            QMessageBox::tr("Expected single metadata (TOML) file in package, but multiple candidates found.")
-        );
-        
-        return;
-    }
+    return files_;
+}
 
-    for(const QString& rly_file : files_rly_ ) {
+void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list) const {
+    QString info_text_ = "";
+    for(const QString& rly_file : files_list["rly"] ) {
         QString base_name_ = QFileInfo(rly_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Railways" + QDir::separator() + base_name_;
         info_text_ += "Added " + new_path_;
@@ -200,7 +159,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         QFile(rly_file).copy(new_path_);
     }
 
-    for(const QString& ttb_file : files_ttb_ ) {
+    for(const QString& ttb_file : files_list["ttb"] ) {
         QString base_name_ = QFileInfo(ttb_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Program timetables" + QDir::separator() + base_name_;
         info_text_ += "\n\nAdded " + new_path_;
@@ -208,7 +167,7 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         QFile(ttb_file).copy(new_path_);
     }
 
-    for(const QString& ssn_file : files_ssn_ ) {
+    for(const QString& ssn_file : files_list["ssn"] ) {
         QString base_name_ = QFileInfo(ssn_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Sessions" + QDir::separator() + base_name_;
         info_text_ += "\n\nAdded " + new_path_;
@@ -226,9 +185,9 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     ROSTools::Metadata package_data_;
 
     try {
-        package_data_ = ROSTools::Metadata(std::filesystem::path(files_toml_[0].toStdString()));
+        package_data_ = ROSTools::Metadata(std::filesystem::path(files_list["toml"][0].toStdString()));
     }
-    catch(std::runtime_error& e) {
+    catch(const std::invalid_argument&) {
         QMessageBox::critical(
             parent_,
             QMessageBox::tr("Missing Package Metadata"),
@@ -237,21 +196,94 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
         
         return;
     }
-    if(!files_docs_.empty()) {
+    if(!files_list["docs"].empty()) {
         // Create directory for add-on docs
         doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
         QDir().mkdir(doc_dir_);
     }
 
-    for(const QString& doc_file : files_docs_ ) {
+    for(const QString& doc_file : files_list["docs"] ) {
         QString base_name_;
         QFileInfo(doc_file).fileName();
         QString new_path_ = doc_dir_ + QDir::separator() + base_name_;
         info_text_ += "\n\nAdded " + new_path_;
         QFile(doc_file).copy(new_path_);
     }
-    
+
     QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
+}
+
+void ROSPkg::System::unzipFile(const QString& file_name) const {
+    QTemporaryDir temp_dir_;
+    QDir().mkdir(temp_dir_.path());
+    elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
+    QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
+
+    // If no TOML file is found then archive is not an ROS package yet so one needs to be created
+    if(files_list_["toml"].empty()) {
+
+        const QString package_name_ = QString(QFileInfo(file_name).baseName()).replace("_", " ");
+
+        ROSPkg::Packager packager_{parent_, ros_loc_, package_name_};
+
+        if(files_list_["rly"].size() != 1) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("Package definition ambiguous"),
+                QMessageBox::tr("Expected single RLY file from archive.")
+            );
+            
+            return;
+        }
+
+        if(files_list_["ttb"].empty()) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("Missing timetables"),
+                QMessageBox::tr("Expected one or more TTB files within archive.")
+            );
+            
+            return;
+        }
+
+        for(const QString& ttb_file : files_list_["ttb"]) packager_.addTTBFile(ttb_file);
+
+        if(!files_list_["ssn"].empty()) {
+            for(const QString& ssn_file : files_list_["ssn"]) packager_.addSSNFile(ssn_file);
+        }
+
+        if(!files_list_["docs"].empty()) {
+            for(const QString& doc_file : files_list_["docs"]) packager_.addDocFile(doc_file);
+        }
+
+        packager_.setRLYFile(QFileInfo(files_list_["rly"][0]).fileName());
+
+        const QString new_toml_ = packager_.buildTOML();
+
+        if(new_toml_.isEmpty()) {
+            QMessageBox::critical(
+                parent_,
+                QMessageBox::tr("TOML creation failure"),
+                QMessageBox::tr("TOML creation for non-project archive failed.")
+            );
+            
+            return;
+        }
+
+        files_list_["toml"].push_back(new_toml_);
+
+    }
+    else if(files_list_["toml"].size() > 1) {
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Package Definition Ambiguous"),
+            QMessageBox::tr("Expected single metadata (TOML) file in package, but multiple candidates found.")
+        );
+        
+        return;
+    }
+
+    unpackZip_(files_list_);
 }
 
 void ROSPkg::System::uninstall(const QString& sha) {

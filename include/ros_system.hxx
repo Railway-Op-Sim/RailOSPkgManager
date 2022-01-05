@@ -58,6 +58,17 @@ private:
  * extracted to be displayed on the installed packages listing
  * **************************************************************************/
     void parseMetaFile_(const QString& file_name);
+
+/*! **************************************************************************
+ * @brief Get all relevant files from the specified zip archive
+ * **************************************************************************/
+    QMap<QString, QList<QString>> getZipFileListing_(const QString& directory) const;
+
+/*! **************************************************************************
+ * @brief Copy files from zip to ROS directories
+ * **************************************************************************/
+    void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
+
 public:
 /*! **************************************************************************
  * @brief Initialise a new instance of the System class
