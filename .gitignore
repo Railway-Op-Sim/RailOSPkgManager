@@ -1,0 +1,6 @@
+build/
+.vscode/
+.scannerwork/
+bw-output/
+*.zip
+external/

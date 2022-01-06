@@ -24,12 +24,11 @@ set( DIGESTPP digestpp )
 set( 11ZIP elzip )
 set( CURL CURL )
 set( ROSTOOLS rostools )
-find_package( ${ROSTOOLS} 0.4.0 REQUIRED )
 
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl )
-
+add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
 
 include(FetchContent)
 FetchContent_Declare(
@@ -39,10 +38,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${ROSTOOLS_LIBRARIES} ${11ZIP} ${CURL} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${11ZIP} ${CURL} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
-target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${digestpp_SOURCE_DIR} )
 
 add_executable( ${PROJECT_NAME} ${MAIN_SRC} )
