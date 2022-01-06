@@ -23,6 +23,7 @@
 #include "rostools/metadata.hxx"
 #include "digestpp.hpp"
 #include "elzip.hpp"
+#include "curl/curl.h"
 
 #include "ros_packager.hxx"
 
@@ -68,6 +69,8 @@ private:
  * @brief Copy files from zip to ROS directories
  * **************************************************************************/
     void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
+
+size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream); 
 
 public:
 /*! **************************************************************************
@@ -116,6 +119,13 @@ public:
  * @brief Retrieve the location of railway.exe on the file system
  * **************************************************************************/
     QString getROSLocation() const {return ros_loc_;}
+
+/*! **************************************************************************
+ * @brief Retrieve archive from a GitHub repository
+ *
+ * @param repository_path GitHub repository path in the form "user/repo"
+ * **************************************************************************/
+    void fetchGitHub(const QString& repository_path, const QString& branch = "main") const;
 };
 }; 
 

@@ -1,5 +1,10 @@
 #include "ros_system.hxx"
 
+size_t ROSPkg::System::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written_n_ = fwrite(ptr, size, nmemb, stream);
+    return written_n_;
+}
+
 void ROSPkg::System::createCache_() {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
@@ -319,4 +324,20 @@ void ROSPkg::System::uninstall(const QString& sha) {
     }
     installed_.remove(sha);
     QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
+}
+
+void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) {
+    const QString GitHub_URL_ = "https://github.com/" + repository_path + "archive/refs/heads/" + branch + ".zip";
+    QTemporaryDir temp_dir_;
+    QDir().mkdir(temp_dir_.path());
+    const QString download_path_ = temp_dir_.path() + QDir::separator() + "download.zip";
+
+    CURL* curl_ = curl_easy_init();
+    FILE* file_ = fopen(download_path_.toStdString().c_str(), "wb");
+
+    curl_easy_setopt(curl_, CURLOPT_URL, GitHub_URL_.toStdString().c_str());
+    curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
+    curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
+    curl_easy_perform(curl_);
+    fclose(file_);
 }
