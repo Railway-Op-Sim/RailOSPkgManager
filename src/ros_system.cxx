@@ -375,6 +375,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
     curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
     curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
     res = curl_easy_perform(curl_);
     fclose(file_);
@@ -387,7 +388,6 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
             QMessageBox::tr(alert_.toStdString().c_str())
         );
         res = curl_easy_perform(curl_);
-        fclose(file_);
         return;
     }
 
