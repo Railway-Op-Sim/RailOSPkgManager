@@ -22,13 +22,20 @@ file( GLOB HEADERS ${CMAKE_SOURCE_DIR}/include/*.hxx )
 
 set( DIGESTPP digestpp )
 set( 11ZIP elzip )
-set( CURL CURL )
 set( ROSTOOLS rostools )
 
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
-add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl )
+
+find_package( CURL )
+
+if( NOT ${CURL_FOUND} )
+    add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl/lib )
+    set( CURL_LIBRARIES libcurl )
+endif()
+
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
+set( BUILD_TESTING OFF )
 
 include(FetchContent)
 FetchContent_Declare(
@@ -38,7 +45,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${11ZIP} ${CURL} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${11ZIP} ${CURL_LIBRARIES} )
 target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )

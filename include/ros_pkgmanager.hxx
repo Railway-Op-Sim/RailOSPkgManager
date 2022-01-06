@@ -58,7 +58,8 @@ private:
     const int BUTTON_HEIGHT = 30;
     QString cache_str_ = "";
     System* system_ = new System(this);
-    QWidget* subwindow_ = new QWidget(this, Qt::Tool);
+    QWidget* package_form_ = new QWidget(this, Qt::Tool);
+    QWidget* url_form_ = new QWidget(this, Qt::Tool);
     QSpinBox* year_box_;
     QCheckBox* factual_box_;
     QCheckBox* advanced_ = new QCheckBox(this);
@@ -67,6 +68,8 @@ private:
     QLabel* advanced_str_ = new QLabel(this);
     QLabel* year_box_label_;
     QLabel* country_code_label_;
+    QLabel* url_label_;
+    QLineEdit* url_entry_;
     QMap<QString, QLineEdit*> package_form_entry_;
     QMap<QString, QLabel*> package_form_labels_;
     QMap<QString, QPushButton*> buttons_ = {
@@ -87,6 +90,11 @@ private:
  * @brief Construct the package creation form for metadata entry
  * **************************************************************************/
     void buildPackageForm_();
+
+/*! **************************************************************************
+ * @brief Construct the GitHub project form for zip retrieval
+ * **************************************************************************/
+    void buildURLForm_();
 
 /*! **************************************************************************
  * @brief Wipe all inputs from the package creation form
@@ -145,7 +153,25 @@ private slots:
  * **************************************************************************/
     void on_BrowseDocFilesClicked();
 
+/*! **************************************************************************
+ * @brief Action associated with the clicking advanced options checkbox
+ * **************************************************************************/
     void on_CheckBoxClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub" button
+ * **************************************************************************/
+    void on_GitHubClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub/Ok" button
+ * **************************************************************************/
+    void on_GitHubOkClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub/Cancel" button
+ * **************************************************************************/
+    void on_GitHubCancelClicked();
 public:
 /*! **************************************************************************
  * @brief Initialise an instance of the application GUI definition

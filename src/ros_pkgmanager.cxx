@@ -5,34 +5,34 @@ void ROSPkg::Manager::buildPackageForm_() {
     const int window_x_ = this->geometry().x()+this->width()/4;
     const int window_y_ = this->geometry().y()+this->height()/4;
 
-    factual_box_ = new QCheckBox(subwindow_);
-    factual_box_label_ = new QLabel(subwindow_);
+    factual_box_ = new QCheckBox(package_form_);
+    factual_box_label_ = new QLabel(package_form_);
     factual_box_label_->setText("Factual");
 
-    year_box_ = new QSpinBox(subwindow_);
+    year_box_ = new QSpinBox(package_form_);
     year_box_->clear();
     year_box_->setMinimum(1800);
     year_box_->setMaximum(2200);
-    year_box_label_ = new QLabel(subwindow_);
+    year_box_label_ = new QLabel(package_form_);
     year_box_label_->setText("Year");
     year_box_->setValue(2022);
 
-    country_code_ = new QComboBox(subwindow_);
+    country_code_ = new QComboBox(package_form_);
 
     for(std::map<std::string, std::string>::const_iterator it = ROSTools::COUNTRY_CODES.begin(); it != ROSTools::COUNTRY_CODES.end(); it++) {
         country_code_->addItem(QString::fromStdString(it->first));
     }
     country_code_->setCurrentText("GB");
 
-    country_code_label_= new QLabel(subwindow_);
+    country_code_label_= new QLabel(package_form_);
     country_code_label_->setText("Country Code");
 
-    buttons_["confirm_create"] = new QPushButton(QPushButton::tr("Ok"), subwindow_);
-    buttons_["confirm_cancel"] = new QPushButton(QPushButton::tr("Cancel"), subwindow_);
-    buttons_["browse_rly"] = new QPushButton(QPushButton::tr("..."), subwindow_);
-    buttons_["browse_ttb"] = new QPushButton(QPushButton::tr("..."), subwindow_);
-    buttons_["browse_ssn"] = new QPushButton(QPushButton::tr("..."), subwindow_);
-    buttons_["browse_doc"] = new QPushButton(QPushButton::tr("..."), subwindow_);
+    buttons_["confirm_create"] = new QPushButton(QPushButton::tr("Ok"), package_form_);
+    buttons_["confirm_cancel"] = new QPushButton(QPushButton::tr("Cancel"), package_form_);
+    buttons_["browse_rly"] = new QPushButton(QPushButton::tr("..."), package_form_);
+    buttons_["browse_ttb"] = new QPushButton(QPushButton::tr("..."), package_form_);
+    buttons_["browse_ssn"] = new QPushButton(QPushButton::tr("..."), package_form_);
+    buttons_["browse_doc"] = new QPushButton(QPushButton::tr("..."), package_form_);
 
     connect(buttons_["confirm_cancel"], &QPushButton::clicked, this, &Manager::on_CreateCancelClicked);
     connect(buttons_["confirm_create"], &QPushButton::clicked, this, &Manager::on_CreateConfirmClicked);
@@ -41,12 +41,12 @@ void ROSPkg::Manager::buildPackageForm_() {
     connect(buttons_["browse_ssn"], &QPushButton::clicked, this, &Manager::on_BrowseSSNFilesClicked);
     connect(buttons_["browse_doc"], &QPushButton::clicked, this, &Manager::on_BrowseDocFilesClicked);
 
-    subwindow_->setGeometry(window_x_, window_y_, 700, 700);
-    subwindow_->setWindowTitle("Create Package");
-    subwindow_->hide();
+    package_form_->setGeometry(window_x_, window_y_, 700, 700);
+    package_form_->setWindowTitle("Create Package");
+    package_form_->hide();
 
-    buttons_["confirm_create"]->move(subwindow_->width()/2-120, subwindow_->height()-40);
-    buttons_["confirm_cancel"]->move(subwindow_->width()/2+30, subwindow_->height()-40);
+    buttons_["confirm_create"]->move(package_form_->width()/2-120, package_form_->height()-40);
+    buttons_["confirm_cancel"]->move(package_form_->width()/2+30, package_form_->height()-40);
 
     const QMap<QString, QString> entries_ = {
         {"package_name", "Name of package"},
@@ -60,166 +60,194 @@ void ROSPkg::Manager::buildPackageForm_() {
         {"ssn_file_paths", "Session files (*.ssn)"},
         {"doc_file_paths", "Manual files (*.pdf,*.md)"}
     };
-
     for(const auto& entry : entries_.toStdMap()) {
-        package_form_entry_[entry.first] = new QLineEdit(subwindow_);
+        package_form_entry_[entry.first] = new QLineEdit(package_form_);
         package_form_entry_[entry.first]->setFixedSize(300, package_form_entry_[entry.first]->height());
-        package_form_labels_[entry.first] = new QLabel(subwindow_);
+        package_form_labels_[entry.first] = new QLabel(package_form_);
         package_form_labels_[entry.first]->setText(entry.second);
     }
 
     package_form_labels_["package_name"]->move(
-        subwindow_->width()/11,
-        subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["package_name"]->move(
-        subwindow_->width()/3,
-        subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["display_name"]->move(
-        subwindow_->width()/11,
-        2*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        2*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["display_name"]->move(
-        subwindow_->width()/3,
-        2*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        2*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["version"]->move(
-        subwindow_->width()/11,
-        3*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        3*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["version"]->setText("1.0.0");
     package_form_entry_["version"]->move(
-        subwindow_->width()/3,
-        3*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        3*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["description"]->move(
-        subwindow_->width()/11,
-        4*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        4*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["description"]->move(
-        subwindow_->width()/3,
-        4*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        4*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["author"]->move(
-        subwindow_->width()/11,
-        5*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        5*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["author"]->move(
-        subwindow_->width()/3,
-        5*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        5*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["contributors"]->move(
-        subwindow_->width()/11,
-        6*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        6*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["contributors"]->move(
-        subwindow_->width()/3,
-        6*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        6*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["rly_file_path"]->move(
-        subwindow_->width()/11,
-        7*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        7*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["rly_file_path"]->move(
-        subwindow_->width()/3,
-        7*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        7*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["ttb_file_paths"]->move(
-        subwindow_->width()/11,
-        8*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        8*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["ttb_file_paths"]->move(
-        subwindow_->width()/3,
-        8*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        8*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["ssn_file_paths"]->move(
-        subwindow_->width()/11,
-        9*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        9*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["ssn_file_paths"]->move(
-        subwindow_->width()/3,
-        9*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        9*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_labels_["doc_file_paths"]->move(
-        subwindow_->width()/11,
-        10*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        10*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["doc_file_paths"]->move(
-        subwindow_->width()/3,
-        10*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        10*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_rly"]->move(
-        9*subwindow_->width()/11,
-        7*subwindow_->height()/(package_form_entry_.size()+7)
+        9*package_form_->width()/11,
+        7*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_ttb"]->move(
-        9*subwindow_->width()/11,
-        8*subwindow_->height()/(package_form_entry_.size()+7)
+        9*package_form_->width()/11,
+        8*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_ssn"]->move(
-        9*subwindow_->width()/11,
-        9*subwindow_->height()/(package_form_entry_.size()+7)
+        9*package_form_->width()/11,
+        9*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     buttons_["browse_doc"]->move(
-        9*subwindow_->width()/11,
-        10*subwindow_->height()/(package_form_entry_.size()+7)
+        9*package_form_->width()/11,
+        10*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     country_code_->move(
-        subwindow_->width()/3,
-        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        (package_form_entry_.size()+1)*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     country_code_label_->move(
-        subwindow_->width()/11,
-        (package_form_entry_.size()+1)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        (package_form_entry_.size()+1)*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     factual_box_->move(
-        subwindow_->width()/3,
-        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        (package_form_entry_.size()+2)*package_form_->height()/(package_form_entry_.size()+7)
     );
     factual_box_label_->move(
-        subwindow_->width()/11,
-        (package_form_entry_.size()+2)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        (package_form_entry_.size()+2)*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     year_box_->move(
-        subwindow_->width()/3,
-        (package_form_entry_.size()+3)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/3,
+        (package_form_entry_.size()+3)*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     year_box_label_->move(
-        subwindow_->width()/11,
-        (package_form_entry_.size()+3)*subwindow_->height()/(package_form_entry_.size()+7)
+        package_form_->width()/11,
+        (package_form_entry_.size()+3)*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     package_form_entry_["package_name"]->setMaxLength(100);
 }
+
+void ROSPkg::Manager::buildURLForm_() {
+    const int window_x_ = this->geometry().x()+this->width()/4;
+    const int window_y_ = this->geometry().y()+this->height()/4;
+
+    url_form_->setGeometry(window_x_, window_y_, 400, 150);
+    url_form_->setWindowTitle("Fetch GitHub Project");
+
+    url_label_ = new QLabel(url_form_);
+    url_label_->setText("Enter GitHub project in the form 'user/repository'");
+
+    buttons_["confirm_fetch"] = new QPushButton(QPushButton::tr("Ok"), url_form_);
+    buttons_["cancel_fetch"] = new QPushButton(QPushButton::tr("Cancel"), url_form_);
+
+    buttons_["confirm_fetch"]->move(200, 100);
+    buttons_["cancel_fetch"]->move(300, 100);
+
+    connect(buttons_["cancel_fetch"], &QPushButton::clicked, this, &Manager::on_GitHubCancelClicked);
+    connect(buttons_["confirm_fetch"], &QPushButton::clicked, this, &Manager::on_GitHubOkClicked);
+
+    url_entry_ = new QLineEdit(url_form_);
+    url_entry_->setText("Railway-Op-Sim/");
+
+    url_label_->move(20, 20);
+    url_entry_->setGeometry(20, 50, 350, url_entry_->height());
+
+    url_form_->hide();
+}
+
 
 void ROSPkg::Manager::clearPackageForm_() {
     for(const auto& entry : package_form_entry_) {
@@ -272,6 +300,7 @@ ROSPkg::Manager::Manager()
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
+    connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
     installed_->update();
@@ -281,6 +310,7 @@ ROSPkg::Manager::Manager()
     info_str_->show();
 
     buildPackageForm_();
+    buildURLForm_();
 
 }
 
@@ -332,12 +362,12 @@ void ROSPkg::Manager::on_UninstallButtonClicked() {
 }
 
 void ROSPkg::Manager::on_CreateButtonClicked() {
-    subwindow_->show();
+    package_form_->show();
 }
 
 void ROSPkg::Manager::on_CreateCancelClicked() {
     clearPackageForm_();
-    subwindow_->hide();
+    package_form_->hide();
 }
 
 void ROSPkg::Manager::on_CreateConfirmClicked() {
@@ -384,7 +414,7 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     }
 
     package_->createPackage();
-    subwindow_->close();
+    package_form_->close();
     clearPackageForm_();
     system_->populateInstalled();
     populateTable_();
@@ -473,4 +503,22 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
 void ROSPkg::Manager::on_CheckBoxClicked() {
     buttons_["github"]->setVisible(advanced_->isChecked());
     buttons_["github"]->setEnabled(advanced_->isChecked());
+}
+
+void ROSPkg::Manager::on_GitHubClicked() {
+    url_form_->show();
+}
+
+void ROSPkg::Manager::on_GitHubCancelClicked() {
+    url_entry_->clear();
+    url_form_->hide();
+}
+
+void ROSPkg::Manager::on_GitHubOkClicked() {
+    const QString path_ = url_entry_->text();
+    url_entry_->setText("Railway-Op-Sim/");
+    url_form_->close();
+    system_->fetchGitHub(path_);
+    system_->populateInstalled();
+    populateTable_();
 }

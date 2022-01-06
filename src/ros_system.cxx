@@ -1,8 +1,7 @@
 #include "ros_system.hxx"
 
-size_t ROSPkg::System::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-    size_t written_n_ = fwrite(ptr, size, nmemb, stream);
-    return written_n_;
+size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    return fwrite(ptr, size, nmemb, stream);
 }
 
 void ROSPkg::System::createCache_() {
@@ -224,6 +223,8 @@ void ROSPkg::System::unzipFile(const QString& file_name) const {
     elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
+    qDebug() << "Zip File Contents: " << files_list_ << Qt::endl;
+
     // If no TOML file is found then archive is not an ROS package yet so one needs to be created
     if(files_list_["toml"].empty()) {
 
@@ -326,18 +327,35 @@ void ROSPkg::System::uninstall(const QString& sha) {
     QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
-void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) {
-    const QString GitHub_URL_ = "https://github.com/" + repository_path + "archive/refs/heads/" + branch + ".zip";
-    QTemporaryDir temp_dir_;
-    QDir().mkdir(temp_dir_.path());
+void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) const {
+    const QString GitHub_URL_ = "https://github.com/" + repository_path + "/archive/refs/heads/" + branch + ".zip";
+    //QTemporaryDir temp_dir_;
+    QDir temp_dir_("temp");
+    QDir().mkdir("temp");
+    //QDir().mkdir(temp_dir_.path());
     const QString download_path_ = temp_dir_.path() + QDir::separator() + "download.zip";
 
     CURL* curl_ = curl_easy_init();
+    CURLcode res;
     FILE* file_ = fopen(download_path_.toStdString().c_str(), "wb");
 
     curl_easy_setopt(curl_, CURLOPT_URL, GitHub_URL_.toStdString().c_str());
+    curl_easy_setopt(curl_, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
     curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
-    curl_easy_perform(curl_);
+
+    res = curl_easy_perform(curl_);
     fclose(file_);
+
+    if(!QFile::exists(download_path_) || res != CURLE_OK) {
+        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_;
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Invalid URL"),
+            QMessageBox::tr(alert_.toStdString().c_str())
+        );
+        return;
+    }
+
+    unzipFile(download_path_);
 }

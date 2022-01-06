@@ -28,6 +28,7 @@
 #include "ros_packager.hxx"
 
 namespace ROSPkg {
+    size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream); 
 /*! **********************************************************************
  * @class System
  * @brief Procedures relating to the files on the file system
@@ -69,8 +70,6 @@ private:
  * @brief Copy files from zip to ROS directories
  * **************************************************************************/
     void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
-
-size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream); 
 
 public:
 /*! **************************************************************************
