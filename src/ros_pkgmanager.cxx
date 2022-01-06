@@ -225,17 +225,21 @@ void ROSPkg::Manager::buildURLForm_() {
     const int window_x_ = this->geometry().x()+this->width()/4;
     const int window_y_ = this->geometry().y()+this->height()/4;
 
-    url_form_->setGeometry(window_x_, window_y_, 400, 150);
+    url_form_->setGeometry(window_x_, window_y_, 450, 250);
     url_form_->setWindowTitle("Fetch GitHub Project");
 
     url_label_ = new QLabel(url_form_);
     url_label_->setText("Enter GitHub project in the form 'user/repository'");
 
+    branch_label_ = new QLabel(url_form_);
+    branch_label_->setText("Branch");
+    branch_entry_ = new QLineEdit(url_form_);
+
     buttons_["confirm_fetch"] = new QPushButton(QPushButton::tr("Ok"), url_form_);
     buttons_["cancel_fetch"] = new QPushButton(QPushButton::tr("Cancel"), url_form_);
 
-    buttons_["confirm_fetch"]->move(200, 100);
-    buttons_["cancel_fetch"]->move(300, 100);
+    buttons_["confirm_fetch"]->move(200, 200);
+    buttons_["cancel_fetch"]->move(300, 200);
 
     connect(buttons_["cancel_fetch"], &QPushButton::clicked, this, &Manager::on_GitHubCancelClicked);
     connect(buttons_["confirm_fetch"], &QPushButton::clicked, this, &Manager::on_GitHubOkClicked);
@@ -245,6 +249,10 @@ void ROSPkg::Manager::buildURLForm_() {
 
     url_label_->move(20, 20);
     url_entry_->setGeometry(20, 50, 350, url_entry_->height());
+
+    branch_label_->move(20, 100);
+    branch_entry_->setText("master");
+    branch_entry_->setGeometry(20, 130, 200, branch_entry_->height());
 
     url_form_->hide();
 }
@@ -517,9 +525,10 @@ void ROSPkg::Manager::on_GitHubCancelClicked() {
 
 void ROSPkg::Manager::on_GitHubOkClicked() {
     const QString path_ = url_entry_->text();
+    const QString branch_ = branch_entry_->text();
     url_entry_->setText("Railway-Op-Sim/");
     url_form_->close();
-    system_->fetchGitHub(path_);
+    system_->fetchGitHub(path_, branch_);
     system_->populateInstalled();
     populateTable_();
 }

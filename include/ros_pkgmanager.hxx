@@ -69,7 +69,9 @@ private:
     QLabel* year_box_label_;
     QLabel* country_code_label_;
     QLabel* url_label_;
+    QLabel* branch_label_;
     QLineEdit* url_entry_;
+    QLineEdit* branch_entry_;
     QMap<QString, QLineEdit*> package_form_entry_;
     QMap<QString, QLabel*> package_form_labels_;
     QMap<QString, QPushButton*> buttons_ = {

@@ -338,7 +338,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
     const QList<QString> gh_path_ = repository_path.split("/");
 
     QString zip_file_name_ = "download";
-    QString author = gh_path_[0];
+    QString author_ = gh_path_[0];
     QString country_code_ = "";
 
     if(gh_path_[1].contains("-")) {
@@ -346,7 +346,8 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
         // for these cases skip the prefix in the file name
         const QList<QString> hyphenated_ = gh_path_[1].split("-");
         zip_file_name_ = "";
-        if(ROSTools::COUNTRY_CODES.find(hyphenated_[0].toStdString()) != ROSTools::COUNTRY_CODES.end()) {
+        qDebug() << hyphenated_ << Qt::endl;
+        if(ROSTools::COUNTRY_CODES.find(hyphenated_[0].toStdString()) == ROSTools::COUNTRY_CODES.end()) {
             zip_file_name_ += hyphenated_[0];
         }
         else {
@@ -360,7 +361,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
     }
 
     if(gh_path_[0].contains("-")) {
-        author = (gh_path_[0].split("-")).join(" ");
+        author_ = (gh_path_[0].split("-")).join(" ");
     }
 
     const QString download_path_ = temp_dir_.path() + QDir::separator() + zip_file_name_ + ".zip";
@@ -390,6 +391,6 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
         return;
     }
 
-    unzipFile(download_path_, gh_path_[0], zip_file_name_, country_code_);
+    unzipFile(download_path_, author_, zip_file_name_, country_code_);
 
 }
