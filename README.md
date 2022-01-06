@@ -32,3 +32,16 @@ The buttons next to the file declaration fields allow you to browse for files to
 |Country Code|Two letter country code of route origin in this simulation (`FN` if fictional).|
 |Factual|If simulation is a factual representation.|
 |Year|Year for which this simulation is a representation (can be any value if fictional).|
+
+
+## Advanced
+Clicking the "Advanced" checkbox shows additional options for package installation.
+
+### Installing from a GitHub Repository
+Installations can be performed from a GitHub repository containing the required files to define a project. Clicking the
+"GitHub" button under the advanced options opens a dialog in which the user can enter the relevant GitHub project. 
+The project is specified in the form "github-user/project-name".
+By default the user is set to "Railway-Op-Sim" as authors are encouraged to develop under this organisation which offers templates to ensure projects are in the correct form. 
+There is also the option to specify an alternative branch to "master". Clicking "Ok" will download an archive of the
+project and install it.
+
