@@ -22,6 +22,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     for(std::map<std::string, std::string>::const_iterator it = ROSTools::COUNTRY_CODES.begin(); it != ROSTools::COUNTRY_CODES.end(); it++) {
         country_code_->addItem(QString::fromStdString(it->first));
     }
+
     country_code_->setCurrentText("GB");
 
     country_code_label_= new QLabel(package_form_);

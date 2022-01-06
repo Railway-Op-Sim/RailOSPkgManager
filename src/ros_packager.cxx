@@ -14,13 +14,17 @@ QString ROSPkg::Packager::buildTOML() {
         version_ = now_.toString(Qt::ISODate);
     }
 
+    if(display_name_.isEmpty()) {
+        display_name_ = package_name_;
+    }
+
     // Builds a TOML file manually using strings
     QFile file_(toml_file_);
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
         stream_ << "name = \"" << package_name_  << "\"" << Qt::endl;
         if(!description_.isEmpty()) stream_ << "description = \"" << description_ << "\"" << Qt::endl;
-        if(!display_name_.isEmpty()) stream_ << "display_name = \"" << display_name_ << "\"" << Qt::endl;
+        stream_ << "display_name = \"" << display_name_ << "\"" << Qt::endl;
         if(rly_file_.isEmpty()) {packageFailure(); return "";}
         if(ttb_files_.empty()) {packageFailure(); return "";}
         stream_ << "rly_file = \"" << QFileInfo(rly_file_).fileName() << "\"" << Qt::endl;

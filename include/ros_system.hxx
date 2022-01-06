@@ -96,8 +96,10 @@ public:
 * metadata file will be kept.
 * 
 * @param file_name path of archive to be extracted.
+* @param author optional name of the author if known
+* @param pkg_name optional name of the package if known
 * ***************************************************************************/
-    void unzipFile(const QString& file_name) const;
+    void unzipFile(const QString& file_name, const QString& author="", const QString& pkg_name="", const QString& country_code="") const;
 
 /*! **************************************************************************
  * @brief Find the list of packages installed on the local system
@@ -124,7 +126,7 @@ public:
  *
  * @param repository_path GitHub repository path in the form "user/repo"
  * **************************************************************************/
-    void fetchGitHub(const QString& repository_path, const QString& branch = "main") const;
+    void fetchGitHub(const QString& repository_path, const QString& branch = "master") const;
 };
 }; 
 
