@@ -50,7 +50,7 @@ class Manager : public QWidget
 
 private:
     const int WINDOW_WIDTH = 600;
-    const int WINDOW_HEIGHT = 480;
+    const int WINDOW_HEIGHT = 500;
     const int TABLE_WIDTH = 510;
     const int TABLE_HEIGHT = 330;
     const int TABLE_NCOLS = 4;
@@ -58,19 +58,27 @@ private:
     const int BUTTON_HEIGHT = 30;
     QString cache_str_ = "";
     System* system_ = new System(this);
-    QWidget* subwindow_ = new QWidget(this, Qt::Tool);
+    QWidget* package_form_ = new QWidget(this, Qt::Tool);
+    QWidget* url_form_ = new QWidget(this, Qt::Tool);
     QSpinBox* year_box_;
     QCheckBox* factual_box_;
+    QCheckBox* advanced_ = new QCheckBox(this);
     QLabel* factual_box_label_;
     QComboBox* country_code_;
+    QLabel* advanced_str_ = new QLabel(this);
     QLabel* year_box_label_;
     QLabel* country_code_label_;
+    QLabel* url_label_;
+    QLabel* branch_label_;
+    QLineEdit* url_entry_;
+    QLineEdit* branch_entry_;
     QMap<QString, QLineEdit*> package_form_entry_;
     QMap<QString, QLabel*> package_form_labels_;
     QMap<QString, QPushButton*> buttons_ = {
         {"install", new QPushButton(QPushButton::tr("Install Package"), this)},
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
+        {"github", new QPushButton(QPushButton::tr("GitHub"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);
@@ -84,6 +92,11 @@ private:
  * @brief Construct the package creation form for metadata entry
  * **************************************************************************/
     void buildPackageForm_();
+
+/*! **************************************************************************
+ * @brief Construct the GitHub project form for zip retrieval
+ * **************************************************************************/
+    void buildURLForm_();
 
 /*! **************************************************************************
  * @brief Wipe all inputs from the package creation form
@@ -141,6 +154,26 @@ private slots:
  * @brief Action associated with the "Create Package/Docs Browse" button
  * **************************************************************************/
     void on_BrowseDocFilesClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the clicking advanced options checkbox
+ * **************************************************************************/
+    void on_CheckBoxClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub" button
+ * **************************************************************************/
+    void on_GitHubClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub/Ok" button
+ * **************************************************************************/
+    void on_GitHubOkClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "GitHub/Cancel" button
+ * **************************************************************************/
+    void on_GitHubCancelClicked();
 public:
 /*! **************************************************************************
  * @brief Initialise an instance of the application GUI definition

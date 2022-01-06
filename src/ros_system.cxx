@@ -1,5 +1,9 @@
 #include "ros_system.hxx"
 
+size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    return fwrite(ptr, size, nmemb, stream);
+}
+
 void ROSPkg::System::createCache_() {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
@@ -203,8 +207,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
     }
 
     for(const QString& doc_file : files_list["docs"] ) {
-        QString base_name_;
-        QFileInfo(doc_file).fileName();
+        QString base_name_ = QFileInfo(doc_file).fileName();
         QString new_path_ = doc_dir_ + QDir::separator() + base_name_;
         info_text_ += "\n\nAdded " + new_path_;
         QFile(doc_file).copy(new_path_);
@@ -213,18 +216,23 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
     QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
-void ROSPkg::System::unzipFile(const QString& file_name) const {
+void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, const QString& pkg_name, const QString& country_code) const {
     QTemporaryDir temp_dir_;
     QDir().mkdir(temp_dir_.path());
     elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
+    qDebug() << "Zip File Contents: " << files_list_ << Qt::endl;
+
     // If no TOML file is found then archive is not an ROS package yet so one needs to be created
     if(files_list_["toml"].empty()) {
 
-        const QString package_name_ = QString(QFileInfo(file_name).baseName()).replace("_", " ");
+        const QString package_name_ = (!pkg_name.isEmpty()) ? pkg_name : QString(QFileInfo(file_name).baseName()).replace("_", " ");
 
         ROSPkg::Packager packager_{parent_, ros_loc_, package_name_};
+
+        if(!author.isEmpty()) packager_.setAuthor(author);
+        if(!country_code.isEmpty()) packager_.setCountryCode(country_code);
 
         if(files_list_["rly"].size() != 1) {
             QMessageBox::critical(
@@ -298,25 +306,91 @@ void ROSPkg::System::uninstall(const QString& sha) {
     info_text_ += "\n\nRemoved '" + data_dir_ + "Metadata" + QDir::separator() + toml_file_ + "'";
     QFile(data_dir_ + "Metadata" + QDir::separator() + toml_file_).remove();
 
+    const QString doc_dir_path_ = data_dir_ + "Documentation" + QDir::separator() + QString::fromStdString(meta_data_.display_name()).replace(" ", "_");
+
     const QList<QString> ttb_files_;
 
     for(const std::filesystem::path& ttb_file: meta_data_.ttb_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
+        info_text_ += "\n\nRemoved '" + data_dir_ + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
 
-        QFile(data_dir_ + QDir::separator() + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string())).remove();
-    }
-
-    for(const std::filesystem::path& doc_file: meta_data_.doc_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string()) + "'";
-
-        QFile(data_dir_ + QDir::separator() + "Documentation" + QDir::separator() + QString::fromStdString(doc_file.string())).remove();
+        QFile(data_dir_ + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string())).remove();
     }
 
     for(const std::filesystem::path& ssn_file: meta_data_.ssn_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
+        info_text_ += "\n\nRemoved '" + data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
 
-        QFile(data_dir_ + QDir::separator() + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
+        QFile(data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
     }
+
+    if(QDir doc_dir_(doc_dir_path_); doc_dir_.exists()){
+        info_text_ += "\n\nRemoved '" + doc_dir_path_;
+        doc_dir_.removeRecursively();
+    }
+
     installed_.remove(sha);
     QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
+}
+
+void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) const {
+    const QString GitHub_URL_ = "https://github.com/" + repository_path + "/archive/refs/heads/" + branch + ".zip";
+    QTemporaryDir temp_dir_;
+    QDir().mkdir(temp_dir_.path());
+    const QList<QString> gh_path_ = repository_path.split("/");
+
+    QString zip_file_name_ = "download";
+    QString author_ = gh_path_[0];
+    QString country_code_ = "";
+
+    if(gh_path_[1].contains("-")) {
+        // Handle the case of repositories starting with two letter country code
+        // for these cases skip the prefix in the file name
+        const QList<QString> hyphenated_ = gh_path_[1].split("-");
+        zip_file_name_ = "";
+        qDebug() << hyphenated_ << Qt::endl;
+        if(ROSTools::COUNTRY_CODES.find(hyphenated_[0].toStdString()) == ROSTools::COUNTRY_CODES.end()) {
+            zip_file_name_ += hyphenated_[0];
+        }
+        else {
+            country_code_ = hyphenated_[0];
+        }
+        for(int i{1}; i < hyphenated_.size()-1; ++i) zip_file_name_ += hyphenated_[i] + " ";
+        zip_file_name_ += hyphenated_[hyphenated_.size()-1];
+    }
+    else {
+        zip_file_name_ = gh_path_[1];
+    }
+
+    if(gh_path_[0].contains("-")) {
+        author_ = (gh_path_[0].split("-")).join(" ");
+    }
+
+    const QString download_path_ = temp_dir_.path() + QDir::separator() + zip_file_name_ + ".zip";
+
+    CURL* curl_ = curl_easy_init();
+    CURLcode res;
+    FILE* file_ = fopen(download_path_.toStdString().c_str(), "wb");
+
+    curl_easy_setopt(curl_, CURLOPT_URL, GitHub_URL_.toStdString().c_str());
+    curl_easy_setopt(curl_, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
+    curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
+    curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1);
+
+    res = curl_easy_perform(curl_);
+    fclose(file_);
+
+    if(!QFile::exists(download_path_) || res != CURLE_OK) {
+        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_;
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Invalid URL"),
+            QMessageBox::tr(alert_.toStdString().c_str())
+        );
+        res = curl_easy_perform(curl_);
+        fclose(file_);
+        return;
+    }
+
+    unzipFile(download_path_, author_, zip_file_name_, country_code_);
+
 }
