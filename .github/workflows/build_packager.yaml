@@ -21,8 +21,11 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: '6.2.1'
-        arch: 'win64_mingw81'
-  
+        setup-python: false
+    
+    - name: Install Curl
+      run: sudo apt install -y curl
+
     - name: Build ROSPackageManager
       env:
         CC: gcc-11
@@ -46,10 +49,13 @@ jobs:
       with:
         cmake-version: '3.20.x'
 
+    - name: Install Curl
+      run: brew install curl
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.2'
+        version: '6.2.1'
         setup-python: false
     - name: Build ROSPackageManager
       run: |
