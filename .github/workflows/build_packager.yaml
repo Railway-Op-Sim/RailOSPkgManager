@@ -17,19 +17,12 @@ jobs:
       with:
         version: 11
         platform: x64
-    - name: Install ROSTools
-      env:
-        CC: gcc-11
-        CXX: g++-11
-      run: |
-        cmake -Bbuild
-        sudo cmake --build build/ --target install
-      working-directory: rostools/cpp
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.2'
-        setup-python: false
+        version: '6.2.1'
+        arch: 'win64_mingw81'
+  
     - name: Build ROSPackageManager
       env:
         CC: gcc-11
