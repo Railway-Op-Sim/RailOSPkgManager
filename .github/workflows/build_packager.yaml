@@ -96,7 +96,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -DCMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\x86_64-w64-mingw32-g++.exe
             cmake --build build --config Release 
       shell: bash
   
