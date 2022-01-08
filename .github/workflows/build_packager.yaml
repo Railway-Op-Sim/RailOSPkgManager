@@ -98,7 +98,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild
+            cmake -Bbuild -DCURL_LIBRARY=C:\ProgramData\chocolatey\lib
             cmake --build build --config Release
   
     - uses: actions/upload-artifact@v1
