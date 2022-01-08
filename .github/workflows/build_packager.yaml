@@ -101,6 +101,7 @@ jobs:
             CURL_DIR_LIB=$(ls C:\ProgramData\chocolatey\lib\curl\tools\curl-*)
             cmake -Bbuild -DCURL_LIBRARY=${CURL_DIR_LIB}\lib -DCURL_LIBRARY=${CURL_DIR_LIB}\include
             cmake --build build --config Release 
+      shell: bash
   
     - uses: actions/upload-artifact@v1
       with:
