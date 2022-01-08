@@ -72,13 +72,16 @@ jobs:
       with:
         submodules: recursive
   
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v2
+    - name: Install compiler
+      uses: rlalik/setup-cpp-compiler@v1
       with:
-        platform: x64
+        compiler: gcc-latest
 
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
+      env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+          CXX: ${{ steps.install_cc.outputs.cxx }}
   
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -87,18 +90,29 @@ jobs:
         arch: 'win64_mingw81'
         host: 'windows'
         target: 'desktop'
+      env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+          CXX: ${{ steps.install_cc.outputs.cxx }}
   
     - name: Install CMake
       run: choco install cmake
+      env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+          CXX: ${{ steps.install_cc.outputs.cxx }}
       
     - name: Install Curl
       run: choco install curl
+      env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+          CXX: ${{ steps.install_cc.outputs.cxx }}
   
     - name: Build ROSPackageManager 
       run: |
             cmake -Bbuild -DCURL_LIBRARY=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\lib -DCURL_INCLUDE_DIR=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\include
             cmake --build build --config Release 
-      shell: bash
+      env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+          CXX: ${{ steps.install_cc.outputs.cxx }}
   
     - uses: actions/upload-artifact@v1
       with:
