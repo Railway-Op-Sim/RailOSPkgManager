@@ -47,6 +47,7 @@ target_link_libraries( ${LIBRARY_NAME} PUBLIC ${CURL_LIBRARIES} )
 target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
 target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC ${CURL_INCLUDE_DIR} )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${digestpp_SOURCE_DIR} )
 
