@@ -29,7 +29,6 @@ add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
 find_package( CURL REQUIRED )
 
-add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl/lib )
 set( CURL_LIBRARIES libcurl )
 
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
