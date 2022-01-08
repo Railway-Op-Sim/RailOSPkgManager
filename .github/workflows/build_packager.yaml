@@ -96,7 +96,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -DCMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\x86_64-w64-mingw32-g++.exe
+            cmake -Bbuild -DCURL_LIBRARY=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\lib -DCURL_INCLUDE_DIR=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\include
             cmake --build build --config Release 
       shell: bash
   
