@@ -24,7 +24,7 @@ jobs:
         setup-python: false
     
     - name: Install Curl
-      run: sudo apt install -y curl
+      run: sudo apt install -y libcurl4
 
     - name: Build ROSPackageManager
       env:
