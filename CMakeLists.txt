@@ -29,7 +29,7 @@ add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
 find_package( CURL REQUIRED )
 
-set( CURL_LIBRARIES libcurl )
+set( CURL_LIBRARIES curl )
 
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
 set( BUILD_TESTING OFF )
@@ -42,7 +42,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui ${11ZIP} ${CURL_LIBRARIES} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC ${11ZIP} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC ${CURL_LIBRARIES} )
+target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
 target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
