@@ -88,18 +88,15 @@ jobs:
         host: 'windows'
         target: 'desktop'
   
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
-      with:
-        cmake-version: '3.20.x'
+    - name: Install CMake
+      run: choco install cmake
       
     - name: Install Curl
       run: choco install curl
   
     - name: Build ROSPackageManager 
       run: |
-            CURL_DIR_LIB=$(ls C:\ProgramData\chocolatey\lib\curl\tools\curl-*)
-            cmake -Bbuild -DCURL_LIBRARY=${CURL_DIR_LIB}\lib -DCURL_LIBRARY=${CURL_DIR_LIB}\include
+            cmake -Bbuild
             cmake --build build --config Release 
       shell: bash
   
