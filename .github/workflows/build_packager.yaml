@@ -74,10 +74,6 @@ jobs:
 
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
-  
-    - name: Add clang path to $PATH env
-      shell: bash
-      run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -101,6 +97,10 @@ jobs:
       env:
           CC: clang
           CXX: clang
+
+    - name: Add clang path to $PATH env
+      shell: bash
+      run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
   
     - name: Build ROSPackageManager 
       run: |
