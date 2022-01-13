@@ -93,7 +93,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -G "Unix Makefiles"
+            cmake -Bbuild -G "Unix Makefiles" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
             cmake --build build --config Release 
       shell: msys2 {0}
   
