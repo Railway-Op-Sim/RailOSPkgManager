@@ -91,15 +91,21 @@ jobs:
         arch: 'win64_mingw81'
 
     - name: GCC version
-      run: gcc --version
+      env:
+        MINGW_HOME: C:\msys64\mingw64
+        MSYS_HOME: C:\msys64
+      run: echo "PATH=${MSYS_HOME}\usr\bin;${MINGW_HOME}\bin:$PATH" >> $GITHUB_ENV
       shell: msys2 {0}
   
   
     - name: Build ROSPackageManager 
       run: |
-            CC=gcc CXX=g++ cmake -Bbuild -G "Unix Makefiles"
-            CC=gcc CXX=g++ cmake --build build --config Release 
+            cmake -Bbuild -G "Unix Makefiles"
+            cmake --build build --config Release 
       shell: msys2 {0}
+      env:
+        CC: gcc
+        CXX: g++
   
     - uses: actions/upload-artifact@v1
       with:
