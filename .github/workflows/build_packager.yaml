@@ -89,12 +89,16 @@ jobs:
       with:
         version: '6.2.1'
         arch: 'win64_mingw81'
+
+    - name: GCC version
+      run: gcc --version
+      shell: msys2 {0}
   
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -G "Unix Makefiles" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
-            cmake --build build --config Release 
+            CC=gcc CXX=g++ cmake -Bbuild -G "Unix Makefiles"
+            CC=gcc CXX=g++ cmake --build build --config Release 
       shell: msys2 {0}
   
     - uses: actions/upload-artifact@v1
