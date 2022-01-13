@@ -82,6 +82,7 @@ jobs:
         install: >-
           cmake
           mingw-w64-x86_64-openssl
+          gcc
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
