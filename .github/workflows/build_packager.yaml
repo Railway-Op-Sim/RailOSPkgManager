@@ -92,7 +92,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            /mingw64/bin/cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
+            /mingw64/bin/cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=/mingw64/bin/mingw64-gcc -DCMAKE_CXX_COMPILER=/mingw64/bin/mingw64-g++
             /mingw64/bin/cmake --build build --config Release 
       shell: msys2 {0}
       env:
