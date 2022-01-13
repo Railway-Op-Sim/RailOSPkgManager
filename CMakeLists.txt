@@ -4,8 +4,6 @@ project( ROSPkgManager VERSION 0.4.1 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
-set( CMAKE_INCLUDE_CURRENT_DIR ON )
-set( CMAKE_AUTOMOC ON )
 set( LIBRARY_NAME rospkg )
 
 find_package( QT NAMES Qt6 Qt5 )
@@ -25,6 +23,7 @@ set( 11ZIP elzip )
 set( ROSTOOLS rostools )
 
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
+set_target_properties( ${LIBRARY_NAME} PROPERTIES AUTOMOC ON )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
 #find_package( CURL )
@@ -59,6 +58,7 @@ target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
 target_include_directories( ${LIBRARY_NAME} PUBLIC ${digestpp_SOURCE_DIR} )
 
 add_executable( ${PROJECT_NAME} ${MAIN_SRC} )
+set_target_properties( ${PROJECT_NAME} PROPERTIES AUTOMOC ON )
 target_link_libraries( ${PROJECT_NAME} PRIVATE ${LIBRARY_NAME} )
 target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
 
