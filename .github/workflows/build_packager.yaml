@@ -80,7 +80,7 @@ jobs:
         msystem: mingw64
         update: true
         install: >-
-          cmake
+          mingw-w64-x86_64-cmake
           mingw-w64-x86_64-openssl
           gcc
     
@@ -92,8 +92,8 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
-            cmake --build build --config Release 
+            /mingw64/bin/cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
+            /mingw64/bin/cmake --build build --config Release 
       shell: msys2 {0}
       env:
         CC: gcc
