@@ -92,7 +92,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -G "MinGW Makefiles"
+            cmake -Bbuild -G "Unix Makefiles"
             cmake --build build --config Release 
       shell: msys2 {0}
   
