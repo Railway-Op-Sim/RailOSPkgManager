@@ -88,19 +88,11 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: '6.2.1'
-        arch: 'win64_mingw81'
-
-    - name: GCC version
-      env:
-        MINGW_HOME: C:\msys64\mingw64
-        MSYS_HOME: C:\msys64
-      run: echo "PATH=${MSYS_HOME}\usr\bin;${MINGW_HOME}\bin:$PATH" >> $GITHUB_ENV
-      shell: msys2 {0}
-  
+        arch: 'win64_mingw81'  
   
     - name: Build ROSPackageManager 
       run: |
-            cmake -Bbuild -G "Unix Makefiles"
+            cmake -Bbuild -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw32-make
             cmake --build build --config Release 
       shell: msys2 {0}
       env:
