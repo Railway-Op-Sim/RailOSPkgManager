@@ -44,13 +44,27 @@ ROSPkg::System::System(QWidget* parent) {
 }
 
 void ROSPkg::System::parseMetaFile_(const QString& file_name) {
-    //TODO: Need a better way of handling missing informartion
-
     if(!QFile::exists(file_name)) {
         return;
     }
 
-    const ROSTools::Metadata meta_data_(std::filesystem::path(file_name.toStdString()));
+    ROSTools::Metadata meta_data_;
+
+    try {
+        meta_data_ = ROSTools::Metadata(std::filesystem::path(file_name.toStdString()));
+    } catch(std::runtime_error& e) {
+        const QString err_ = QString("Cannot import package from '") +
+        file_name + 
+        QString("' due to missing content:\n") + 
+        QString(e.what()) +
+        QString(" in metadata.");
+
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Missing Package Content"),
+            QMessageBox::tr(err_.toStdString().c_str()));
+        return;
+    }
 
     QFile file_(file_name);
     QString hash_ = "";
@@ -199,7 +213,19 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
         );
         
         return;
+    } catch(std::runtime_error& e) {
+        const QString err_ = QString("Cannot import package due to missing content:\n") +
+        QString(e.what()) +
+        QString(" in metadata.");
+
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Missing Package Content"),
+            QMessageBox::tr(err_.toStdString().c_str()));
+        
+        return;
     }
+
     if(!files_list["docs"].empty()) {
         // Create directory for add-on docs
         doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
