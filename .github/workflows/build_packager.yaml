@@ -75,6 +75,11 @@ jobs:
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
     
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: mingw64
+        update: true
+
     - name: Install Qt
       uses: actions/checkout@v2
     - name: Install Qt
@@ -82,11 +87,6 @@ jobs:
       with:
         version: '6.2.1'
         arch: 'win64_mingw81'
-
-    - name: Set up MinGW
-      uses: egor-tensin/setup-mingw@v2
-      with:
-        platform: x64
   
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
@@ -97,6 +97,7 @@ jobs:
       run: |
             cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build --config Release 
+      shell: msys2 {0}
   
     - uses: actions/upload-artifact@v1
       with:
