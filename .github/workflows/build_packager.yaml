@@ -82,35 +82,16 @@ jobs:
         arch: 'win64_mingw81'
         host: 'windows'
         target: 'desktop'
-      env:
-          CC: clang
-          CXX: clang
   
-    - name: Install CMake
-      run: choco install cmake
-      env:
-          CC: clang
-          CXX: clang
-      
-    - name: Install Curl
-      run: choco install curl
-      env:
-          CC: clang
-          CXX: clang
-
-    - name: Add clang path to $PATH env
-      shell: bash
-      run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.9
+      with:
+        cmake-version: '3.20.x'
   
     - name: Build ROSPackageManager 
       run: |
-            clang --version
-            CC=clang CXX=clang cmake -Bbuild -DCURL_LIBRARY=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\lib -DCURL_INCLUDE_DIR=C:\ProgramData\chocolatey\lib\curl\tools\curl-7.81.0-win64-mingw\include
-            CC=clang CXX=clang cmake --build build --config Release 
-      shell: bash
-      env:
-          CC: clang
-          CXX: clang
+            cmake -Bbuild
+            cmake --build build --config Release 
   
     - uses: actions/upload-artifact@v1
       with:

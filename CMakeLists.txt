@@ -27,9 +27,16 @@ set( ROSTOOLS rostools )
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
-find_package( CURL REQUIRED )
+#find_package( CURL )
 
-set( CURL_LIBRARIES curl )
+if( NOT CURL_FOUND )
+    add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl )
+    set_target_properties( curl PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1 )
+    set( CURL_LIBRARIES libcurl )
+    set( CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/curl/lib/include )
+else()
+    set( CURL_LIBRARIES curl )
+endif()
 
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
 set( BUILD_TESTING OFF )

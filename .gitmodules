@@ -4,3 +4,6 @@
 [submodule "external/rostools"]
 	path = external/rostools
 	url = https://github.com/Railway-Op-Sim/rostools.git
+[submodule "external/curl"]
+	path = external/curl
+	url = https://github.com/curl/curl.git
