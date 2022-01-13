@@ -82,6 +82,11 @@ jobs:
       with:
         version: '6.2.1'
         arch: 'win64_mingw81'
+
+    - name: Set up MinGW
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        platform: x64
   
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
