@@ -106,4 +106,5 @@ jobs:
           prerelease: false
           tag_name: ${{ steps.previoustag.outputs.tag }}
           files: |
-            build/ROSPackageManager-*
+            build-test-linux/ROSPackageManager-*
+            build-test-windows/ROSPackageManager-*
