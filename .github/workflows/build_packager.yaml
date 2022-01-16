@@ -82,6 +82,16 @@ jobs:
       - build-test-windows
       - build-test-linux
     steps:
+      - name: Retrieve Windows Executable
+        uses: actions/download-artifact@v1
+        with:
+          name: build-test-windows
+
+      - name: Retrieve Linux Executable
+        uses: actions/download-artifact@v1
+        with:
+          name: build-test-linux
+      
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
