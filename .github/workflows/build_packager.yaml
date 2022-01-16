@@ -82,7 +82,12 @@ jobs:
         install: >-
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-openssl
-          gcc
+    
+    - name: Set up MinGW
+      uses: egor-tensin/setup-mingw@v2
+      id: setup-mingw
+      with:
+        platform: x64
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -92,7 +97,7 @@ jobs:
   
     - name: Build ROSPackageManager 
       run: |
-            /mingw64/bin/cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=/mingw64/bin/mingw64-gcc -DCMAKE_CXX_COMPILER=/mingw64/bin/mingw64-g++
+            /mingw64/bin/cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=${{ outputs.setp-mingw.gcc }} -DCMAKE_CXX_COMPILER=${{ outputs.setp-mingw.gxx }}
             /mingw64/bin/cmake --build build --config Release 
       shell: msys2 {0}
       env:
