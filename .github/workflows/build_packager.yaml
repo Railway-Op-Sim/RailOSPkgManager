@@ -1,6 +1,11 @@
-name: Build & Test
+name: Deploy ROSPkgManager
+on:
+  push:
+    tags:
+      - "v*"
+permissions:
+  contents: write
 
-on: [push]
 jobs:
   build-test-linux:
     runs-on: ubuntu-latest
@@ -8,34 +13,24 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-        path: rospkgmanager
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
         cmake-version: '3.20.x'
-    - uses: actions/checkout@v2
-      with:
-        repository: Railway-Op-Sim/rostools
-        ref: v0.4.0
-        path: rostools
     - name: Set up GCC
       uses: egor-tensin/setup-gcc@v1
       with:
         version: 11
         platform: x64
-    - name: Install ROSTools
-      env:
-        CC: gcc-11
-        CXX: g++-11
-      run: |
-        cmake -Bbuild
-        sudo cmake --build build/ --target install
-      working-directory: rostools/cpp
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.2'
+        version: '6.2.1'
         setup-python: false
+    
+    - name: Install Curl
+      run: sudo apt install -y sudo curl libssl-dev libcurl4-openssl-dev
+
     - name: Build ROSPackageManager
       env:
         CC: gcc-11
@@ -43,81 +38,93 @@ jobs:
       run: |
             cmake -Bbuild
             cmake --build build
-      working-directory: rospkgmanager
-    - uses: actions/upload-artifact@v1
-      with:
-          name: ubuntu_rospkg
-          path: rospkgmanager/build/ROSPkgManager
+    - name: Build ROSPackageManager
+      run: |
+            cmake -Bbuild
+            cmake --build build
+            mv build/ROSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
+
   build-test-macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-        path: rospkgmanager
+  
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
         cmake-version: '3.20.x'
-    - uses: actions/checkout@v2
-      with:
-        repository: Railway-Op-Sim/rostools
-        ref: v0.4.0
-        path: rostools
-    - name: Install ROSTools
-      run: |
-        cmake -Bbuild
-        sudo cmake --build build/ --target install
-      working-directory: rostools/cpp
+
+    - name: Install Curl
+      run: brew install openssl curl
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.2'
+        version: '6.2.1'
         setup-python: false
     - name: Build ROSPackageManager
       run: |
             cmake -Bbuild
             cmake --build build
-      working-directory: rospkgmanager
+            mv build/ROSPkgManager.app build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.app
+    
     - uses: actions/upload-artifact@v1
       with:
           name: darwin_rospkg
-          path: rospkgmanager/build/ROSPkgManager.app
+          path: build/ROSPkgManager.app
+
   build-test-windows:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-        path: rospkgmanager
-    - uses: actions/checkout@v2
-      with:
-        repository: Railway-Op-Sim/rostools
-        ref: v0.4.0
-        path: rostools
-    - name: Install ZLIB
-      run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
+
+    - name: Get Previous tag
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.2'
-        setup-python: false
+        version: '6.2.1'
+        arch: 'win64_mingw81'
+
+    - name: Upgrade GCC
+      run: choco upgrade mingw
+
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
         cmake-version: '3.20.x'
-    - name: Install ROSTools
+
+    - name: Build ROSPackageManager
       run: |
-        mkdir install
-        cmake -Bbuild
-        cmake --build build/ --target install
-      working-directory: rostools/cpp
-    - name: Build ROSPackageManager 
-      run: |
-            cmake -Bbuild
-            cmake --build build --config Release
-      working-directory: rospkgmanager
+            cmake -Bbuild -G "MinGW Makefiles" --config Release
+            cmake --build build
+            mv build/ROSPkgManager.exe build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+  
     - uses: actions/upload-artifact@v1
       with:
-          name: win_rospkg
-          path: rospkgmanager/build/ROSPkgManager.exe
+          name: build-test-windows
+          path: build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs:
+      - ubuntu-py39
+      - macos-py39
+      - windows-py39
+    steps:
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ROSPkgManager Release ${{ steps.previoustag.outputs.tag }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          tag_name: ${{ steps.previoustag.outputs.tag }}
+          files: |
+            build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.*
