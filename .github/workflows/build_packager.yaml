@@ -39,45 +39,6 @@ jobs:
             cmake -Bbuild
             cmake --build build
             mv build/ROSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
-
-  build-test-macos:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-  
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
-      with:
-        cmake-version: '3.20.x'
-
-    - name: Install Curl
-      run: brew install openssl curl
-
-    - name: Add OpenSSL to environment
-      run: |
-        export PATH="/usr/local/opt/openssl@3/bin:$PATH" >> $GITHUB_ENV
-        export LDFLAGS="-L/usr/local/opt/openssl@3/lib" >> $GITHUB_ENV
-        export CPPFLAGS="-I/usr/local/opt/openssl@3/include" >> $GITHUB_ENV
-        export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig" >> $GITHUB_ENV
-
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: '6.2.1'
-        setup-python: false
-    - name: Build ROSPackageManager
-      run: |
-            cmake -Bbuild
-            cmake --build build
-            mv build/ROSPkgManager.app build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.app
-    
-    - uses: actions/upload-artifact@v1
-      with:
-          name: build-test-macos
-          path: build/ROSPkgManager.app
-
   build-test-windows:
     runs-on: windows-latest
     steps:
@@ -119,7 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-test-windows
-      - build-test-macos
       - build-test-linux
     steps:
       - name: Create Release
