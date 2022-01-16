@@ -99,6 +99,7 @@ jobs:
       run: |
             cmake -Bbuild -G "MinGW Makefiles" -DCMAKE_MAKE_PROGRAM:PATH=/mingw64/bin/mingw64-make -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/cc -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/c++
             cmake --build build --config Release
+      shell: msys2 {0}
   
     - uses: actions/upload-artifact@v1
       with:
