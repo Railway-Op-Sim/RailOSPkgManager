@@ -25,7 +25,6 @@ set( ROSTOOLS rostools )
 add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${LIBRARY_NAME} PROPERTIES AUTOMOC ON )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs" )
 
 #find_package( CURL )
 

@@ -13,6 +13,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+
+    - name: Get Previous tag
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+  
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
@@ -70,6 +75,9 @@ jobs:
       with:
         cmake-version: '3.20.x'
 
+    - name: Install ZLIB
+      run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
+
     - name: Build ROSPackageManager
       run: |
             cmake -Bbuild -G "MinGW Makefiles"
@@ -79,7 +87,11 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
           name: build-test-windows
-          path: build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+          path: |
+            build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+            build/external/rostools/librostools.dll
+            build/external/curl/lib/libcurl.dll
+
 
   create-release:
     name: Create Release
@@ -88,6 +100,13 @@ jobs:
       - build-test-windows
       - build-test-linux
     steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
       - name: Retrieve Windows Executable
         uses: actions/download-artifact@v1
         with:
@@ -97,6 +116,16 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: build-test-linux
+
+      - name: Archive WindowsRelease
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: 'ROSPackageManager-${{ steps.previoustag.outputs.tag }}-Win64.zip'
+          path: |
+            build-test-windows/libcurl.dll
+            build-test-windows/librostools.dll
+            build-test-windows/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -107,4 +136,4 @@ jobs:
           tag_name: ${{ steps.previoustag.outputs.tag }}
           files: |
             build-test-linux/ROSPackageManager-*
-            build-test-windows/ROSPackageManager-*
+            ROSPackageManager-${{ steps.previoustag.outputs.tag }}-Win64.zip
