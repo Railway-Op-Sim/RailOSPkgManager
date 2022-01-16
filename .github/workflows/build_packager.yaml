@@ -69,6 +69,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -78,7 +80,7 @@ jobs:
       uses: jwlawson/actions-setup-cmake@v1.9
       with:
         cmake-version: '3.20.x'
-    - name: Build RailwayBuilder
+    - name: Build ROSPackageManager
       run: |
             cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
