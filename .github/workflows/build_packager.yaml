@@ -78,7 +78,7 @@ jobs:
         arch: 'win64_mingw81'
 
     - name: Upgrade GCC
-      run: choco upgrade gcc
+      run: choco upgrade mingw
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
