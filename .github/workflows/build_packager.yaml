@@ -39,6 +39,12 @@ jobs:
             cmake -Bbuild
             cmake --build build
             mv build/ROSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
+
+    - uses: actions/upload-artifact@v1
+      with:
+          name: build-test-linux
+          path: build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
+
   build-test-windows:
     runs-on: windows-latest
     steps:
