@@ -55,6 +55,13 @@ jobs:
     - name: Install Curl
       run: brew install openssl curl
 
+    - name: Add OpenSSL to environment
+      run: |
+        export PATH="/usr/local/opt/openssl@3/bin:$PATH" >> $GITHUB_ENV
+        export LDFLAGS="-L/usr/local/opt/openssl@3/lib" >> $GITHUB_ENV
+        export CPPFLAGS="-I/usr/local/opt/openssl@3/include" >> $GITHUB_ENV
+        export PKG_CONFIG_PATH="/usr/local/opt/openssl@3/lib/pkgconfig" >> $GITHUB_ENV
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
