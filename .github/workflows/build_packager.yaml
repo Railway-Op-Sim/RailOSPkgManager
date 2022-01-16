@@ -90,4 +90,4 @@ jobs:
           prerelease: false
           tag_name: ${{ steps.previoustag.outputs.tag }}
           files: |
-            build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.*
+            build/ROSPackageManager-*
