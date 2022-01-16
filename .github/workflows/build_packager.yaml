@@ -1,7 +1,8 @@
 name: Deploy ROSPkgManager
 on:
   push:
-    branches: [main]
+    tags:
+      - "v*"
 permissions:
   contents: write
 
@@ -37,10 +38,6 @@ jobs:
       run: |
             cmake -Bbuild
             cmake --build build
-    - name: Build ROSPackageManager
-      run: |
-            cmake -Bbuild
-            cmake --build build
             mv build/ROSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
 
   build-test-macos:
@@ -71,7 +68,7 @@ jobs:
     
     - uses: actions/upload-artifact@v1
       with:
-          name: darwin_rospkg
+          name: build-test-macos
           path: build/ROSPkgManager.app
 
   build-test-windows:
@@ -101,7 +98,7 @@ jobs:
 
     - name: Build ROSPackageManager
       run: |
-            cmake -Bbuild -G "MinGW Makefiles" --config Release
+            cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
             mv build/ROSPkgManager.exe build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
   
@@ -114,9 +111,9 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     needs:
-      - ubuntu-py39
-      - macos-py39
-      - windows-py39
+      - build-test-windows
+      - build-test-macos
+      - build-test-linux
     steps:
       - name: Create Release
         uses: softprops/action-gh-release@v1
