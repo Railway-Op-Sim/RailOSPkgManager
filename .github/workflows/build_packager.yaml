@@ -64,11 +64,8 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: '6.2.1'
-        arch: 'win64_mingw81'
-
-    - name: Upgrade GCC
-      run: choco upgrade mingw
+        version: '6.2.2'
+        arch: 'win64_mingw'
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.9
