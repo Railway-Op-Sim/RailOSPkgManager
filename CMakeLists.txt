@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.20 )
 
-project( ROSPkgManager VERSION 0.4.1 LANGUAGES CXX )
+project( ROSPkgManager VERSION 0.4.2 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
@@ -26,7 +26,8 @@ add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${LIBRARY_NAME} PROPERTIES AUTOMOC ON )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
-#find_package( CURL )
+find_package( CURL )
+set( ELZIP_TESTS OFF )
 
 if( NOT CURL_FOUND )
     add_subdirectory( ${CMAKE_SOURCE_DIR}/external/curl )
@@ -38,7 +39,6 @@ else()
 endif()
 
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
-set( BUILD_TESTING OFF )
 
 include(FetchContent)
 FetchContent_Declare(

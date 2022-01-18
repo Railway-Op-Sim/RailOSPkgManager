@@ -23,6 +23,7 @@
 
 #include <QDir>
 #include <QString>
+#include <QTextStream>
 #include <QTemporaryDir>
 #include <QWidget>
 #include <QtCore>
@@ -34,6 +35,12 @@
 #include <QList>
 
 #include "elzip.hpp"
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt {
+	static auto endl = ::endl;
+};
+#endif
 
 namespace ROSPkg {
 /*! **********************************************************************

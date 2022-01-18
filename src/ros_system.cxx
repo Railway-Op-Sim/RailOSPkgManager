@@ -32,8 +32,16 @@ ROSPkg::System::System(QWidget* parent) {
         }
     }
 
-    while(!QFile::exists(ros_loc_)) {
+    if(!QFile::exists(ros_loc_)) {
         createCache_();
+	if(ros_loc_.isEmpty() || ros_loc_.isNull()) {
+	    QMessageBox::critical(
+                parent_,
+		QMessageBox::tr("Railway Operation Simulator EXE unset"),
+		QMessageBox::tr("Cannot load package manager without setting Railway Operation Simulator executable path")
+	    );
+	    throw std::runtime_error("No ROS location set");
+	}
         QFile file_(cache_file_);
         if(file_.open(QIODevice::ReadOnly)) {
             ros_loc_ = file_.readLine();
