@@ -47,6 +47,13 @@ QString ROSPkg::Packager::buildTOML() {
             }
         }
         stream_ << "]" << Qt::endl;
+        stream_ << "img_files = [";
+        if(!img_files_.empty()) {
+            for(const QString& img_file : img_files_) {
+                stream_ << "\"" << QFileInfo(img_file).fileName() << "\",";
+            }
+        }
+        stream_ << "]" << Qt::endl;
         if(year_ > 0) stream_ << "year = \"" << year_ << "\"" << Qt::endl;
         if(!factual_.isEmpty()) stream_ << "factual = \"" << factual_ << "\"" << Qt::endl;
         stream_ << "author = \"" << author_ << "\"" << Qt::endl;
@@ -113,6 +120,13 @@ QString ROSPkg::Packager::createPackage() {
         QFile(doc_file).copy(
             out_dir_+
             QDir::separator() + "Documentation" + QDir::separator() + QFileInfo(doc_file).fileName()
+        );
+    }
+
+    for(const QString& img_file : img_files_) {
+        QFile(img_file).copy(
+            out_dir_+
+            QDir::separator() + "Images" + QDir::separator() + QFileInfo(img_file).fileName()
         );
     }
 

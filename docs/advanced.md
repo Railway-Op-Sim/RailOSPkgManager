@@ -3,7 +3,7 @@ ROS Package Manager comes with some advanced features which are hidden by defaul
 
 ## GitHub Repository Install
 ROS Package Manager supports the ability to install packages directly from a repository. For example you can install
-projects from the Railway Operation Simulator Developer GitHub (ROSDGH)(https://github.com/Railway-Op-Sim) by clicking the "GitHub" button after enabling advanced features.
+projects from the Railway Operation Simulator Developer GitHub [ROSDGH](https://github.com/Railway-Op-Sim) by clicking the "GitHub" button after enabling advanced features.
 
 To install from a repository you must provide the name in the form `<USER>/<REPOSITORY>`, by default the `USER` is set to be the ROSDGH `Railway-Op-Sim` username. Optionally you may specify the branch to install from if this is not `master`.
 

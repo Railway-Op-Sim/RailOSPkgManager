@@ -156,6 +156,11 @@ private slots:
     void on_BrowseDocFilesClicked();
 
 /*! **************************************************************************
+ * @brief Action associated with the "Create Package/Imgs Browse" button
+ * **************************************************************************/
+    void on_BrowseImgFilesClicked();
+
+/*! **************************************************************************
  * @brief Action associated with the clicking advanced options checkbox
  * **************************************************************************/
     void on_CheckBoxClicked();
@@ -174,6 +179,7 @@ private slots:
  * @brief Action associated with the "GitHub/Cancel" button
  * **************************************************************************/
     void on_GitHubCancelClicked();
+    
 public:
 /*! **************************************************************************
  * @brief Initialise an instance of the application GUI definition

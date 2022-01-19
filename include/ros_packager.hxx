@@ -12,6 +12,7 @@
  * - One or more program timetable files (.ttb)
  * - Optionally, session files (.ssn)
  * - Documentation files (.pdf, .md)
+ * - Image files (.png, .bmp)
  * - A metadata definition file (.toml)
  * 
  * A metadata file following the standard is created and used as a package
@@ -69,6 +70,7 @@ class Packager {
         QList<QString> ssn_files_;
         QList<QString> doc_files_;
         QList<QString> ttb_files_;
+        QList<QString> img_files_;
         QString toml_file_ = "";
     public:
 /*! **************************************************************************
