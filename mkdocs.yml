@@ -1,0 +1,30 @@
+site_name: ROS Package Manager
+site_url:
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Creating Packages: creating_packages.md
+  - Advanced Features: advanced.md
+markdown_extensions:
+  toc:
+    permalink: true
+  admonition: {}
+  md_in_html: {}
+  tables: {}
+theme:
+  name: material
+  logo: media/rospkgmanager_white.svg
+  favicon: media/favicon.ico
+  features:
+    - toc.integrate
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: teal
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+      primary: teal
