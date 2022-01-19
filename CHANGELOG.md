@@ -1,3 +1,5 @@
+# 2021-01-18 [v0.4.2](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.4.2)
+- Working release for Windows
 # 2021-01-06 [v0.4.1](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.4.1)
 - Fix vulnerability under CURL.
 - Fix bug in file closure after download.
