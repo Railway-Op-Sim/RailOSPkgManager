@@ -71,6 +71,11 @@ private:
  * **************************************************************************/
     void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
 
+/*! **************************************************************************
+ * @brief Upgrade the local ROS installation from the contents of a zip file
+ * **************************************************************************/
+    void upgradeROS_(const QMap<QString, QList<QString>>& files_list) const;
+
 public:
 /*! **************************************************************************
  * @brief Initialise a new instance of the System class
