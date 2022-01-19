@@ -124,7 +124,7 @@ class Packager {
  *
  * @param doc_path full path to the documentation file
  * *************************************************************************/
-    void addGraphicsFile(const QString& graphic_path) {graphics_files_.push_back(graphic_path);}
+    void addGraphicsFile(const QString& graphic_path) {graphic_files_.push_back(graphic_path);}
 
 /*! *************************************************************************
  * @brief add a contributor to the package, this is an additional author.

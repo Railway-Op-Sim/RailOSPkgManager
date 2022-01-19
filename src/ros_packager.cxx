@@ -137,6 +137,13 @@ QString ROSPkg::Packager::createPackage() {
         );
     }
 
+    for(const QString& graphic_file : graphic_files_) {
+        QFile(graphic_file).copy(
+            out_dir_+
+            QDir::separator() + "Graphics" + QDir::separator() + QFileInfo(graphic_file).fileName()
+        );
+    }
+
     const QString zip_file_ = out_dir_ + ".zip";
 
     elz::zipFolder(out_dir_.toStdString(), zip_file_.toStdString());

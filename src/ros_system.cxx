@@ -400,6 +400,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
         files_list_["toml"].push_back(new_toml_);
 
     }
+
     else if(files_list_["toml"].size() > 1) {
         QMessageBox::critical(
             parent_,
@@ -439,6 +440,18 @@ void ROSPkg::System::uninstall(const QString& sha) {
         info_text_ += "\n\nRemoved '" + data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
 
         QFile(data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
+    }
+
+    for(const std::filesystem::path& img_file: meta_data_.img_files()){
+        info_text_ += "\n\nRemoved '" + data_dir_ + "Images" + QDir::separator() + QString::fromStdString(img_file.string()) + "'";
+
+        QFile(data_dir_ + "Images" + QDir::separator() + QString::fromStdString(img_file.string())).remove();
+    }
+
+    for(const std::filesystem::path& graphic_file: meta_data_.graphic_files()){
+        info_text_ += "\n\nRemoved '" + data_dir_ + "Graphics" + QDir::separator() + QString::fromStdString(graphic_file.string()) + "'";
+
+        QFile(data_dir_ + "Graphics" + QDir::separator() + QString::fromStdString(graphic_file.string())).remove();
     }
 
     if(QDir doc_dir_(doc_dir_path_); doc_dir_.exists()){
