@@ -161,6 +161,11 @@ private slots:
     void on_BrowseImgFilesClicked();
 
 /*! **************************************************************************
+ * @brief Action associated with the "Create Package/Graphics Browse" button
+ * **************************************************************************/
+    void on_BrowseGraphicFilesClicked();
+
+/*! **************************************************************************
  * @brief Action associated with the clicking advanced options checkbox
  * **************************************************************************/
     void on_CheckBoxClicked();

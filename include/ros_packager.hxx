@@ -71,6 +71,7 @@ class Packager {
         QList<QString> doc_files_;
         QList<QString> ttb_files_;
         QList<QString> img_files_;
+        QList<QString> graphics_files_;
         QString toml_file_ = "";
     public:
 /*! **************************************************************************
@@ -110,6 +111,20 @@ class Packager {
  * @param doc_path full path to the documentation file
  * *************************************************************************/
     void addDocFile(const QString& doc_path) {doc_files_.push_back(doc_path);}
+
+/*! *************************************************************************
+ * @brief append an Images file to the package
+ *
+ * @param doc_path full path to the documentation file
+ * *************************************************************************/
+    void addImgFile(const QString& img_path) {img_files_.push_back(img_path);}
+
+/*! *************************************************************************
+ * @brief append a Graphics file to the package
+ *
+ * @param doc_path full path to the documentation file
+ * *************************************************************************/
+    void addGraphicsFile(const QString& graphic_path) {graphics_files_.push_back(graphic_path);}
 
 /*! *************************************************************************
  * @brief add a contributor to the package, this is an additional author.

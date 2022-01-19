@@ -129,8 +129,10 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QList<QString> filter_ttb_{"*.ttb", "*.TTB"};
     QList<QString> filter_toml_{"*.toml"};
     QList<QString> filter_docs_{"*.md", "*.pdf"};
+    QList<QString> filter_imgs_{"*.bmp"};
+    QList<QString> filter_graphics_{"*.jpg"};
     QList<QString> filter_ros_exe_{"railway.exe"};
-    QList<QString> filter_ros_files_{"*.dll", "*.chm", "*.bpl", "*.txt"};
+    QList<QString> filter_ros_files_{"*.dll", "*.chm", "*.bpl", "*.txt", "*.pdf"};
 
     // File result containers
     QMap<QString, QList<QString>> files_ ={
@@ -138,7 +140,9 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
         {"toml", {}},
         {"docs", {}},
         {"ttb", {}},
-        {"rly", {}}
+        {"rly", {}},
+        {"imgs", {}},
+        {"graphics", {}},
     };
 
 
@@ -149,6 +153,8 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QDirIterator it_toml(unzip_directory, filter_toml_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_docs(unzip_directory, filter_docs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_ros_exe(unzip_directory, filter_ros_exe_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_imgs(unzip_directory, filter_imgs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_graphics(unzip_directory, filter_graphics_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_ros_files(unzip_directory, filter_ros_files_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
     // Check if package is an ROS upgrade
@@ -187,6 +193,16 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     while(it_docs.hasNext()) {
         const QString docs_file_{it_docs.next()};
         files_["docs"] << docs_file_;
+    }
+
+    while(it_imgs.hasNext()) {
+        const QString img_file_{it_imgs.next()};
+        files_["imgs"] << img_file_;
+    }
+
+    while(it_graphics.hasNext()) {
+        const QString graphic_file_{it_graphics.next()};
+        files_["graphics"] << graphic_file_;
     }
 
     return files_;
@@ -357,6 +373,14 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
 
         if(!files_list_["docs"].empty()) {
             for(const QString& doc_file : files_list_["docs"]) packager_.addDocFile(doc_file);
+        }
+
+        if(!files_list_["imgs"].empty()) {
+            for(const QString& img_file : files_list_["imgs"]) packager_.addImgFile(img_file);
+        }
+
+        if(!files_list_["graphics"].empty()) {
+            for(const QString& graphic_file : files_list_["graphics"]) packager_.addGraphicsFile(graphic_file);
         }
 
         packager_.setRLYFile(QFileInfo(files_list_["rly"][0]).fileName());

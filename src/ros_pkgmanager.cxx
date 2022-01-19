@@ -35,6 +35,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     buttons_["browse_ssn"] = new QPushButton(QPushButton::tr("..."), package_form_);
     buttons_["browse_doc"] = new QPushButton(QPushButton::tr("..."), package_form_);
     buttons_["browse_img"] = new QPushButton(QPushButton::tr("..."), package_form_);
+    buttons_["browse_graphic"] = new QPushButton(QPushButton::tr("..."), package_form_);
 
     connect(buttons_["confirm_cancel"], &QPushButton::clicked, this, &Manager::on_CreateCancelClicked);
     connect(buttons_["confirm_create"], &QPushButton::clicked, this, &Manager::on_CreateConfirmClicked);
@@ -43,6 +44,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     connect(buttons_["browse_ssn"], &QPushButton::clicked, this, &Manager::on_BrowseSSNFilesClicked);
     connect(buttons_["browse_doc"], &QPushButton::clicked, this, &Manager::on_BrowseDocFilesClicked);
     connect(buttons_["browse_img"], &QPushButton::clicked, this, &Manager::on_BrowseImgFilesClicked);
+    connect(buttons_["browse_graphic"], &QPushButton::clicked, this, &Manager::on_BrowseGraphicFilesClicked);
 
     package_form_->setGeometry(window_x_, window_y_, 700, 700);
     package_form_->setWindowTitle("Create Package");
@@ -62,7 +64,8 @@ void ROSPkg::Manager::buildPackageForm_() {
         {"ttb_file_paths", "Timetable files (*.ttb)"},
         {"ssn_file_paths", "Session files (*.ssn)"},
         {"doc_file_paths", "Manual files (*.pdf,*.md)"},
-        {"img_file_paths", "Image files (*.png,*.bmp)"}
+        {"img_file_paths", "Image files"},
+        {"graphic_file_paths", "Graphics files"}
     };
     for(const auto& entry : entries_.toStdMap()) {
         package_form_entry_[entry.first] = new QLineEdit(package_form_);
@@ -182,6 +185,16 @@ void ROSPkg::Manager::buildPackageForm_() {
         11*package_form_->height()/(package_form_entry_.size()+7)
     );
 
+    package_form_labels_["graphic_file_paths"]->move(
+        package_form_->width()/11,
+        12*package_form_->height()/(package_form_entry_.size()+7)
+    );
+
+    package_form_entry_["graphic_file_paths"]->move(
+        package_form_->width()/3,
+        12*package_form_->height()/(package_form_entry_.size()+7)
+    );
+
     buttons_["browse_rly"]->move(
         9*package_form_->width()/11,
         7*package_form_->height()/(package_form_entry_.size()+7)
@@ -205,6 +218,11 @@ void ROSPkg::Manager::buildPackageForm_() {
     buttons_["browse_img"]->move(
         9*package_form_->width()/11,
         11*package_form_->height()/(package_form_entry_.size()+7)
+    );
+
+    buttons_["browse_graphic"]->move(
+        9*package_form_->width()/11,
+        12*package_form_->height()/(package_form_entry_.size()+7)
     );
 
     country_code_->move(
@@ -476,7 +494,7 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     QString img_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Image File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp, *.png, *.pdf)")
+        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp, *.png, *.jpg, *.pdf)")
     );
     if(img_file_path_.isEmpty() || img_file_path_.isNull()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
@@ -484,6 +502,20 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     }
     package_form_entry_["img_file_paths"]->setText(img_file_path_);
     package_form_entry_["img_file_paths"]->update();
+}
+
+void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
+    QString graphic_file_path_ = QFileDialog::getOpenFileName(
+        this,
+        QFileDialog::tr("Find Graphics File"),
+        QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphics Files (*.bmp, *.png, *.jpg)")
+    );
+    if(graphic_file_path_.isEmpty() || graphic_file_path_.isNull()) return;
+    if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
+        graphic_file_path_ = package_form_entry_["graphic_file_paths"]->text() + "," + graphic_file_path_;
+    }
+    package_form_entry_["graphic_file_paths"]->setText(graphic_file_path_);
+    package_form_entry_["graphic_file_paths"]->update();
 }
 
 void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
