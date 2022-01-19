@@ -1,3 +1,5 @@
+# 2021-01-19 [v0.5.0](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.5.0)
+- Add ability to upgrade base program version from the package manager.
 # 2021-01-18 [v0.4.2](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.4.2)
 - Working release for Windows
 # 2021-01-06 [v0.4.1](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.4.1)
