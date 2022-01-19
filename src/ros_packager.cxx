@@ -54,6 +54,13 @@ QString ROSPkg::Packager::buildTOML() {
             }
         }
         stream_ << "]" << Qt::endl;
+        stream_ << "graphic_files = [";
+        if(!img_files_.empty()) {
+            for(const QString& graphic_file : graphic_files_) {
+                stream_ << "\"" << QFileInfo(graphic_file).fileName() << "\",";
+            }
+        }
+        stream_ << "]" << Qt::endl;
         if(year_ > 0) stream_ << "year = \"" << year_ << "\"" << Qt::endl;
         if(!factual_.isEmpty()) stream_ << "factual = \"" << factual_ << "\"" << Qt::endl;
         stream_ << "author = \"" << author_ << "\"" << Qt::endl;

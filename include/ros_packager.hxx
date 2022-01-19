@@ -71,7 +71,7 @@ class Packager {
         QList<QString> doc_files_;
         QList<QString> ttb_files_;
         QList<QString> img_files_;
-        QList<QString> graphics_files_;
+        QList<QString> graphic_files_;
         QString toml_file_ = "";
     public:
 /*! **************************************************************************
