@@ -5,6 +5,7 @@ nav:
   - Getting Started: getting_started.md
   - Creating Packages: creating_packages.md
   - Advanced Features: advanced.md
+  - Upgrading ROS: upgrade.md
 markdown_extensions:
   toc:
     permalink: true

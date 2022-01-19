@@ -368,7 +368,7 @@ void ROSPkg::Manager::on_InstallButtonClicked() {
     const QString zip_file_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Open Zip Archive"),
-        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("Add-ons (*.zip)")
+        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("Packages (*.zip)")
     );
     if(zip_file_.isEmpty() || zip_file_.isNull()) return;
     system_->unzipFile(zip_file_);

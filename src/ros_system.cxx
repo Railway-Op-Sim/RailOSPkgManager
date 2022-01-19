@@ -129,6 +129,8 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QList<QString> filter_ttb_{"*.ttb", "*.TTB"};
     QList<QString> filter_toml_{"*.toml"};
     QList<QString> filter_docs_{"*.md", "*.pdf"};
+    QList<QString> filter_ros_exe_{"railway.exe"};
+    QList<QString> filter_ros_files_{"*.dll", "*.chm", "*.bpl", "*.txt"};
 
     // File result containers
     QMap<QString, QList<QString>> files_ ={
@@ -139,12 +141,27 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
         {"rly", {}}
     };
 
+
     // Directory iterators for each file type
     QDirIterator it_ssn(unzip_directory, filter_ssn_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_rly(unzip_directory, filter_rly_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_ttb(unzip_directory, filter_ttb_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_toml(unzip_directory, filter_toml_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_docs(unzip_directory, filter_docs_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ros_exe(unzip_directory, filter_ros_exe_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    QDirIterator it_ros_files(unzip_directory, filter_ros_files_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+    // Check if package is an ROS upgrade
+    if(it_ros_exe.hasNext()) {
+        QMap<QString, QList<QString>>ros_files_{{"ros", {it_ros_exe.next()}}};
+        
+        while(it_ros_files.hasNext()) {
+            const QString ros_file_{it_ros_files.next()};
+            ros_files_["ros_files"] << ros_file_;
+        }
+
+        return ros_files_;
+    }
 
     // For each file type search recursively for the needed file types
     while(it_toml.hasNext()) {
@@ -173,6 +190,43 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     }
 
     return files_;
+}
+
+void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list) const {
+    QMessageBox ros_install_dialog(parent_);
+
+    ros_install_dialog.setWindowTitle("Upgrade Railway Operation Simulator?");
+    ros_install_dialog.setText("A Railway Operation Simulator application package was detected.");
+    ros_install_dialog.setInformativeText("Do you want to upgrade your local installation?");
+    ros_install_dialog.setStandardButtons(QMessageBox::Abort | QMessageBox::Ok);
+    ros_install_dialog.setDefaultButton(QMessageBox::Ok);
+
+    const int return_code_ = ros_install_dialog.exec();
+    QStringList installed_ = {};
+
+    if(return_code_ == QMessageBox::Abort) return;
+
+    const QString ros_exe_ = files_list["ros"][0];
+    installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName());
+
+    QFile(ros_exe_).copy(
+        ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName()
+    );
+
+    for(const QString ros_file : files_list["ros_files"]) {
+        installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName());
+        QFile(ros_file).copy(
+            ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName()
+        );
+    }
+
+    const QString info_str_ = "The following files were installed:\n"+installed_.join("\n");
+
+    QMessageBox::information(
+        parent_,
+        QMessageBox::tr("Upgrade successful"),
+        QMessageBox::tr(info_str_.toStdString().c_str())
+    );
 }
 
 void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list) const {
@@ -257,6 +311,13 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
     qDebug() << "Zip File Contents: " << files_list_ << Qt::endl;
+
+    // If there is an ROS executable in the zip file assume that it is
+    // an upgrade to ROS to be installed
+    if(files_list_.contains("ros")) {
+        upgradeROS_(files_list_);
+        return;
+    }
 
     // If no TOML file is found then archive is not an ROS package yet so one needs to be created
     if(files_list_["toml"].empty()) {
