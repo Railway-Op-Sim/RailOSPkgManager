@@ -15,6 +15,8 @@
 
 This application aims to simplify the process of adding and removing route simulations to the local installation of [Railway Operation Simulator](https://railwayoperationsimulator.com/) (ROS), a railway signalling simulation by Albert Ball.
 
+Full documentation can be found on the [project website](https://railway-op-sim.github.io/ROSPkgManager/).
+
 ## Getting Started
 On first launch you will need to specify the location of the `railway.exe` ROS executable on your system, this location is used to determine where add-ons should be installed. Once this is set the location will be cached and so no longer required. Functionality for altering the installation will be added at a later date. Within this manual `${ROS_HOME}` refers to the directory containing `railway.exe`.
 
