@@ -45,6 +45,9 @@ The buttons next to the file declaration fields allow you to browse for files to
 |Factual|If simulation is a factual representation.|
 |Year|Year for which this simulation is a representation (can be any value if fictional).|
 
+## Upgrading Railway Operation Simulator
+If select a zip file containing a `railway.exe` executable the program will assume it to be a copy of the main ROS program and ask if you wish to
+upgrade your local installation with the files contained.
 
 ## Advanced
 Clicking the "Advanced" checkbox shows additional options for package installation.
