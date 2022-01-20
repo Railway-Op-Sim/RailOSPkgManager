@@ -13,7 +13,7 @@
     
     
       
-        <title>Creating Packages - ROS Package Manager</title>
+        <title>Upgrading ROS - ROS Package Manager</title>
       
     
     
@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#creating-packages" class="md-skip">
+        <a href="#upgrading-railway-operation-simulator" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Creating Packages
+              Upgrading ROS
             
           </span>
         </div>
@@ -231,72 +231,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Creating Packages
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../creating_packages/" class="md-nav__link">
         Creating Packages
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-editor-form" class="md-nav__link">
-    The Editor Form
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mandatory-requirements" class="md-nav__link">
-    Mandatory Requirements
-  </a>
-  
-    <nav class="md-nav" aria-label="Mandatory Requirements">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#editor-form-fields" class="md-nav__link">
-    Editor Form Fields
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -322,11 +261,21 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../upgrade/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Upgrading ROS
       </a>
+      
     </li>
   
 
@@ -344,91 +293,25 @@
               
                 
 
-<h1 id="creating-packages">Creating Packages<a class="headerlink" href="#creating-packages" title="Permanent link">&para;</a></h1>
-<h2 id="the-editor-form">The Editor Form<a class="headerlink" href="#the-editor-form" title="Permanent link">&para;</a></h2>
-<p>In order create a package there is a minimum requirement for files and metadata that must be provided
-to meet the standard. The built in editor form contains all the required fields for creating a
-metadata file to be included within the package. This file provides the means of linking together
-all the components of a package, as well as defines extra information such as version number.</p>
-<p>Those fields requiring one or more file path have buttons for browsing the local file system.</p>
+<h1 id="upgrading-railway-operation-simulator">Upgrading Railway Operation Simulator<a class="headerlink" href="#upgrading-railway-operation-simulator" title="Permanent link">&para;</a></h1>
+<p>In addition to the installation of add-ons, ROSPkgManager can handle the switching of base program version,
+performing a pseudo-upgrade.
+If the user specifies a downloaded zip file containing an ROS version (recognised by the presence of a <code>railway.exe</code> file), the program offers to replace the files in the local system installation with the new files. The term "pseudo" refers
+to the fact that the program does not recognise one version as newer than another, as such this method can also be used
+to perform a downgrade.</p>
 <figure>
-<p><img alt="pkg_editor" src="../media/package_editor.png" /></p>
+<p><img alt="install_pkg" src="../media/install_pkg.png" /></p>
 </figure>
-<h2 id="mandatory-requirements">Mandatory Requirements<a class="headerlink" href="#mandatory-requirements" title="Permanent link">&para;</a></h2>
-<p>Requirements for package creation are quite strict, the idea being a package should be accessible to
-all using ROS where possible:</p>
-<ul>
-<li>Documentation MUST be provided and should be either a markdown file <code>.md</code> or a PDF <code>.pdf</code>, formats like <code>.docx</code> are not accepted due to them not being universal.</li>
-<li>You must provide only a single <code>.rly</code> file per package.</li>
-<li>Do NOT add a file to a package that is used by another simulation, this file will be removed whenever the package is uninstalled breaking any other simulations which require it.</li>
-</ul>
-<div class="admonition important">
-<p class="admonition-title">Image Inclusion</p>
-<p>In future releases image files will also be included as an additional field. Currently this is not supported.</p>
-</div>
-<h3 id="editor-form-fields">Editor Form Fields<a class="headerlink" href="#editor-form-fields" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th><strong>Field</strong></th>
-<th><strong>Description</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Package Name</td>
-<td>Name of the package as it would appear on a file system.</td>
-</tr>
-<tr>
-<td>Display Name</td>
-<td>Name of the package as it would appear on a listing.</td>
-</tr>
-<tr>
-<td>Description</td>
-<td>A brief description of the contained simulation.</td>
-</tr>
-<tr>
-<td>Version</td>
-<td>A <a href="https://semver.org">semantic version</a> of the form <code>MAJOR.MINOR.PATCH</code> for this package.</td>
-</tr>
-<tr>
-<td>Author</td>
-<td>The leading author of this project.</td>
-</tr>
-<tr>
-<td>Contributors</td>
-<td>(Optional) Additional authors (separated by <code>,</code>).</td>
-</tr>
-<tr>
-<td>Railway File</td>
-<td>Single <code>.rly</code> for this simulation.</td>
-</tr>
-<tr>
-<td>Timetable Files</td>
-<td>All <code>.ttb</code> files for this simulation (separated by <code>,</code>).</td>
-</tr>
-<tr>
-<td>Session Files</td>
-<td>(Optional) All <code>.ssn</code> files for this simulation (separated by <code>,</code>).</td>
-</tr>
-<tr>
-<td>Manual Files</td>
-<td>Documentation files (<code>.pdf</code>, <code>.md</code>) for this simulation (separated by <code>,</code>).</td>
-</tr>
-<tr>
-<td>Country Code</td>
-<td>Two letter country code of route origin in this simulation (<code>FN</code> if fictional).</td>
-</tr>
-<tr>
-<td>Factual</td>
-<td>If simulation is a factual representation.</td>
-</tr>
-<tr>
-<td>Year</td>
-<td>Year for which this simulation is a representation (can be any value if fictional).</td>
-</tr>
-</tbody>
-</table>
+<figure>
+<p><img alt="select_ros" src="../media/select_ros.png" /></p>
+</figure>
+<figure>
+<p><img alt="confirm_upgrade" src="../media/confirm_upgrade.png" /></p>
+</figure>
+<figure>
+<p><img alt="ros_upgraded" src="../media/ros_upgraded.png" /></p>
+</figure>
+<p>This greatly simplifies the process of patching your local version when a new release of ROS is made. Releases for the program are available on the base program <a href="https://www.railwayoperationsimulator.com/catalog/base-program/railway-operation-simulator">download page</a>.</p>
 
               
             </article>
@@ -442,7 +325,7 @@ all using ROS where possible:</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../getting_started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started" rel="prev">
+        <a href="../advanced/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Advanced Features" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -451,26 +334,11 @@ all using ROS where possible:</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Getting Started
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../advanced/" class="md-footer__link md-footer__link--next" aria-label="Next: Advanced Features" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
               Advanced Features
             </div>
           </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
         </a>
+      
       
     </nav>
   
