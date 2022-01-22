@@ -268,6 +268,22 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
         QFile(ttb_file).copy(new_path_);
     }
 
+    for(const QString& graphic_file : files_list["graphics"] ) {
+        QString base_name_ = QFileInfo(graphic_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Graphics" + QDir::separator() + base_name_;
+        info_text_ += "\n\nAdded " + new_path_;
+        qDebug() << "Copying: " << graphic_file << " to " << new_path_;
+        QFile(graphic_file).copy(new_path_);
+    }
+
+    for(const QString& img_file : files_list["imgs"] ) {
+        QString base_name_ = QFileInfo(img_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Images" + QDir::separator() + base_name_;
+        info_text_ += "\n\nAdded " + new_path_;
+        qDebug() << "Copying: " << img_file << " to " << new_path_;
+        QFile(img_file).copy(new_path_);
+    }
+
     for(const QString& ssn_file : files_list["ssn"] ) {
         QString base_name_ = QFileInfo(ssn_file).fileName();
         QString new_path_ = ros_loc_ + QDir::separator() + "Sessions" + QDir::separator() + base_name_;
@@ -282,6 +298,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
     }
 
     QString doc_dir_ = ros_loc_ + QDir::separator() + "Documentation";
+    QString meta_dir_ = ros_loc_ + QDir::separator() + "Metadata";
 
     ROSTools::Metadata package_data_;
 
@@ -313,6 +330,14 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
         // Create directory for add-on docs
         doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
         QDir().mkpath(doc_dir_);
+    }
+
+    for(const QString& toml_file : files_list["toml"]) {
+        QString base_name_ = QFileInfo(toml_file).fileName();
+        QString new_path_ = ros_loc_ + QDir::separator() + "Metadata" + QDir::separator() + base_name_;
+        info_text_ += "\n\nAdded " + new_path_;
+        qDebug() << "Copying: " << toml_file << " to " << new_path_;
+        QFile(toml_file).copy(new_path_);
     }
 
     for(const QString& doc_file : files_list["docs"] ) {
@@ -458,6 +483,10 @@ void ROSPkg::System::uninstall(const QString& sha) {
 
         QFile(data_dir_ + "Graphics" + QDir::separator() + QString::fromStdString(graphic_file.string())).remove();
     }
+
+    info_text_ += "\n\nRemoved '" + data_dir_ + "Metadata" + QDir::separator() + QString::fromStdString(meta_data_.toml_file().string()) + "'";
+
+    QFile(data_dir_ + "Metadata" + QDir::separator() + QString::fromStdString(meta_data_.toml_file().string())).remove();
 
     if(QDir doc_dir_(doc_dir_path_); doc_dir_.exists()){
         info_text_ += "\n\nRemoved '" + doc_dir_path_;
