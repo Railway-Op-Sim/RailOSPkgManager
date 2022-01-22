@@ -1,16 +1,18 @@
 cmake_minimum_required( VERSION 3.20 )
 
-project( ROSPkgManager VERSION 0.5.0 LANGUAGES CXX )
+project( ROSPkgManager VERSION 0.5.1 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
-set( LIBRARY_NAME rospkg )
+set( ROSPKGMANAGER_LIBRARY rospkg )
 
 find_package( QT NAMES Qt6 Qt5 )
 find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui REQUIRED )
 
 set( MAIN_SRC ${CMAKE_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
+
+option( BUILD_ROSPKGMANAGER_TESTS "Build the available ROSPkgManager tests" OFF )
 
 file( GLOB SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cxx )
 file( GLOB TS_FILES ${CMAKE_SOURCE_DIR}/lang/*.ts )
@@ -22,8 +24,8 @@ set( DIGESTPP digestpp )
 set( 11ZIP elzip )
 set( ROSTOOLS rostools )
 
-add_library( ${LIBRARY_NAME} STATIC ${SRC_FILES} ${HEADERS} )
-set_target_properties( ${LIBRARY_NAME} PROPERTIES AUTOMOC ON )
+add_library( ${ROSPKGMANAGER_LIBRARY} STATIC ${SRC_FILES} ${HEADERS} )
+set_target_properties( ${ROSPKGMANAGER_LIBRARY} PROPERTIES AUTOMOC ON )
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/11Zip )
 
 find_package( CURL )
@@ -48,19 +50,23 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${LIBRARY_NAME} PUBLIC ${11ZIP} )
-target_link_libraries( ${LIBRARY_NAME} PUBLIC ${CURL_LIBRARIES} )
-target_link_libraries( ${LIBRARY_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
-target_link_libraries( ${LIBRARY_NAME} PUBLIC ${ROSTOOLS} )
-target_include_directories( ${LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
-target_include_directories( ${LIBRARY_NAME} PUBLIC ${CURL_INCLUDE_DIR} )
-target_include_directories( ${LIBRARY_NAME} PUBLIC ${tomlplusplus_SOURCE_DIR} )
-target_include_directories( ${LIBRARY_NAME} PUBLIC ${digestpp_SOURCE_DIR} )
+target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${11ZIP} )
+target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${CURL_LIBRARIES} )
+target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
+target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${ROSTOOLS} )
+target_include_directories( ${ROSPKGMANAGER_LIBRARY} PRIVATE ${CMAKE_SOURCE_DIR}/include )
+target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${CURL_INCLUDE_DIR} )
+target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${tomlplusplus_SOURCE_DIR} )
+target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${digestpp_SOURCE_DIR} )
 
 add_executable( ${PROJECT_NAME} ${MAIN_SRC} )
 set_target_properties( ${PROJECT_NAME} PROPERTIES AUTOMOC ON )
-target_link_libraries( ${PROJECT_NAME} PRIVATE ${LIBRARY_NAME} )
+target_link_libraries( ${PROJECT_NAME} PRIVATE ${ROSPKGMANAGER_LIBRARY} )
 target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
+
+if( BUILD_ROSPKGMANAGER_TESTS )
+    add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/tests )
+endif()
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE

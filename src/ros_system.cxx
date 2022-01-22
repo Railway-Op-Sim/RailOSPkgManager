@@ -7,13 +7,18 @@ size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *
 void ROSPkg::System::createCache_() {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
-        QDir().mkdir(cache_dir_);
+        QDir().mkpath(cache_dir_);
     }
-    ros_loc_ = QFileDialog::getOpenFileName(
+    const QString ros_exe_ = QFileDialog::getOpenFileName(
         parent_,
         QFileDialog::tr("Locate") + QString(" Railway Operation Simulator"),
         QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
     );
+
+    const QDir ros_dir_ = QFileInfo(ros_exe_).dir();
+    
+    ros_loc_ = QFileInfo(ros_dir_.path()).absolutePath();
+
     if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
     QFile file_(cache_file_);
     if(file_.open(QIODevice::WriteOnly)) {
@@ -273,7 +278,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
 
     // If the Documentation directory does not yet exist create it
     if(!QDir(ros_loc_ + QDir::separator() + "Documentation").exists()) {
-        QDir().mkdir(ros_loc_ + QDir::separator() + "Documentation");
+        QDir().mkpath(ros_loc_ + QDir::separator() + "Documentation");
     }
 
     QString doc_dir_ = ros_loc_ + QDir::separator() + "Documentation";
@@ -307,7 +312,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
     if(!files_list["docs"].empty()) {
         // Create directory for add-on docs
         doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
-        QDir().mkdir(doc_dir_);
+        QDir().mkpath(doc_dir_);
     }
 
     for(const QString& doc_file : files_list["docs"] ) {
@@ -322,7 +327,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
 
 void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, const QString& pkg_name, const QString& country_code) const {
     QTemporaryDir temp_dir_;
-    QDir().mkdir(temp_dir_.path());
+    QDir().mkpath(temp_dir_.path());
     elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
@@ -466,7 +471,7 @@ void ROSPkg::System::uninstall(const QString& sha) {
 void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) const {
     const QString GitHub_URL_ = "https://github.com/" + repository_path + "/archive/refs/heads/" + branch + ".zip";
     QTemporaryDir temp_dir_;
-    QDir().mkdir(temp_dir_.path());
+    QDir().mkpath(temp_dir_.path());
     const QList<QString> gh_path_ = repository_path.split("/");
 
     QString zip_file_name_ = "download";

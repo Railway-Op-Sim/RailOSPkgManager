@@ -7,7 +7,14 @@ void ROSPkg::Packager::packageFailure() {
 QString ROSPkg::Packager::buildTOML() {
     QString file_name_ = QString(package_name_);
     file_name_.replace(" ", "_");
-    toml_file_ = ros_loc_ + QDir::separator() + "Metadata" + QDir::separator() + file_name_ + ".toml";
+    
+    QString metadata_dir_ = ros_loc_ + QDir::separator() + "Metadata";
+    
+    if(!QDir(metadata_dir_).exists()) {
+        QDir().mkpath(metadata_dir_);
+    }
+
+    toml_file_ = metadata_dir_ + QDir::separator() + file_name_ + ".toml";
 
     if(version_.isEmpty()) {
         const QDate now_ = QDate::currentDate();
@@ -20,6 +27,7 @@ QString ROSPkg::Packager::buildTOML() {
 
     // Builds a TOML file manually using strings
     QFile file_(toml_file_);
+    qDebug() << toml_file_ << Qt::endl;
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
         stream_ << "name = \"" << package_name_  << "\"" << Qt::endl;
@@ -74,6 +82,8 @@ QString ROSPkg::Packager::buildTOML() {
         stream_ << "country_code = \"" << country_code_ << "\"" << Qt::endl;
     }
 
+    file_.close();
+
     return toml_file_;
 }
 
@@ -81,7 +91,7 @@ QString ROSPkg::Packager::createPackage() {
     buildTOML();
     const QString build_dir_ = ros_loc_ + QDir::separator() + "Packages";
     if(!QDir(build_dir_).exists()) {
-        QDir().mkdir(build_dir_);
+        QDir().mkpath(build_dir_);
     }
     QString package_file_name_ = package_name_;
     QString package_name_version_ = version_;
@@ -91,13 +101,13 @@ QString ROSPkg::Packager::createPackage() {
 
     const QString out_dir_ = build_dir_ + QDir::separator() + package_file_name_;
 
-    QDir().mkdir(out_dir_);
-    QDir().mkdir(out_dir_+ QDir::separator() + "Railway");
-    QDir().mkdir(out_dir_+ QDir::separator() + "Program_Timetables");
-    QDir().mkdir(out_dir_+ QDir::separator() + "Sessions");
-    QDir().mkdir(out_dir_+ QDir::separator() + "Documentation");
-    QDir().mkdir(out_dir_+ QDir::separator() + "Images");
-    QDir().mkdir(out_dir_+ QDir::separator() + "Metadata");
+    QDir().mkpath(out_dir_);
+    QDir().mkpath(out_dir_+ QDir::separator() + "Railway");
+    QDir().mkpath(out_dir_+ QDir::separator() + "Program_Timetables");
+    QDir().mkpath(out_dir_+ QDir::separator() + "Sessions");
+    QDir().mkpath(out_dir_+ QDir::separator() + "Documentation");
+    QDir().mkpath(out_dir_+ QDir::separator() + "Images");
+    QDir().mkpath(out_dir_+ QDir::separator() + "Metadata");
 
     QFile(rly_file_).copy(
         out_dir_+
