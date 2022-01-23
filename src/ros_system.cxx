@@ -39,7 +39,7 @@ ROSPkg::System::System(QWidget* parent) {
 
     if(!QFile::exists(ros_loc_)) {
         createCache_();
-	if(ros_loc_.isEmpty())) {
+	if(ros_loc_.isEmpty()) {
 	    QMessageBox::critical(
                 parent_,
 		QMessageBox::tr("Railway Operation Simulator EXE unset"),
