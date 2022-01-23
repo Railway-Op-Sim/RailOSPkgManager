@@ -388,7 +388,7 @@ void ROSPkg::Manager::on_InstallButtonClicked() {
         QFileDialog::tr("Open Zip Archive"),
         QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("Packages (*.zip)")
     );
-    if(zip_file_.isEmpty() || zip_file_.isNull()) return;
+	if(zip_file_.isEmpty()) return;
     system_->unzipFile(zip_file_);
     system_->populateInstalled();
     populateTable_();
@@ -471,7 +471,7 @@ void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
         QFileDialog::tr("Find Railway File"),
         QString(system_->getROSLocation() + QDir::separator() + "Railways"), QFileDialog::tr("Railway Files (*.rly)")
     );
-    if(rly_file_.isEmpty() || rly_file_.isNull()) return;
+	if(rly_file_.isEmpty()) return;
     package_form_entry_["rly_file_path"]->setText(rly_file_);
     package_form_entry_["rly_file_path"]->update();
 }
@@ -482,7 +482,7 @@ void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
         QFileDialog::tr("Find Session File"),
         QString(system_->getROSLocation() + QDir::separator() + "Sessions"), QFileDialog::tr("Session Files (*.ssn)")
     );
-    if(ssn_file_path_.isEmpty() || ssn_file_path_.isNull()) return;
+	if(ssn_file_path_.isEmpty()) return;
     if(!package_form_entry_["ssn_file_paths"]->text().isEmpty()) {
         ssn_file_path_ = package_form_entry_["ttb_file_paths"]->text() + "," + ssn_file_path_;
     }
@@ -496,7 +496,7 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
         QFileDialog::tr("Find Image File"),
         QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp, *.png, *.jpg, *.pdf)")
     );
-    if(img_file_path_.isEmpty() || img_file_path_.isNull()) return;
+	if(img_file_path_.isEmpty()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
         img_file_path_ = package_form_entry_["img_file_paths"]->text() + "," + img_file_path_;
     }
@@ -510,7 +510,7 @@ void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
         QFileDialog::tr("Find Graphics File"),
         QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphics Files (*.bmp, *.png, *.jpg)")
     );
-    if(graphic_file_path_.isEmpty() || graphic_file_path_.isNull()) return;
+	if(graphic_file_path_.isEmpty()) return;
     if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
         graphic_file_path_ = package_form_entry_["graphic_file_paths"]->text() + "," + graphic_file_path_;
     }
@@ -524,7 +524,7 @@ void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
         QFileDialog::tr("Find Timetable File"),
         QString(system_->getROSLocation() + QDir::separator() + "Program timetables"), QFileDialog::tr("Timetable Files (*.ttb)")
     );
-    if(ttb_file_path_.isEmpty() || ttb_file_path_.isNull()) return;
+	if(ttb_file_path_.isEmpty()) return;
     if(!package_form_entry_["ttb_file_paths"]->text().isEmpty()) {
         ttb_file_path_ = package_form_entry_["ttb_file_paths"]->text() + "," + ttb_file_path_;
     }
@@ -538,7 +538,7 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
         QFileDialog::tr("Find Documentation File"),
         QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf, *.md)")
     );
-    if(doc_file_path_.isEmpty() || doc_file_path_.isNull()) return;
+	if(doc_file_path_.isEmpty()) return;
     if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
         doc_file_path_ = package_form_entry_["doc_file_paths"]->text() + "," + doc_file_path_;
     }

@@ -19,7 +19,7 @@ void ROSPkg::System::createCache_() {
     
     ros_loc_ = QFileInfo(ros_dir_.path()).absolutePath();
 
-    if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
+	if(ros_loc_.isEmpty()) return;
     QFile file_(cache_file_);
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
@@ -39,7 +39,7 @@ ROSPkg::System::System(QWidget* parent) {
 
     if(!QFile::exists(ros_loc_)) {
         createCache_();
-	if(ros_loc_.isEmpty() || ros_loc_.isNull()) {
+	if(ros_loc_.isEmpty())) {
 	    QMessageBox::critical(
                 parent_,
 		QMessageBox::tr("Railway Operation Simulator EXE unset"),
