@@ -165,6 +165,8 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     // Check if package is an ROS upgrade
     if(it_ros_exe.hasNext()) {
         QMap<QString, QList<QString>>ros_files_{{"ros", {it_ros_exe.next()}}};
+        QDir unzip_dir(unzip_directory);
+        ros_files_["source_loc"] = {unzip_dir.path()};
         
         while(it_ros_files.hasNext()) {
             const QString ros_file_{it_ros_files.next()};
@@ -234,11 +236,13 @@ void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list
         ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName()
     );
 
+    const QString archive_loc_ = files_list["source_loc"][0];
+
     for(const QString ros_file : files_list["ros_files"]) {
-        installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName());
-        QFile(ros_file).copy(
-            ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName()
-        );
+        QString ros_root_ = QFileInfo(ros_loc_).absolutePath();
+        QString file_ = ros_root_ + QDir::separator() + QDir(archive_loc_).relativeFilePath(ros_file);
+        installed_.push_back(file_);
+        QFile(ros_file).copy(file_);
     }
 
     const QString info_str_ = "The following files were installed:\n"+installed_.join("\n");
