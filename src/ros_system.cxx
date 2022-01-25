@@ -230,18 +230,25 @@ void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list
     if(return_code_ == QMessageBox::Abort) return;
 
     const QString ros_exe_ = files_list["ros"][0];
-    installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName());
+    const QString ros_exe_out_ = ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName();
 
-    QFile(ros_exe_).copy(
-        ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName()
-    );
+    if(QFile(ros_exe_out_).exists()) {
+        QFile(ros_exe_out_).remove();
+    }
+
+    QFile(ros_exe_).copy(ros_exe_out_);
+
+    installed_.push_back(ros_exe_out_);
 
     const QString archive_loc_ = files_list["source_loc"][0];
 
     for(const QString ros_file : files_list["ros_files"]) {
-        QString ros_root_ = QFileInfo(ros_loc_).absolutePath();
-        QString file_ = ros_root_ + QDir::separator() + QDir(archive_loc_).relativeFilePath(ros_file);
+        const QString ros_root_ = QFileInfo(ros_loc_).absolutePath();
+        const QString file_ = ros_root_ + QDir::separator() + QDir(archive_loc_).relativeFilePath(ros_file);
         installed_.push_back(file_);
+        if(QFile(file_).exists()) {
+            QFile(file_).remove();
+        }
         QFile(ros_file).copy(file_);
     }
 

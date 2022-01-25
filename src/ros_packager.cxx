@@ -109,49 +109,55 @@ QString ROSPkg::Packager::createPackage() {
     QDir().mkpath(out_dir_+ QDir::separator() + "Images");
     QDir().mkpath(out_dir_+ QDir::separator() + "Metadata");
 
-    QFile(rly_file_).copy(
-        out_dir_+
-        QDir::separator() + "Railway" + QDir::separator() + QFileInfo(rly_file_).fileName()
-    );
+    const QString out_rly_file_ = out_dir_ +
+        QDir::separator() + "Railway" + QDir::separator() + QFileInfo(rly_file_).fileName();
+    const QString out_toml_file_ = out_dir_+
+        QDir::separator() + "Metadata" + QDir::separator() + QFileInfo(toml_file_).fileName();
+    
+    if(QFile(out_rly_file_).exists()) QFile(out_rly_file_).remove();
+    if(QFile(out_toml_file_).exists()) QFile(out_toml_file_).remove();
 
-    QFile(toml_file_).copy(
-        out_dir_+
-        QDir::separator() + "Metadata" + QDir::separator() + QFileInfo(toml_file_).fileName()
-    );
+    QFile(rly_file_).copy(out_rly_file_);
+    QFile(toml_file_).copy(out_toml_file_);
 
     for(const QString& ttb_file : ttb_files_) {
-        QFile(ttb_file).copy(
-            out_dir_+
-            QDir::separator() + "Program_Timetables" + QDir::separator() + QFileInfo(ttb_file).fileName()
-        );
+        const QString out_ttb_file_ = out_dir_+
+            QDir::separator() + "Program_Timetables" +
+            QDir::separator() + QFileInfo(ttb_file).fileName();
+        if(QFile(out_ttb_file_).exists()) QFile(out_ttb_file_).remove();
+        QFile(ttb_file).copy(out_ttb_file_);
     }
 
     for(const QString& ssn_file : ssn_files_) {
-        QFile(ssn_file).copy(
-            out_dir_+
-            QDir::separator() + "Sessions" + QDir::separator() + QFileInfo(ssn_file).fileName()
-        );
+        const QString out_ssn_file_ = out_dir_+
+            QDir::separator() + "Sessions" +
+            QDir::separator() + QFileInfo(ssn_file).fileName();
+        if(QFile(out_ssn_file_).exists()) QFile(out_ssn_file_).remove();
+        QFile(ssn_file).copy(out_ssn_file_);
     }
 
     for(const QString& doc_file : doc_files_) {
-        QFile(doc_file).copy(
-            out_dir_+
-            QDir::separator() + "Documentation" + QDir::separator() + QFileInfo(doc_file).fileName()
-        );
+        const QString out_doc_file_ = out_dir_+
+            QDir::separator() + "Documentation" +
+            QDir::separator() + QFileInfo(doc_file).fileName();
+        if(QFile(out_doc_file_).exists()) QFile(out_doc_file_).remove();
+        QFile(doc_file).copy(out_doc_file_);
     }
 
     for(const QString& img_file : img_files_) {
-        QFile(img_file).copy(
-            out_dir_+
-            QDir::separator() + "Images" + QDir::separator() + QFileInfo(img_file).fileName()
-        );
+        const QString out_img_file_ = out_dir_+
+            QDir::separator() + "Images" +
+            QDir::separator() + QFileInfo(img_file).fileName();
+        if(QFile(out_img_file_).exists()) QFile(out_img_file_).remove();
+        QFile(img_file).copy(out_img_file_);
     }
 
     for(const QString& graphic_file : graphic_files_) {
-        QFile(graphic_file).copy(
-            out_dir_+
-            QDir::separator() + "Graphics" + QDir::separator() + QFileInfo(graphic_file).fileName()
-        );
+        const QString out_graphic_file_ = out_dir_+
+            QDir::separator() + "Graphics" +
+            QDir::separator() + QFileInfo(graphic_file).fileName();
+        if(QFile(out_graphic_file_).exists()) QFile(out_graphic_file_).remove();
+        QFile(graphic_file).copy(out_graphic_file_);
     }
 
     const QString zip_file_ = out_dir_ + ".zip";
