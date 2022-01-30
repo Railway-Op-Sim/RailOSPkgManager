@@ -7,9 +7,9 @@ void ROSPkg::Packager::packageFailure() {
 QString ROSPkg::Packager::buildTOML() {
     QString file_name_ = QString(package_name_);
     file_name_.replace(" ", "_");
-    
+
     QString metadata_dir_ = ros_loc_ + QDir::separator() + "Metadata";
-    
+
     if(!QDir(metadata_dir_).exists()) {
         QDir().mkpath(metadata_dir_);
     }
@@ -21,68 +21,62 @@ QString ROSPkg::Packager::buildTOML() {
         version_ = now_.toString(Qt::ISODate);
     }
 
+
+    ROSTools::Metadata new_meta_;
+    if(!description_.isEmpty()) new_meta_.setDescription(description_.toStdString());
+    if(package_name_.isEmpty()) {packageFailure(); return "";}
     if(display_name_.isEmpty()) {
-        display_name_ = package_name_;
+        display_name_ = QString(package_name_);
+    }
+    new_meta_.setDisplayName(display_name_.toStdString());
+    new_meta_.setName(package_name_.toStdString());
+    new_meta_.setFactual(factual_);
+    new_meta_.setCountryCode(country_code_.toStdString());
+    if(rly_file_.isEmpty()) {packageFailure(); return "";}
+    if(ttb_files_.empty()) {packageFailure(); return "";}
+    if(doc_files_.empty()) {packageFailure(); return "";}
+    new_meta_.setAuthor(author_.toStdString());
+    new_meta_.setRLYFile(QFileInfo(rly_file_).fileName().toStdString());
+    for(const QString& ttb_file : ttb_files_) {
+        new_meta_.addTTBFile(QFileInfo(ttb_file).fileName().toStdString());
+    }
+    for(const QString& doc_file : doc_files_) {
+        new_meta_.addDocFile(QFileInfo(doc_file).fileName().toStdString());
+    }
+    if(!ssn_files_.empty()) {
+        for(const QString& ssn_file : ssn_files_) {
+            new_meta_.addSSNFile(QFileInfo(ssn_file).fileName().toStdString());
+        }
+    }
+    if(!img_files_.empty()) {
+        for(const QString& img_file : img_files_) {
+            new_meta_.addImgFile(QFileInfo(img_file).fileName().toStdString());
+        }
+    }
+    if(!graphic_files_.empty()) {
+        for(const QString& graphic_file : graphic_files_) {
+            new_meta_.addGraphicFile(QFileInfo(graphic_file).fileName().toStdString());
+        }
+    }
+    if(!contributors_.empty()) {
+        for(const QString& contributor : contributors_) {
+            new_meta_.addContributor(contributor.toStdString());
+        }
     }
 
-    // Builds a TOML file manually using strings
-    QFile file_(toml_file_);
-    qDebug() << toml_file_ << Qt::endl;
-    if(file_.open(QIODevice::WriteOnly)) {
-        QTextStream stream_(&file_);
-        stream_ << "name = \"" << package_name_  << "\"" << Qt::endl;
-        if(!description_.isEmpty()) stream_ << "description = \"" << description_ << "\"" << Qt::endl;
-        stream_ << "display_name = \"" << display_name_ << "\"" << Qt::endl;
-        if(rly_file_.isEmpty()) {packageFailure(); return "";}
-        if(ttb_files_.empty()) {packageFailure(); return "";}
-        stream_ << "rly_file = \"" << QFileInfo(rly_file_).fileName() << "\"" << Qt::endl;
-        stream_ << "ttb_files = [";
-        for(const QString& ttb_file : ttb_files_) {
-            stream_ << "\"" << QFileInfo(ttb_file).fileName() << "\",";
-        }
-        stream_ << "]" << Qt::endl;
-        if(!ssn_files_.empty()) {
-            stream_ << "ssn_files = [";
-            for(const QString& ssn_file : ssn_files_) {
-                stream_ << "\"" << QFileInfo(ssn_file).fileName() << "\",";
-            }
-            stream_ << "]" << Qt::endl;
-        }
-        stream_ << "doc_files = [";
-        if(!doc_files_.empty()) {
-            for(const QString& doc_file : doc_files_) {
-                stream_ << "\"" << QFileInfo(doc_file).fileName() << "\",";
-            }
-        }
-        stream_ << "]" << Qt::endl;
-        stream_ << "img_files = [";
-        if(!img_files_.empty()) {
-            for(const QString& img_file : img_files_) {
-                stream_ << "\"" << QFileInfo(img_file).fileName() << "\",";
-            }
-        }
-        stream_ << "]" << Qt::endl;
-        stream_ << "graphic_files = [";
-        if(!img_files_.empty()) {
-            for(const QString& graphic_file : graphic_files_) {
-                stream_ << "\"" << QFileInfo(graphic_file).fileName() << "\",";
-            }
-        }
-        stream_ << "]" << Qt::endl;
-        if(year_ > 0) stream_ << "year = \"" << year_ << "\"" << Qt::endl;
-        if(!factual_.isEmpty()) stream_ << "factual = \"" << factual_ << "\"" << Qt::endl;
-        stream_ << "author = \"" << author_ << "\"" << Qt::endl;
-        if(!contributors_.empty()) {
-            stream_ << "contributors = [";
-            for(const QString& contrib : contributors_) {
-                stream_ << "\"" << QFileInfo(contrib).fileName() << "\",";
-            }
-            stream_ << "]" << Qt::endl;
-        }
-        stream_ << "country_code = \"" << country_code_ << "\"" << Qt::endl;
+    try {
+        new_meta_.validate();
+    } catch(std::runtime_error& e) {
+        const QString err_ = QString("Package creation was unsuccessful due to validation failure:\n") + QString(e.what());
+        QMessageBox::critical(
+            parent_,
+            QMessageBox::tr("Package Creation Failed"),
+            QMessageBox::tr(err_.toStdString().c_str())
+        );
+        return "";
     }
 
-    file_.close();
+    new_meta_.write(toml_file_.toStdString());
 
     return toml_file_;
 }
@@ -113,7 +107,7 @@ QString ROSPkg::Packager::createPackage() {
         QDir::separator() + "Railway" + QDir::separator() + QFileInfo(rly_file_).fileName();
     const QString out_toml_file_ = out_dir_+
         QDir::separator() + "Metadata" + QDir::separator() + QFileInfo(toml_file_).fileName();
-    
+
     if(QFile(out_rly_file_).exists()) QFile(out_rly_file_).remove();
     if(QFile(out_toml_file_).exists()) QFile(out_toml_file_).remove();
 

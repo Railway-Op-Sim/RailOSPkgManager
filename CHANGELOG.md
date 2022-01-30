@@ -1,3 +1,8 @@
+# 2021-01-19 [v0.5.5](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.5.5)
+- Fixed curl issues when retrieving add ons from GitHub.
+- Fixed bad file type in browser windows listing during package creation.
+- Uses latest `rostools` with validation removed on import to prevent error throws.
+- Adds icon.
 # 2021-01-19 [v0.5.0](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.5.0)
 - Add ability to upgrade base program version from the package manager.
 # 2021-01-18 [v0.4.2](https://github.com/Railway-Op-Sim/ROSPkgManager/releases/tag/v0.4.2)

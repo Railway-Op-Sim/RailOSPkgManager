@@ -74,10 +74,10 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
     ROSTools::Metadata meta_data_;
 
     try {
-        meta_data_ = ROSTools::Metadata(std::filesystem::path(file_name.toStdString()));
+        meta_data_ = ROSTools::Metadata(std::filesystem::path(file_name.toStdString()), false);
     } catch(std::runtime_error& e) {
         const QString err_ = QString("Cannot import package from '") +
-        file_name + 
+        file_name +
         QString("' due to missing content:\n") + 
         QString(e.what()) +
         QString(" in metadata.");
@@ -324,7 +324,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
     ROSTools::Metadata package_data_;
 
     try {
-        package_data_ = ROSTools::Metadata(std::filesystem::path(files_list["toml"][0].toStdString()));
+        package_data_ = ROSTools::Metadata(std::filesystem::path(files_list["toml"][0].toStdString()), false);
     }
     catch(const std::invalid_argument&) {
         QMessageBox::critical(
@@ -332,7 +332,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
             QMessageBox::tr("Missing Package Metadata"),
             QMessageBox::tr("Cannot install selected package, missing package metadata.")
         );
-        
+
         return;
     } catch(std::runtime_error& e) {
         const QString err_ = QString("Cannot import package due to missing content:\n") +
@@ -343,7 +343,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
             parent_,
             QMessageBox::tr("Missing Package Content"),
             QMessageBox::tr(err_.toStdString().c_str()));
-        
+
         return;
     }
 
@@ -402,7 +402,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
                 QMessageBox::tr("Package definition ambiguous"),
                 QMessageBox::tr("Expected single RLY file from archive.")
             );
-            
+
             return;
         }
 
@@ -412,7 +412,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
                 QMessageBox::tr("Missing timetables"),
                 QMessageBox::tr("Expected one or more TTB files within archive.")
             );
-            
+
             return;
         }
 

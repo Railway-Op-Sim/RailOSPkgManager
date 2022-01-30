@@ -7,17 +7,17 @@
  * This file contains the Packager class used for handling and creating
  * packages for Railway Operation Simulator. A package is defined as a single
  * route simulation consisting of:
- * 
+ *
  * - A single railway definition (.rly) file
  * - One or more program timetable files (.ttb)
  * - Optionally, session files (.ssn)
  * - Documentation files (.pdf, .md)
  * - Image files (.png, .bmp)
  * - A metadata definition file (.toml)
- * 
+ *
  * A metadata file following the standard is created and used as a package
  * definition file.
- * 
+ *
  ****************************************************************************/
 #ifndef __ROSPACKAGER_HXX__
 #define __ROSPACKAGER_HXX__
@@ -36,6 +36,7 @@
 #include <QList>
 
 #include "elzip.hpp"
+#include "rostools/metadata.hxx"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 namespace Qt {
@@ -56,23 +57,23 @@ class Packager {
     private:
         QWidget* parent_ = nullptr;
         const QDir output_dir_{QStandardPaths::writableLocation(QStandardPaths::CacheLocation)};
-        const QString package_name_ = "";
-        const QString ros_loc_ = "";
-        QString display_name_ = "";
+        const QString package_name_{};
+        const QString ros_loc_{};
+        QString display_name_{};
         QString author_ = "Unknown";
         QList<QString> contributors_ = {};
-        QString version_ = "";
-        QString description_ = "";
+        QString version_{};
+        QString description_{};
         int year_ = -1;
-        QString factual_ = "false";
+        bool factual_ = false;
         QString country_code_ = "UN";
-        QString rly_file_ = "";
+        QString rly_file_{};
         QList<QString> ssn_files_;
         QList<QString> doc_files_;
         QList<QString> ttb_files_;
         QList<QString> img_files_;
         QList<QString> graphic_files_;
-        QString toml_file_ = "";
+        QString toml_file_{};
     public:
 /*! **************************************************************************
  * @brief Initialise a new packager for a given parent widget
@@ -81,7 +82,7 @@ class Packager {
  * @param ros_loc full path to directory containing railway.exe
  * @param package_name name to give final package
  * **************************************************************************/
-    Packager(QWidget* parent, const QString& ros_loc, const QString& package_name) : 
+    Packager(QWidget* parent, const QString& ros_loc, const QString& package_name) :
         parent_(parent), ros_loc_(ros_loc), package_name_(package_name) {}
 
 /*! *************************************************************************
@@ -93,7 +94,7 @@ class Packager {
 
 /*! *************************************************************************
  * @brief append a program timetable file (.ttb) to the package
- * 
+ *
  * @param ttb_path full path to the TTB file
  * *************************************************************************/
     void addTTBFile(const QString& ttb_path) {ttb_files_.push_back(ttb_path);}
@@ -152,7 +153,7 @@ class Packager {
  *
  * @param is_true if simulation is factual
  * *************************************************************************/
-    void setFactual(bool is_true) {factual_ = (is_true) ? "true" : "false";}
+    void setFactual(bool is_true) {factual_ = is_true;}
 
 /*! *************************************************************************
  * @brief set the year the simulation in the package is set

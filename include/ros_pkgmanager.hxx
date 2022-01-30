@@ -30,6 +30,10 @@
 #include "ros_system.hxx"
 #include "rostools/country_codes.hxx"
 
+#ifndef ROSPKGMANAGER_VERSION
+    #error "Version not specified during build"
+#endif
+
 /*! **********************************************************************
  * @namespace ROSPkg
  * @brief Contains all methods and classes relating to the ROSPkgManager

@@ -133,6 +133,6 @@ public:
  * **************************************************************************/
     void fetchGitHub(const QString& repository_path, const QString& branch = "master") const;
 };
-}; 
+};
 
 #endif

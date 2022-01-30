@@ -42,7 +42,9 @@ The buttons next to the file declaration fields allow you to browse for files to
 |Railway File|Single `.rly` for this simulation.|
 |Timetable Files|All `.ttb` files for this simulation (separated by `,`).|
 |Session Files|(Optional) All `.ssn` files for this simulation (separated by `,`).|
-|Manual Files|Documentation files (`.pdf`, `.md`) for this simulation (separated by `,`).|
+|Documentation Files|Documentation files (`.pdf`, `.md`) for this simulation (separated by `,`).|
+|Graphic Files|(Optional) Graphics files used in map (separated by `,`).|
+|Image Files|Screenshot image files to include (separated by `,`).|
 |Country Code|Two letter country code of route origin in this simulation (`FN` if fictional).|
 |Factual|If simulation is a factual representation.|
 |Year|Year for which this simulation is a representation (can be any value if fictional).|

@@ -63,7 +63,7 @@ void ROSPkg::Manager::buildPackageForm_() {
         {"rly_file_path", "Railway file (*.rly)"},
         {"ttb_file_paths", "Timetable files (*.ttb)"},
         {"ssn_file_paths", "Session files (*.ssn)"},
-        {"doc_file_paths", "Manual files (*.pdf,*.md)"},
+        {"doc_file_paths", "Documentation files (*.pdf,*.md)"},
         {"img_file_paths", "Image files"},
         {"graphic_file_paths", "Graphics files"}
     };
@@ -305,7 +305,8 @@ ROSPkg::Manager::Manager()
 
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    this->setWindowTitle("Railway Operation Simulator Package Manager");
+    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(ROSPKGMANAGER_VERSION);
+    this->setWindowTitle(title_);
 
     // Define the installed add-on table offsets
     const int table_x_ = (WINDOW_WIDTH-TABLE_WIDTH)/2;
@@ -494,7 +495,7 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     QString img_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Image File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp, *.png, *.jpg, *.pdf)")
+        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
     );
     if(img_file_path_.isEmpty() || img_file_path_.isNull()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
@@ -508,7 +509,7 @@ void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
     QString graphic_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Graphics File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphics Files (*.bmp, *.png, *.jpg)")
+        QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
     );
     if(graphic_file_path_.isEmpty() || graphic_file_path_.isNull()) return;
     if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
@@ -536,7 +537,7 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
     QString doc_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Documentation File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf, *.md)")
+        QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf *.md)")
     );
     if(doc_file_path_.isEmpty() || doc_file_path_.isNull()) return;
     if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
@@ -550,16 +551,21 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
     QMap<QString,QString> data_;
     for(const auto& e : package_form_entry_.toStdMap()) {
         // Session files are not mandatory
-        if(e.first == "ssn_files") continue;
+        if(e.first == "ssn_file_paths") continue;
 
         // Contributor list not mandatory
         if(e.first == "contributors") continue;
 
+        // Graphic files are optional
+        if(e.first == "graphic_file_paths") continue;
+
         if(e.second->text().isEmpty()) {
+            const QString err_ = QString("Package is missing required information '") + QString(e.first) + QString("'.");
             QMessageBox::critical(
                 this,
                 QMessageBox::tr("Incomplete Package"),
-                QMessageBox::tr("Package is missing required information"));
+                QMessageBox::tr(err_.toStdString().c_str())
+                );
             throw std::invalid_argument("Invalid package form data specified");
         }
     }

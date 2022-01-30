@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.20 )
 
-project( ROSPkgManager VERSION 0.5.4 LANGUAGES CXX )
+project( ROSPkgManager VERSION 0.5.5 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
@@ -24,6 +24,8 @@ file( GLOB HEADERS ${CMAKE_SOURCE_DIR}/include/*.hxx )
 set( DIGESTPP digestpp )
 set( 11ZIP elzip )
 set( ROSTOOLS rostools )
+
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DROSPKGMANAGER_VERSION=\\\"${CMAKE_PROJECT_VERSION}\\\" " )
 
 add_library( ${ROSPKGMANAGER_LIBRARY} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${ROSPKGMANAGER_LIBRARY} PROPERTIES AUTOMOC ON )
