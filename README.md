@@ -66,11 +66,12 @@ project and install it.
 To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
 
 ### Linux
-Install `openssl` using the relevant package manager for your distribution and build using:
+Install `openssl` using the relevant package manager for your distribution. Build using:
 ```
 cmake -Bbuild -DCURL_USE_OPENSSL=ON
 cmake --build build 
 ```
+you can also speed up the build process by installing `libcurl-dev`/`libcurl-devel`, make sure to do this after OpenSSL, you will not need the `CURL_USE_OPENSSL` argument if you do this.
 
 ### Windows
 The application is built on Windows using packages/applications installed via the [Chocolatey package manager](https://community.chocolatey.org):
