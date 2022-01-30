@@ -11,6 +11,7 @@ find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui RE
 
 set( MAIN_SRC ${CMAKE_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
+set( APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/img/appicon.rc" )
 
 option( BUILD_ROSPKGMANAGER_TESTS "Build the available ROSPkgManager tests" OFF )
 
@@ -59,7 +60,7 @@ target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${CURL_INCLUDE_DIR} 
 target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${tomlplusplus_SOURCE_DIR} )
 target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${digestpp_SOURCE_DIR} )
 
-add_executable( ${PROJECT_NAME} ${MAIN_SRC} )
+add_executable( ${PROJECT_NAME} ${MAIN_SRC} ${APP_ICON_RESOURCE_WINDOWS} )
 set_target_properties( ${PROJECT_NAME} PROPERTIES AUTOMOC ON )
 target_link_libraries( ${PROJECT_NAME} PRIVATE ${ROSPKGMANAGER_LIBRARY} )
 target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
