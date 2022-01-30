@@ -15,9 +15,17 @@ void ROSPkg::System::createCache_() {
         QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
     );
 
-    const QDir ros_dir_ = QFileInfo(ros_exe_).dir();
-    
-    ros_loc_ = QFileInfo(ros_dir_.path()).absolutePath();
+    if(ros_exe_.isNull())
+    {
+        QMessageBox::critical(
+	    parent_,
+	    QMessageBox::tr("Missing ROS Location"),
+	    QMessageBox::tr("Railway Operation Simulator executable 'railway.exe' location is required, aborting.")
+	);
+	throw std::runtime_error("No ROS location set");
+    }
+
+    ros_loc_ = QFileInfo(ros_exe_).absolutePath();
 
     if(ros_loc_.isEmpty() || ros_loc_.isNull()) return;
     QFile file_(cache_file_);
@@ -37,7 +45,9 @@ ROSPkg::System::System(QWidget* parent) {
         }
     }
 
-    if(!QFile::exists(ros_loc_)) {
+    QFileInfo loc_info_(ros_loc_ + QDir::separator() + "Railway" + QDir::separator() + "railway.exe");
+
+    if(!loc_info_.exists() || !loc_info_.isFile()) {
         createCache_();
 	if(ros_loc_.isEmpty() || ros_loc_.isNull()) {
 	    QMessageBox::critical(
@@ -549,6 +559,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
 
     curl_easy_setopt(curl_, CURLOPT_URL, GitHub_URL_.toStdString().c_str());
     curl_easy_setopt(curl_, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
     curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
     curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1);
@@ -558,7 +569,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
     fclose(file_);
 
     if(!QFile::exists(download_path_) || res != CURLE_OK) {
-        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_;
+        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_+"\nwith error code "+QString::number(res);
         QMessageBox::critical(
             parent_,
             QMessageBox::tr("Invalid URL"),

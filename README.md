@@ -62,3 +62,37 @@ By default the user is set to "Railway-Op-Sim" as authors are encouraged to deve
 There is also the option to specify an alternative branch to "master". Clicking "Ok" will download an archive of the
 project and install it.
 
+## Building from Source
+To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
+
+### Linux
+Install `openssl` using the relevant package manager for your distribution and build using:
+```
+cmake -Bbuild -DCURL_USE_OPENSSL=ON
+cmake --build build 
+```
+
+### Windows
+The application is built on Windows using packages/applications installed via the [Chocolatey package manager](https://community.chocolatey.org):
+```
+choco install mingw
+choco install cmake
+choco install openssl
+```
+It is built using the Git Bash terminal and the following commands:
+
+```
+cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake/Qt<QT-VERSION-NUMBER>/ -DCURL_USE_OPENSSL=ON
+cmake --build build
+```
+
+You will need to include the required DLLs in the package:
+
+* `C:\Qt\<Qt-version>\mingw_<version>\translations`
+* `C:\Qt\<Qt-version>\mingw_<version>\plugins\platforms\qwindows.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Core.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Widgets.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Gui.dll`
+* `build/external/lib/libcurl.dll`
+* `build/external/rostools/cpp/librostools.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\libwinpthread-1.dll`
