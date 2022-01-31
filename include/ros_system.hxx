@@ -32,7 +32,7 @@ namespace ROSPkg {
 /*! **********************************************************************
  * @class System
  * @brief Procedures relating to the files on the file system
- * 
+ *
  * Handles the creation/removal of files on the file system including
  * the building of packages and metadata files. Also determines which
  * packages are installed. Packages are stored under an SHA256 hash
@@ -69,7 +69,7 @@ private:
 /*! **************************************************************************
  * @brief Copy files from zip to ROS directories
  * **************************************************************************/
-    void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
+    void unpackZip_(const QMap<QString, QList<QString>>& file_listing, bool legacy_package=false) const;
 
 /*! **************************************************************************
  * @brief Upgrade the local ROS installation from the contents of a zip file

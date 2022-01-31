@@ -10,6 +10,11 @@ To install from a repository you must provide the name in the form `<USER>/<REPO
 !!! important "URL Download"
     The URL `https://github.com/<USER>/<PROJECT>/archive/refs/heads/<BRANCH>.zip` is used to retrieve the project files.
 
+!!! important "Error 22"
+    If you perform above a certain number of download requests in a given time you are likely to receive an Error 22. This is
+    from the GitHub server itself. This feature is for developer use only, all normal add-on installations should be performed
+    from a zip file downloaded from the main Railway Operation Simulator website.
+
 <figure markdown>
 ![gh_install](media/gh_install.png)
 </figure>

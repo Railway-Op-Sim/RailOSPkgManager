@@ -295,13 +295,14 @@ void ROSPkg::Manager::buildURLForm_() {
 
 
 void ROSPkg::Manager::clearPackageForm_() {
-    for(const auto& entry : package_form_entry_) {
-        entry->clear();
+    for(const auto& entry : package_form_entry_.keys()) {
+        if(entry == "version") continue; // Keep default version in form
+        package_form_entry_[entry]->clear();
     }
 }
 
 ROSPkg::Manager::Manager()
-{ 
+{
 
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -432,15 +433,36 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     package_->setYear(data_["year"].toInt());
     package_->setVersion(data_["version"]);
     package_->setDescription(data_["description"]);
-    package_->setRLYFile(data_["rly_file_path"]);
+
+    try {
+        package_->setRLYFile(data_["rly_file_path"]);
+    } catch(const std::runtime_error&) {
+        return;
+    }
 
     QList<QString> ttb_files_ = data_["ttb_file_paths"].split(",");
     QList<QString> doc_files_ = data_["doc_file_paths"].split(",");
+    QList<QString> img_files_ = data_["img_file_paths"].split(",");
 
     if(!data_["ssn_files_paths"].isEmpty()) {
         QList<QString> ssn_files_ = data_["ssn_file_paths"].split(",");
-        for(const QString& ssn_file : ssn_files_) {
-            package_->addSSNFile(ssn_file);
+        try {
+            for(const QString& ssn_file : ssn_files_) {
+                package_->addSSNFile(ssn_file);
+            }
+        } catch(const std::runtime_error&) {
+            return;
+        }
+    }
+
+    if(!data_["graphic_files_paths"].isEmpty()) {
+        QList<QString> graphic_files_ = data_["graphic_files_paths"].split(",");
+        try {
+            for(const QString& graphic_file : graphic_files_) {
+                package_->addGraphicsFile(graphic_file);
+            }
+        } catch(const std::runtime_error&) {
+            return;
         }
     }
 
@@ -452,12 +474,29 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     }
 
     for(const QString& ttb_file : ttb_files_) {
-        package_->addTTBFile(ttb_file);
+        try {
+            package_->addTTBFile(ttb_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
     }
 
     for(const QString& doc_file : doc_files_) {
-        package_->addDocFile(doc_file);
+        try {
+            package_->addDocFile(doc_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
     }
+
+    for(const QString& img_file : img_files_) {
+        try {
+            package_->addImgFile(img_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
+    }
+
 
     package_->createPackage();
     package_form_->close();
@@ -470,7 +509,7 @@ void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
     const QString rly_file_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Railway File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Railways"), QFileDialog::tr("Railway Files (*.rly)")
+        QString(QDir(system_->getROSLocation()).filePath("Railways")), QFileDialog::tr("Railway Files (*.rly)")
     );
     if(rly_file_.isEmpty() || rly_file_.isNull()) return;
     package_form_entry_["rly_file_path"]->setText(rly_file_);
@@ -481,7 +520,7 @@ void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
     QString ssn_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Session File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Sessions"), QFileDialog::tr("Session Files (*.ssn)")
+        QString(QDir(system_->getROSLocation()).filePath("Sessions")), QFileDialog::tr("Session Files (*.ssn)")
     );
     if(ssn_file_path_.isEmpty() || ssn_file_path_.isNull()) return;
     if(!package_form_entry_["ssn_file_paths"]->text().isEmpty()) {
@@ -495,7 +534,7 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     QString img_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Image File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
+        QString(QDir(system_->getROSLocation()).filePath("Images")), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
     );
     if(img_file_path_.isEmpty() || img_file_path_.isNull()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
@@ -509,7 +548,7 @@ void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
     QString graphic_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Graphics File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
+        QString(QDir(system_->getROSLocation()).filePath("Graphics")), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
     );
     if(graphic_file_path_.isEmpty() || graphic_file_path_.isNull()) return;
     if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
@@ -523,7 +562,7 @@ void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
     QString ttb_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Timetable File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Program timetables"), QFileDialog::tr("Timetable Files (*.ttb)")
+        QString(QDir(system_->getROSLocation()).filePath("Program timetables")), QFileDialog::tr("Timetable Files (*.ttb)")
     );
     if(ttb_file_path_.isEmpty() || ttb_file_path_.isNull()) return;
     if(!package_form_entry_["ttb_file_paths"]->text().isEmpty()) {
@@ -537,7 +576,7 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
     QString doc_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Documentation File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf *.md)")
+        QString(QDir(system_->getROSLocation()).filePath("Documentation")), QFileDialog::tr("Documentation Files (*.pdf *.md)")
     );
     if(doc_file_path_.isEmpty() || doc_file_path_.isNull()) return;
     if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
