@@ -1,10 +1,10 @@
 <p align="center">
-<img 
-    style="display: block; 
+<img
+    style="display: block;
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="https://raw.githubusercontent.com/Railway-Op-Sim/ROSPkgManager/main/img/rospkgmanager.svg" 
+    src="https://raw.githubusercontent.com/Railway-Op-Sim/ROSPkgManager/main/img/rospkgmanager.svg"
     alt="Our logo">
 </img>
 </p>
@@ -58,9 +58,9 @@ Clicking the "Advanced" checkbox shows additional options for package installati
 
 ### Installing from a GitHub Repository
 Installations can be performed from a GitHub repository containing the required files to define a project. Clicking the
-"GitHub" button under the advanced options opens a dialog in which the user can enter the relevant GitHub project. 
+"GitHub" button under the advanced options opens a dialog in which the user can enter the relevant GitHub project.
 The project is specified in the form "github-user/project-name".
-By default the user is set to "Railway-Op-Sim" as authors are encouraged to develop under this organisation which offers templates to ensure projects are in the correct form. 
+By default the user is set to "Railway-Op-Sim" as authors are encouraged to develop under this organisation which offers templates to ensure projects are in the correct form.
 There is also the option to specify an alternative branch to "master". Clicking "Ok" will download an archive of the
 project and install it.
 
@@ -71,7 +71,7 @@ To build this application you will need an installation of Qt5 or Qt6 on your sy
 Install `openssl` using the relevant package manager for your distribution. Build using:
 ```
 cmake -Bbuild -DCURL_USE_OPENSSL=ON
-cmake --build build 
+cmake --build build
 ```
 you can also speed up the build process by installing `libcurl-dev`/`libcurl-devel`, make sure to do this after OpenSSL, you will not need the `CURL_USE_OPENSSL` argument if you do this.
 

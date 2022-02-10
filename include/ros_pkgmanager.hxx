@@ -82,7 +82,8 @@ private:
         {"install", new QPushButton(QPushButton::tr("Install Package"), this)},
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
-        {"github", new QPushButton(QPushButton::tr("GitHub"), this)}
+        {"github", new QPushButton(QPushButton::tr("GitHub"), this)},
+        {"ros_path", new QPushButton(QPushButton::tr("Set ROS"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);
@@ -188,7 +189,12 @@ private slots:
  * @brief Action associated with the "GitHub/Cancel" button
  * **************************************************************************/
     void on_GitHubCancelClicked();
-    
+
+/*! **************************************************************************
+ * @brief Action associated with the "ROS Path" button
+ * **************************************************************************/
+    void on_ROSPathClicked();
+
 public:
 /*! **************************************************************************
  * @brief Initialise an instance of the application GUI definition

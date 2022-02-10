@@ -13,7 +13,7 @@ To install from a repository you must provide the name in the form `<USER>/<REPO
 !!! important "Error 22"
     If you perform above a certain number of download requests in a given time you are likely to receive an Error 22. This is
     from the GitHub server itself. This feature is for developer use only, all normal add-on installations should be performed
-    from a zip file downloaded from the main Railway Operation Simulator website.
+    from a zip file downloaded from the main Railway Operation Simulator website. 
 
 <figure markdown>
 ![gh_install](media/gh_install.png)
@@ -21,3 +21,6 @@ To install from a repository you must provide the name in the form `<USER>/<REPO
 <figure markdown>
 ![gh_success](media/gh_success.png)
 </figure>
+
+## Setting ROS Location
+When the program is first launched you will be asked for the location of your local Railway Operation Simulator installation. If however you want to change this at a later point you can do so using the "Set ROS" button under the advanced options.

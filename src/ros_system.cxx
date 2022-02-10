@@ -4,7 +4,7 @@ size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *
     return fwrite(ptr, size, nmemb, stream);
 }
 
-void ROSPkg::System::createCache_() {
+void ROSPkg::System::createCache(bool startup) {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
         QDir().mkpath(cache_dir_);
@@ -17,6 +17,7 @@ void ROSPkg::System::createCache_() {
 
     if(ros_exe_.isNull())
     {
+        if(!startup) return;
         QMessageBox::critical(
 	    parent_,
 	    QMessageBox::tr("Missing ROS Location"),
@@ -48,7 +49,7 @@ ROSPkg::System::System(QWidget* parent) {
     QFileInfo loc_info_(ros_loc_ + QDir::separator() + "Railway" + QDir::separator() + "railway.exe");
 
     if(!loc_info_.exists() || !loc_info_.isFile()) {
-        createCache_();
+        createCache(true);
 	if(ros_loc_.isEmpty() || ros_loc_.isNull()) {
 	    QMessageBox::critical(
                 parent_,
