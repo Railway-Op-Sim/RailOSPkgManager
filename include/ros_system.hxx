@@ -28,11 +28,11 @@
 #include "ros_packager.hxx"
 
 namespace ROSPkg {
-    size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream); 
+    size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream);
 /*! **********************************************************************
  * @class System
  * @brief Procedures relating to the files on the file system
- * 
+ *
  * Handles the creation/removal of files on the file system including
  * the building of packages and metadata files. Also determines which
  * packages are installed. Packages are stored under an SHA256 hash
@@ -44,14 +44,6 @@ private:
     QMap<QString, ROSTools::Metadata> installed_;
     QString ros_loc_ = "";
     const QString cache_file_ = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("ros_cfg");
-
-/*! **************************************************************************
-* @brief Locate the ROS installation on the local system and cache it
-*
-* Opens a user dialog requesting the location of railway.exe on the system
-* and stores the location for future use.
-* **************************************************************************/
-    void createCache_();
 
 /*! **************************************************************************
  * @brief Parse an existing metadata file for information on a package
@@ -69,7 +61,7 @@ private:
 /*! **************************************************************************
  * @brief Copy files from zip to ROS directories
  * **************************************************************************/
-    void unpackZip_(const QMap<QString, QList<QString>>& file_listing) const;
+    void unpackZip_(const QMap<QString, QList<QString>>& file_listing, bool legacy_package=false) const;
 
 /*! **************************************************************************
  * @brief Upgrade the local ROS installation from the contents of a zip file
@@ -77,6 +69,16 @@ private:
     void upgradeROS_(const QMap<QString, QList<QString>>& files_list) const;
 
 public:
+/*! **************************************************************************
+* @brief Locate the ROS installation on the local system and cache it
+*
+* Opens a user dialog requesting the location of railway.exe on the system
+* and stores the location for future use.
+*
+* @param startup whether this is called at program opening
+* **************************************************************************/
+    void createCache(bool startup);
+
 /*! **************************************************************************
  * @brief Initialise a new instance of the System class
  *
@@ -89,7 +91,7 @@ public:
  *
  * Converts the data of the installed packages into table objects to be
  * displayed on the main application interface.
- * 
+ *
  * @return a 2D array of information for display on the table widget
  * **************************************************************************/
     QList<QList<QTableWidgetItem*>> getTableInfo() const;
@@ -99,7 +101,7 @@ public:
 *
 * Although all contents is extracted, only files stated in the relevant
 * metadata file will be kept.
-* 
+*
 * @param file_name path of archive to be extracted.
 * @param author optional name of the author if known
 * @param pkg_name optional name of the package if known
@@ -116,7 +118,7 @@ public:
  *
  * Packages are stored under an SHA256 ID calculated from their metadata TOML
  * file contents.
- * 
+ *
  * @param sha the SHA256 hash of the package to remove
  * **************************************************************************/
     void uninstall(const QString& sha);
@@ -133,6 +135,6 @@ public:
  * **************************************************************************/
     void fetchGitHub(const QString& repository_path, const QString& branch = "master") const;
 };
-}; 
+};
 
 #endif

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.20 )
 
-project( ROSPkgManager VERSION 0.5.2 LANGUAGES CXX )
+project( ROSPkgManager VERSION 1.1.0 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
@@ -11,6 +11,7 @@ find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui RE
 
 set( MAIN_SRC ${CMAKE_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
+set( APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/img/appicon.rc" )
 
 option( BUILD_ROSPKGMANAGER_TESTS "Build the available ROSPkgManager tests" OFF )
 
@@ -23,6 +24,8 @@ file( GLOB HEADERS ${CMAKE_SOURCE_DIR}/include/*.hxx )
 set( DIGESTPP digestpp )
 set( 11ZIP elzip )
 set( ROSTOOLS rostools )
+
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DROSPKGMANAGER_VERSION=\\\"${CMAKE_PROJECT_VERSION}\\\" " )
 
 add_library( ${ROSPKGMANAGER_LIBRARY} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${ROSPKGMANAGER_LIBRARY} PROPERTIES AUTOMOC ON )
@@ -59,7 +62,7 @@ target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${CURL_INCLUDE_DIR} 
 target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${tomlplusplus_SOURCE_DIR} )
 target_include_directories( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${digestpp_SOURCE_DIR} )
 
-add_executable( ${PROJECT_NAME} ${MAIN_SRC} )
+add_executable( ${PROJECT_NAME} ${MAIN_SRC} ${APP_ICON_RESOURCE_WINDOWS} )
 set_target_properties( ${PROJECT_NAME} PROPERTIES AUTOMOC ON )
 target_link_libraries( ${PROJECT_NAME} PRIVATE ${ROSPKGMANAGER_LIBRARY} )
 target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )

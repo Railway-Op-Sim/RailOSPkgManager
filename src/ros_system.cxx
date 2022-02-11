@@ -4,7 +4,7 @@ size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *
     return fwrite(ptr, size, nmemb, stream);
 }
 
-void ROSPkg::System::createCache_() {
+void ROSPkg::System::createCache(bool startup) {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
         QDir().mkpath(cache_dir_);
@@ -15,9 +15,18 @@ void ROSPkg::System::createCache_() {
         QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
     );
 
-    const QDir ros_dir_ = QFileInfo(ros_exe_).dir();
-    
-    ros_loc_ = QFileInfo(ros_dir_.path()).absolutePath();
+    if(ros_exe_.isNull())
+    {
+        if(!startup) return;
+        QMessageBox::critical(
+	    parent_,
+	    QMessageBox::tr("Missing ROS Location"),
+	    QMessageBox::tr("Railway Operation Simulator executable 'railway.exe' location is required, aborting.")
+	);
+	throw std::runtime_error("No ROS location set");
+    }
+
+    ros_loc_ = QFileInfo(ros_exe_).absolutePath();
 
 	if(ros_loc_.isEmpty()) return;
     QFile file_(cache_file_);
@@ -37,8 +46,10 @@ ROSPkg::System::System(QWidget* parent) {
         }
     }
 
-    if(!QFile::exists(ros_loc_)) {
-        createCache_();
+    QFileInfo loc_info_(ros_loc_ + QDir::separator() + "Railway" + QDir::separator() + "railway.exe");
+
+    if(!loc_info_.exists() || !loc_info_.isFile()) {
+        createCache(true);
 	if(ros_loc_.isEmpty()) {
 	    QMessageBox::critical(
                 parent_,
@@ -64,10 +75,10 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
     ROSTools::Metadata meta_data_;
 
     try {
-        meta_data_ = ROSTools::Metadata(std::filesystem::path(file_name.toStdString()));
+        meta_data_ = ROSTools::Metadata(std::filesystem::path(file_name.toStdString()), false);
     } catch(std::runtime_error& e) {
         const QString err_ = QString("Cannot import package from '") +
-        file_name + 
+        file_name +
         QString("' due to missing content:\n") + 
         QString(e.what()) +
         QString(" in metadata.");
@@ -82,7 +93,10 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
     QFile file_(file_name);
     QString hash_ = "";
     if(file_.open(QIODevice::ReadOnly)) {
-        const QString toml_dat_ = file_.readLine();
+        QString toml_dat_;
+        while(!file_.atEnd()) {
+            toml_dat_ += file_.readLine();
+        }
         hash_ = QString::fromStdString(digestpp::sha256().absorb(toml_dat_.toStdString()).hexdigest());
     }
 
@@ -93,7 +107,7 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
 }
 
 void ROSPkg::System::populateInstalled() {
-    QDir meta_dir_(ros_loc_ + QDir::separator() + "Metadata");
+    QDir meta_dir_(QDir(ros_loc_).filePath("Railway/Metadata"));
     QList<QString> filters_ = {"*.toml"};
     QList<QString> toml_files_;
     QDirIterator iter_toml_(meta_dir_.path(), filters_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
@@ -165,6 +179,8 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     // Check if package is an ROS upgrade
     if(it_ros_exe.hasNext()) {
         QMap<QString, QList<QString>>ros_files_{{"ros", {it_ros_exe.next()}}};
+        QDir unzip_dir(unzip_directory);
+        ros_files_["source_loc"] = {unzip_dir.path()};
         
         while(it_ros_files.hasNext()) {
             const QString ros_file_{it_ros_files.next()};
@@ -228,17 +244,25 @@ void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list
     if(return_code_ == QMessageBox::Abort) return;
 
     const QString ros_exe_ = files_list["ros"][0];
-    installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName());
+    const QString ros_exe_out_ = QDir(ros_loc_).filePath("Railway/"+QFileInfo(ros_exe_).fileName());
 
-    QFile(ros_exe_).copy(
-        ros_loc_ + QDir::separator() + QFileInfo(ros_exe_).fileName()
-    );
+    if(QFile(ros_exe_out_).exists()) {
+        QFile(ros_exe_out_).remove();
+    }
+
+    copy_check(parent_, ros_exe_, ros_exe_out_);
+
+    installed_.push_back(ros_exe_out_);
+
+    const QString archive_loc_ = files_list["source_loc"][0];
 
     for(const QString ros_file : files_list["ros_files"]) {
-        installed_.push_back(ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName());
-        QFile(ros_file).copy(
-            ros_loc_ + QDir::separator() + QFileInfo(ros_file).fileName()
-        );
+        const QString file_ = QDir(ros_loc_).filePath(QDir(archive_loc_).relativeFilePath(ros_file));
+        installed_.push_back(file_);
+        if(QFile(file_).exists()) {
+            QFile(file_).remove();
+        }
+        copy_check(parent_, ros_file, file_);
     }
 
     const QString info_str_ = "The following files were installed:\n"+installed_.join("\n");
@@ -250,60 +274,62 @@ void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list
     );
 }
 
-void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list) const {
+void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list, bool legacy_package) const {
     QString info_text_ = "";
+    const QDir ros_loc_dir_(ros_loc_);
     for(const QString& rly_file : files_list["rly"] ) {
         QString base_name_ = QFileInfo(rly_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Railways" + QDir::separator() + base_name_;
+        QString new_path_ = ros_loc_dir_.filePath("Railway/Railways/" + base_name_);
         info_text_ += "Added " + new_path_;
         qDebug() << "Copying: " << rly_file << " to " << new_path_;
-        QFile(rly_file).copy(new_path_);
+        copy_check(parent_, rly_file, new_path_);
     }
 
     for(const QString& ttb_file : files_list["ttb"] ) {
         QString base_name_ = QFileInfo(ttb_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Program timetables" + QDir::separator() + base_name_;
+        QString new_path_ = ros_loc_dir_.filePath("Railway/Program timetables/" + base_name_);
         info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << ttb_file << " to " << new_path_;
-        QFile(ttb_file).copy(new_path_);
+        copy_check(parent_, ttb_file, new_path_);
     }
 
     for(const QString& graphic_file : files_list["graphics"] ) {
         QString base_name_ = QFileInfo(graphic_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Graphics" + QDir::separator() + base_name_;
+        QString new_path_ = ros_loc_dir_.filePath("Railway/Graphics/" + base_name_);
         info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << graphic_file << " to " << new_path_;
-        QFile(graphic_file).copy(new_path_);
+        copy_check(parent_, graphic_file, new_path_);
     }
 
     for(const QString& img_file : files_list["imgs"] ) {
         QString base_name_ = QFileInfo(img_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Images" + QDir::separator() + base_name_;
+        QString new_path_ = ros_loc_dir_.filePath("Railway/Images/" + base_name_);
         info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << img_file << " to " << new_path_;
-        QFile(img_file).copy(new_path_);
+        copy_check(parent_, img_file, new_path_);
     }
 
     for(const QString& ssn_file : files_list["ssn"] ) {
         QString base_name_ = QFileInfo(ssn_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Sessions" + QDir::separator() + base_name_;
+        QString new_path_ = ros_loc_dir_.filePath("Railway/Sessions/" + base_name_);
         info_text_ += "\n\nAdded " + new_path_;
         qDebug() << "Copying: " << ssn_file << " to " << new_path_;
-        QFile(ssn_file).copy(new_path_);
+        copy_check(parent_, ssn_file, new_path_);
     }
+
+    QDir doc_dir_(ros_loc_dir_.filePath("Railway/Documentation"));
 
     // If the Documentation directory does not yet exist create it
-    if(!QDir(ros_loc_ + QDir::separator() + "Documentation").exists()) {
-        QDir().mkpath(ros_loc_ + QDir::separator() + "Documentation");
+    if(!doc_dir_.exists()) {
+        QDir().mkpath(doc_dir_.path());
     }
 
-    QString doc_dir_ = ros_loc_ + QDir::separator() + "Documentation";
-    QString meta_dir_ = ros_loc_ + QDir::separator() + "Metadata";
+    QString meta_dir_ = ros_loc_dir_.filePath("Railway/Metadata");
 
     ROSTools::Metadata package_data_;
 
     try {
-        package_data_ = ROSTools::Metadata(std::filesystem::path(files_list["toml"][0].toStdString()));
+        package_data_ = ROSTools::Metadata(std::filesystem::path(files_list["toml"][0].toStdString()), false);
     }
     catch(const std::invalid_argument&) {
         QMessageBox::critical(
@@ -311,7 +337,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
             QMessageBox::tr("Missing Package Metadata"),
             QMessageBox::tr("Cannot install selected package, missing package metadata.")
         );
-        
+
         return;
     } catch(std::runtime_error& e) {
         const QString err_ = QString("Cannot import package due to missing content:\n") +
@@ -322,29 +348,32 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
             parent_,
             QMessageBox::tr("Missing Package Content"),
             QMessageBox::tr(err_.toStdString().c_str()));
-        
+
         return;
     }
 
+    const QString pkg_doc_dir_ = doc_dir_.filePath(QString::fromStdString(package_data_.display_name()).replace(" ", "_"));
+
     if(!files_list["docs"].empty()) {
         // Create directory for add-on docs
-        doc_dir_  += QDir::separator() + QString::fromStdString(package_data_.display_name()).replace(" ", "_");
-        QDir().mkpath(doc_dir_);
+        QDir().mkpath(pkg_doc_dir_);
     }
 
-    for(const QString& toml_file : files_list["toml"]) {
-        QString base_name_ = QFileInfo(toml_file).fileName();
-        QString new_path_ = ros_loc_ + QDir::separator() + "Metadata" + QDir::separator() + base_name_;
-        info_text_ += "\n\nAdded " + new_path_;
-        qDebug() << "Copying: " << toml_file << " to " << new_path_;
-        QFile(toml_file).copy(new_path_);
+    if(!legacy_package) {
+        for(const QString& toml_file : files_list["toml"]) {
+            QString base_name_ = QFileInfo(toml_file).fileName();
+            QString new_path_ = ros_loc_dir_.filePath("Railway/Metadata/" + base_name_);
+            info_text_ += "\n\nAdded " + new_path_;
+            qDebug() << "Copying: " << toml_file << " to " << new_path_;
+            copy_check(parent_, toml_file, new_path_);
+        }
     }
 
     for(const QString& doc_file : files_list["docs"] ) {
         QString base_name_ = QFileInfo(doc_file).fileName();
-        QString new_path_ = doc_dir_ + QDir::separator() + base_name_;
+        QString new_path_ = QDir(pkg_doc_dir_).filePath(base_name_);
         info_text_ += "\n\nAdded " + new_path_;
-        QFile(doc_file).copy(new_path_);
+        copy_check(parent_, doc_file, new_path_);
     }
 
     QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
@@ -353,6 +382,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list)
 void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, const QString& pkg_name, const QString& country_code) const {
     QTemporaryDir temp_dir_;
     QDir().mkpath(temp_dir_.path());
+    bool no_toml_ = false;
     elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
@@ -381,7 +411,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
                 QMessageBox::tr("Package definition ambiguous"),
                 QMessageBox::tr("Expected single RLY file from archive.")
             );
-            
+
             return;
         }
 
@@ -391,7 +421,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
                 QMessageBox::tr("Missing timetables"),
                 QMessageBox::tr("Expected one or more TTB files within archive.")
             );
-            
+
             return;
         }
 
@@ -415,7 +445,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
 
         packager_.setRLYFile(QFileInfo(files_list_["rly"][0]).fileName());
 
-        const QString new_toml_ = packager_.buildTOML();
+        const QString new_toml_ = packager_.buildTOML(true);
 
         if(new_toml_.isEmpty()) {
             QMessageBox::critical(
@@ -423,11 +453,21 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
                 QMessageBox::tr("TOML creation failure"),
                 QMessageBox::tr("TOML creation for non-project archive failed.")
             );
-            
+
             return;
         }
 
+        const QString message_ = QString("Created metadata file for legacy package import '") + new_toml_ + QString("'.");
+
+        QMessageBox::information(
+            parent_,
+            QMessageBox::tr("New Metadata File Created"),
+            QMessageBox::tr(message_.toStdString().c_str())
+        );
+
         files_list_["toml"].push_back(new_toml_);
+
+        no_toml_ = true;
 
     }
 
@@ -437,56 +477,58 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
             QMessageBox::tr("Package Definition Ambiguous"),
             QMessageBox::tr("Expected single metadata (TOML) file in package, but multiple candidates found.")
         );
-        
+
         return;
     }
 
-    unpackZip_(files_list_);
+    unpackZip_(files_list_, no_toml_);
 }
 
 void ROSPkg::System::uninstall(const QString& sha) {
     QString info_text_ = "";
     const ROSTools::Metadata meta_data_ = installed_[sha];
-    const QString data_dir_ = ros_loc_ + QDir::separator();
+    const QDir data_dir_(ros_loc_);
     const QString toml_file_ = QFileInfo(QString::fromStdString(meta_data_.toml_file().string())).fileName();
 
-    info_text_ += "Removed '" + data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string()) + "'";
-    QFile(data_dir_ + "Railways" + QDir::separator() + QString::fromStdString(meta_data_.rly_file().string())).remove();
+    const QString rly_file_path_ = data_dir_.filePath("Railway/Railways/" + QString::fromStdString(meta_data_.rly_file().string()));
+    info_text_ += "Removed '" + rly_file_path_ + "'";
+    QFile(rly_file_path_).remove();
 
-    info_text_ += "\n\nRemoved '" + data_dir_ + "Metadata" + QDir::separator() + toml_file_ + "'";
-    QFile(data_dir_ + "Metadata" + QDir::separator() + toml_file_).remove();
+    const QString toml_file_path_ = data_dir_.filePath("Railway/Metadata/" + toml_file_);
+    info_text_ += "\n\nRemoved '" + toml_file_path_  + "'";
+    QFile(toml_file_path_).remove();
 
-    const QString doc_dir_path_ = data_dir_ + "Documentation" + QDir::separator() + QString::fromStdString(meta_data_.display_name()).replace(" ", "_");
+    const QString doc_dir_path_ = data_dir_.filePath("Railway/Documentation/" + QString::fromStdString(meta_data_.display_name()).replace(" ", "_"));
 
     const QList<QString> ttb_files_;
 
     for(const std::filesystem::path& ttb_file: meta_data_.ttb_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string()) + "'";
+        const QString ttb_file_path_ = data_dir_.filePath("Railway/Program timetables/" + QString::fromStdString(ttb_file.string()));
+        info_text_ += "\n\nRemoved '" + ttb_file_path_ + "'";
 
-        QFile(data_dir_ + "Program timetables" + QDir::separator() + QString::fromStdString(ttb_file.string())).remove();
+        QFile(ttb_file_path_).remove();
     }
 
     for(const std::filesystem::path& ssn_file: meta_data_.ssn_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string()) + "'";
+        const QString ssn_file_path_ = data_dir_.filePath("Railway/Sessions/" + QString::fromStdString(ssn_file.string()));
+        info_text_ += "\n\nRemoved '" + ssn_file_path_ + "'";
 
-        QFile(data_dir_ + "Sessions" + QDir::separator() + QString::fromStdString(ssn_file.string())).remove();
+        QFile(ssn_file_path_).remove();
     }
 
     for(const std::filesystem::path& img_file: meta_data_.img_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + "Images" + QDir::separator() + QString::fromStdString(img_file.string()) + "'";
+        const QString img_file_path_ = data_dir_.filePath("Railway/Images/" + QString::fromStdString(img_file.string()));
+        info_text_ += "\n\nRemoved '" + img_file_path_ + "'";
 
-        QFile(data_dir_ + "Images" + QDir::separator() + QString::fromStdString(img_file.string())).remove();
+        QFile(img_file_path_).remove();
     }
 
     for(const std::filesystem::path& graphic_file: meta_data_.graphic_files()){
-        info_text_ += "\n\nRemoved '" + data_dir_ + "Graphics" + QDir::separator() + QString::fromStdString(graphic_file.string()) + "'";
+        const QString graphic_file_path_ = data_dir_.filePath("Railway/Images/" + QString::fromStdString(graphic_file.string()));
+        info_text_ += "\n\nRemoved '" + graphic_file_path_ + "'";
 
-        QFile(data_dir_ + "Graphics" + QDir::separator() + QString::fromStdString(graphic_file.string())).remove();
+        QFile(graphic_file_path_).remove();
     }
-
-    info_text_ += "\n\nRemoved '" + data_dir_ + "Metadata" + QDir::separator() + QString::fromStdString(meta_data_.toml_file().string()) + "'";
-
-    QFile(data_dir_ + "Metadata" + QDir::separator() + QString::fromStdString(meta_data_.toml_file().string())).remove();
 
     if(QDir doc_dir_(doc_dir_path_); doc_dir_.exists()){
         info_text_ += "\n\nRemoved '" + doc_dir_path_;
@@ -538,6 +580,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
 
     curl_easy_setopt(curl_, CURLOPT_URL, GitHub_URL_.toStdString().c_str());
     curl_easy_setopt(curl_, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, download_write_file_);
     curl_easy_setopt(curl_, CURLOPT_WRITEDATA, file_);
     curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1);
@@ -547,7 +590,7 @@ void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& 
     fclose(file_);
 
     if(!QFile::exists(download_path_) || res != CURLE_OK) {
-        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_;
+        const QString alert_ = "Failed to retrieve project using URL:\n"+GitHub_URL_+"\nwith error code "+QString::number(res);
         QMessageBox::critical(
             parent_,
             QMessageBox::tr("Invalid URL"),

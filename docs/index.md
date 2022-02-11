@@ -1,3 +1,13 @@
+<p align="center">
+<img 
+    style="display: block; 
+           margin-left: auto;
+           margin-right: auto;
+           width: 30%;"
+    src="media/rospkgmanager.svg" 
+    alt="Our logo">
+</img>
+</p>
 # Railway Operation Simulator Package Manager
 
 *Quick and easy add-on management for Railway Operation Simulator*

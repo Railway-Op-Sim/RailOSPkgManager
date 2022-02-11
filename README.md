@@ -1,10 +1,10 @@
 <p align="center">
-<img 
-    style="display: block; 
+<img
+    style="display: block;
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="https://raw.githubusercontent.com/Railway-Op-Sim/ROSPkgManager/main/img/rospkgmanager.svg" 
+    src="https://raw.githubusercontent.com/Railway-Op-Sim/ROSPkgManager/main/img/rospkgmanager.svg"
     alt="Our logo">
 </img>
 </p>
@@ -42,7 +42,9 @@ The buttons next to the file declaration fields allow you to browse for files to
 |Railway File|Single `.rly` for this simulation.|
 |Timetable Files|All `.ttb` files for this simulation (separated by `,`).|
 |Session Files|(Optional) All `.ssn` files for this simulation (separated by `,`).|
-|Manual Files|Documentation files (`.pdf`, `.md`) for this simulation (separated by `,`).|
+|Documentation Files|Documentation files (`.pdf`, `.md`) for this simulation (separated by `,`).|
+|Graphic Files|(Optional) Graphics files used in map (separated by `,`).|
+|Image Files|Screenshot image files to include (separated by `,`).|
 |Country Code|Two letter country code of route origin in this simulation (`FN` if fictional).|
 |Factual|If simulation is a factual representation.|
 |Year|Year for which this simulation is a representation (can be any value if fictional).|
@@ -56,9 +58,44 @@ Clicking the "Advanced" checkbox shows additional options for package installati
 
 ### Installing from a GitHub Repository
 Installations can be performed from a GitHub repository containing the required files to define a project. Clicking the
-"GitHub" button under the advanced options opens a dialog in which the user can enter the relevant GitHub project. 
+"GitHub" button under the advanced options opens a dialog in which the user can enter the relevant GitHub project.
 The project is specified in the form "github-user/project-name".
-By default the user is set to "Railway-Op-Sim" as authors are encouraged to develop under this organisation which offers templates to ensure projects are in the correct form. 
+By default the user is set to "Railway-Op-Sim" as authors are encouraged to develop under this organisation which offers templates to ensure projects are in the correct form.
 There is also the option to specify an alternative branch to "master". Clicking "Ok" will download an archive of the
 project and install it.
 
+## Building from Source
+To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
+
+### Linux
+Install `openssl` using the relevant package manager for your distribution. Build using:
+```
+cmake -Bbuild -DCURL_USE_OPENSSL=ON
+cmake --build build
+```
+you can also speed up the build process by installing `libcurl-dev`/`libcurl-devel`, make sure to do this after OpenSSL, you will not need the `CURL_USE_OPENSSL` argument if you do this.
+
+### Windows
+The application is built on Windows using packages/applications installed via the [Chocolatey package manager](https://community.chocolatey.org):
+```
+choco install mingw
+choco install cmake
+choco install openssl
+```
+It is built using the Git Bash terminal and the following commands:
+
+```
+cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake/Qt<QT-VERSION-NUMBER>/ -DCURL_USE_OPENSSL=ON
+cmake --build build
+```
+
+You will need to include the required DLLs in the package:
+
+* `C:\Qt\<Qt-version>\mingw_<version>\translations`
+* `C:\Qt\<Qt-version>\mingw_<version>\plugins\platforms\qwindows.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Core.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Widgets.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Gui.dll`
+* `build/external/lib/libcurl.dll`
+* `build/external/rostools/cpp/librostools.dll`
+* `C:\Qt\<Qt-version>\mingw_<version>\bin\libwinpthread-1.dll`

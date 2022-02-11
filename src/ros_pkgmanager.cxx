@@ -63,7 +63,7 @@ void ROSPkg::Manager::buildPackageForm_() {
         {"rly_file_path", "Railway file (*.rly)"},
         {"ttb_file_paths", "Timetable files (*.ttb)"},
         {"ssn_file_paths", "Session files (*.ssn)"},
-        {"doc_file_paths", "Manual files (*.pdf,*.md)"},
+        {"doc_file_paths", "Documentation files (*.pdf,*.md)"},
         {"img_file_paths", "Image files"},
         {"graphic_file_paths", "Graphics files"}
     };
@@ -295,17 +295,19 @@ void ROSPkg::Manager::buildURLForm_() {
 
 
 void ROSPkg::Manager::clearPackageForm_() {
-    for(const auto& entry : package_form_entry_) {
-        entry->clear();
+    for(const auto& entry : package_form_entry_.keys()) {
+        if(entry == "version") continue; // Keep default version in form
+        package_form_entry_[entry]->clear();
     }
 }
 
 ROSPkg::Manager::Manager()
-{ 
+{
 
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    this->setWindowTitle("Railway Operation Simulator Package Manager");
+    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(ROSPKGMANAGER_VERSION);
+    this->setWindowTitle(title_);
 
     // Define the installed add-on table offsets
     const int table_x_ = (WINDOW_WIDTH-TABLE_WIDTH)/2;
@@ -334,6 +336,7 @@ ROSPkg::Manager::Manager()
     buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["ros_path"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
 
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
@@ -341,11 +344,13 @@ ROSPkg::Manager::Manager()
     advanced_str_->setText("Advanced");
     advanced_->setChecked(false);
     buttons_["github"]->hide();
+    buttons_["ros_path"]->hide();
 
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
     connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
+    connect(buttons_["ros_path"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
     installed_->update();
@@ -431,15 +436,36 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     package_->setYear(data_["year"].toInt());
     package_->setVersion(data_["version"]);
     package_->setDescription(data_["description"]);
-    package_->setRLYFile(data_["rly_file_path"]);
+
+    try {
+        package_->setRLYFile(data_["rly_file_path"]);
+    } catch(const std::runtime_error&) {
+        return;
+    }
 
     QList<QString> ttb_files_ = data_["ttb_file_paths"].split(",");
     QList<QString> doc_files_ = data_["doc_file_paths"].split(",");
+    QList<QString> img_files_ = data_["img_file_paths"].split(",");
 
     if(!data_["ssn_files_paths"].isEmpty()) {
         QList<QString> ssn_files_ = data_["ssn_file_paths"].split(",");
-        for(const QString& ssn_file : ssn_files_) {
-            package_->addSSNFile(ssn_file);
+        try {
+            for(const QString& ssn_file : ssn_files_) {
+                package_->addSSNFile(ssn_file);
+            }
+        } catch(const std::runtime_error&) {
+            return;
+        }
+    }
+
+    if(!data_["graphic_files_paths"].isEmpty()) {
+        QList<QString> graphic_files_ = data_["graphic_files_paths"].split(",");
+        try {
+            for(const QString& graphic_file : graphic_files_) {
+                package_->addGraphicsFile(graphic_file);
+            }
+        } catch(const std::runtime_error&) {
+            return;
         }
     }
 
@@ -451,12 +477,29 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     }
 
     for(const QString& ttb_file : ttb_files_) {
-        package_->addTTBFile(ttb_file);
+        try {
+            package_->addTTBFile(ttb_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
     }
 
     for(const QString& doc_file : doc_files_) {
-        package_->addDocFile(doc_file);
+        try {
+            package_->addDocFile(doc_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
     }
+
+    for(const QString& img_file : img_files_) {
+        try {
+            package_->addImgFile(img_file);
+        } catch(std::runtime_error&) {
+            return;
+        }
+    }
+
 
     package_->createPackage();
     package_form_->close();
@@ -469,7 +512,7 @@ void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
     const QString rly_file_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Railway File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Railways"), QFileDialog::tr("Railway Files (*.rly)")
+        QString(QDir(system_->getROSLocation()).filePath("Railways")), QFileDialog::tr("Railway Files (*.rly)")
     );
 	if(rly_file_.isEmpty()) return;
     package_form_entry_["rly_file_path"]->setText(rly_file_);
@@ -480,7 +523,7 @@ void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
     QString ssn_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Session File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Sessions"), QFileDialog::tr("Session Files (*.ssn)")
+        QString(QDir(system_->getROSLocation()).filePath("Sessions")), QFileDialog::tr("Session Files (*.ssn)")
     );
 	if(ssn_file_path_.isEmpty()) return;
     if(!package_form_entry_["ssn_file_paths"]->text().isEmpty()) {
@@ -494,7 +537,7 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     QString img_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Image File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Images"), QFileDialog::tr("Image Files (*.bmp, *.png, *.jpg, *.pdf)")
+        QString(QDir(system_->getROSLocation()).filePath("Images")), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
     );
 	if(img_file_path_.isEmpty()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
@@ -508,7 +551,7 @@ void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
     QString graphic_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Graphics File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Graphics"), QFileDialog::tr("Graphics Files (*.bmp, *.png, *.jpg)")
+        QString(QDir(system_->getROSLocation()).filePath("Graphics")), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
     );
 	if(graphic_file_path_.isEmpty()) return;
     if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
@@ -522,7 +565,7 @@ void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
     QString ttb_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Timetable File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Program timetables"), QFileDialog::tr("Timetable Files (*.ttb)")
+        QString(QDir(system_->getROSLocation()).filePath("Program timetables")), QFileDialog::tr("Timetable Files (*.ttb)")
     );
 	if(ttb_file_path_.isEmpty()) return;
     if(!package_form_entry_["ttb_file_paths"]->text().isEmpty()) {
@@ -536,7 +579,7 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
     QString doc_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Documentation File"),
-        QString(system_->getROSLocation() + QDir::separator() + "Documentation"), QFileDialog::tr("Documentation Files (*.pdf, *.md)")
+        QString(QDir(system_->getROSLocation()).filePath("Documentation")), QFileDialog::tr("Documentation Files (*.pdf *.md)")
     );
 	if(doc_file_path_.isEmpty()) return;
     if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
@@ -550,16 +593,21 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
     QMap<QString,QString> data_;
     for(const auto& e : package_form_entry_.toStdMap()) {
         // Session files are not mandatory
-        if(e.first == "ssn_files") continue;
+        if(e.first == "ssn_file_paths") continue;
 
         // Contributor list not mandatory
         if(e.first == "contributors") continue;
 
+        // Graphic files are optional
+        if(e.first == "graphic_file_paths") continue;
+
         if(e.second->text().isEmpty()) {
+            const QString err_ = QString("Package is missing required information '") + QString(e.first) + QString("'.");
             QMessageBox::critical(
                 this,
                 QMessageBox::tr("Incomplete Package"),
-                QMessageBox::tr("Package is missing required information"));
+                QMessageBox::tr(err_.toStdString().c_str())
+                );
             throw std::invalid_argument("Invalid package form data specified");
         }
     }
@@ -576,6 +624,8 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
 void ROSPkg::Manager::on_CheckBoxClicked() {
     buttons_["github"]->setVisible(advanced_->isChecked());
     buttons_["github"]->setEnabled(advanced_->isChecked());
+    buttons_["ros_path"]->setVisible(advanced_->isChecked());
+    buttons_["ros_path"]->setEnabled(advanced_->isChecked());
 }
 
 void ROSPkg::Manager::on_GitHubClicked() {
@@ -585,6 +635,10 @@ void ROSPkg::Manager::on_GitHubClicked() {
 void ROSPkg::Manager::on_GitHubCancelClicked() {
     url_entry_->clear();
     url_form_->hide();
+}
+
+void ROSPkg::Manager::on_ROSPathClicked() {
+    system_->createCache(false);
 }
 
 void ROSPkg::Manager::on_GitHubOkClicked() {
