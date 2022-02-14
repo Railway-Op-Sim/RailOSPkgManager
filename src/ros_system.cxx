@@ -4,7 +4,7 @@ size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *
     return fwrite(ptr, size, nmemb, stream);
 }
 
-void ROSPkg::System::createCache(bool startup) {
+bool ROSPkg::System::createCache(bool startup) {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
         QDir().mkpath(cache_dir_);
@@ -17,23 +17,24 @@ void ROSPkg::System::createCache(bool startup) {
 
     if(ros_exe_.isNull())
     {
-        if(!startup) return;
-        QMessageBox::critical(
-	    parent_,
-	    QMessageBox::tr("Missing ROS Location"),
-	    QMessageBox::tr("Railway Operation Simulator executable 'railway.exe' location is required, aborting.")
+		if(!startup) return false;
+		QMessageBox::critical(
+		parent_,
+		QMessageBox::tr("Missing ROS Location"),
+		QMessageBox::tr("Railway Operation Simulator executable 'railway.exe' location is required, aborting.")
 	);
 	throw std::runtime_error("No ROS location set");
     }
 
     ros_loc_ = QFileInfo(ros_exe_).absolutePath();
 
-	if(ros_loc_.isEmpty()) return;
+	if(ros_loc_.isEmpty()) return false;
     QFile file_(cache_file_);
     if(file_.open(QIODevice::WriteOnly)) {
         QTextStream stream_(&file_);
         stream_ << QFileInfo(ros_loc_).absolutePath();
     }
+	return true;
 }
 
 ROSPkg::System::System(QWidget* parent) {
@@ -45,26 +46,6 @@ ROSPkg::System::System(QWidget* parent) {
             ros_loc_ = file_.readLine();
         }
     }
-
-    QFileInfo loc_info_(ros_loc_ + QDir::separator() + "Railway" + QDir::separator() + "railway.exe");
-
-    if(!loc_info_.exists() || !loc_info_.isFile()) {
-        createCache(true);
-	if(ros_loc_.isEmpty()) {
-	    QMessageBox::critical(
-                parent_,
-		QMessageBox::tr("Railway Operation Simulator EXE unset"),
-		QMessageBox::tr("Cannot load package manager without setting Railway Operation Simulator executable path")
-	    );
-	    throw std::runtime_error("No ROS location set");
-	}
-        QFile file_(cache_file_);
-        if(file_.open(QIODevice::ReadOnly)) {
-            ros_loc_ = file_.readLine();
-        }
-    }
-
-    populateInstalled();
 }
 
 void ROSPkg::System::parseMetaFile_(const QString& file_name) {

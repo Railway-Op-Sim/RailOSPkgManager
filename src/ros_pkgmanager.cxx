@@ -338,6 +338,8 @@ ROSPkg::Manager::Manager()
     buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["ros_path"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
 
+
+
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
     advanced_str_->move(table_x_+20, table_y_+TABLE_HEIGHT+70);
@@ -352,6 +354,14 @@ ROSPkg::Manager::Manager()
     connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
     connect(buttons_["ros_path"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
+
+	if (system_->getROSLocation().isEmpty())
+	{
+		 buttons_["install"]->setDisabled(true);
+		 buttons_["create"]->setDisabled(true);
+		 buttons_["uninstall"]->setDisabled(true);
+		 buttons_["github"]->setDisabled(true);
+	}
 
     installed_->update();
     populateTable_();
@@ -638,7 +648,14 @@ void ROSPkg::Manager::on_GitHubCancelClicked() {
 }
 
 void ROSPkg::Manager::on_ROSPathClicked() {
-    system_->createCache(false);
+	 if (system_->createCache(false)) {
+		 buttons_["install"]->setDisabled(false);
+		 buttons_["create"]->setDisabled(false);
+		 buttons_["uninstall"]->setDisabled(false);
+		 buttons_["github"]->setDisabled(false);
+		 system_->populateInstalled();
+	 }
+
 }
 
 void ROSPkg::Manager::on_GitHubOkClicked() {

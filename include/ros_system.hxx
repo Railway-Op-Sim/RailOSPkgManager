@@ -77,7 +77,7 @@ public:
 *
 * @param startup whether this is called at program opening
 * **************************************************************************/
-    void createCache(bool startup);
+	 bool createCache(bool startup);
 
 /*! **************************************************************************
  * @brief Initialise a new instance of the System class
