@@ -338,8 +338,6 @@ ROSPkg::Manager::Manager()
     buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["ros_path"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
 
-
-
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
     advanced_str_->move(table_x_+20, table_y_+TABLE_HEIGHT+70);
@@ -655,7 +653,6 @@ void ROSPkg::Manager::on_ROSPathClicked() {
 		 buttons_["github"]->setDisabled(false);
 		 system_->populateInstalled();
 	 }
-
 }
 
 void ROSPkg::Manager::on_GitHubOkClicked() {
