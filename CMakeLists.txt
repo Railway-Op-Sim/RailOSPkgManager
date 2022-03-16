@@ -5,10 +5,14 @@ project( ROSPkgManager VERSION 1.1.0 LANGUAGES CXX )
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( ROSPKGMANAGER_LIBRARY rospkg )
+set( ROSTOOLS_STATIC_LIBRARY ON )
 
 find_package( QT NAMES Qt6 Qt5 )
 find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui REQUIRED )
 
+set( CMAKE_EXE_LINKER_FLAGS "-static" )
+SET( CMAKE_FIND_LIBRARY_SUFFIXES ".a;.dll.a" )
+set( BUILD_SHARED_LIBS OFF )
 set( MAIN_SRC ${CMAKE_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_SOURCE_DIR}/external )
 set( APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/img/appicon.rc" )
@@ -45,6 +49,8 @@ endif()
 
 add_subdirectory( ${CMAKE_SOURCE_DIR}/external/rostools/cpp )
 
+message( STATUS "BLAM" ${ROSTOOLS_STATIC_LIBRARY} )
+
 include(FetchContent)
 FetchContent_Declare(
     ${DIGESTPP}
@@ -55,6 +61,7 @@ FetchContent_MakeAvailable( ${DIGESTPP} )
 
 target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${11ZIP} )
 target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${CURL_LIBRARIES} )
+target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC -static )
 target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
 target_link_libraries( ${ROSPKGMANAGER_LIBRARY} PUBLIC ${ROSTOOLS} )
 target_include_directories( ${ROSPKGMANAGER_LIBRARY} PRIVATE ${CMAKE_SOURCE_DIR}/include )
