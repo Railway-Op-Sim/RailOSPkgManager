@@ -1,10 +1,10 @@
 <p align="center">
-<img 
+<img
     style="display: block; 
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="media/RailOSPkgManager.svg" 
+    src="media/railospkgmanager.svg" 
     alt="Our logo">
 </img>
 </p>
