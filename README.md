@@ -4,14 +4,14 @@
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="https://raw.githubusercontent.com/Railway-Op-Sim/RailOSPkgManager/main/img/RailOSPkgManager.svg"
+    src="https://raw.githubusercontent.com/Railway-Op-Sim/RailOSPkgManager/main/img/railospkgmanager.svg"
     alt="Our logo">
 </img>
 </p>
 
 # Railway Operation Simulator Package Manager
 
-[![Build & Test](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml/badge.svg)](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Railway-Op-Sim_RailOSPkgManager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Railway-Op-Sim_RailOSPkgManager)
+[![Build & Test](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml/badge.svg)](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Railway-Op-Sim_ROSPkgManager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Railway-Op-Sim_ROSPkgManager)
 
 This application aims to simplify the process of adding and removing route simulations to the local installation of [Railway Operation Simulator](https://railwayoperationsimulator.com/) (ROS), a railway signalling simulation by Albert Ball.
 
