@@ -9,7 +9,7 @@
       
       
       <link rel="icon" href="../media/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.9">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.5">
     
     
       
@@ -17,7 +17,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2b4465f4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.2d9f7617.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
@@ -28,8 +28,9 @@
     
       
         
+        
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
@@ -78,7 +79,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="ROS Package Manager" class="md-header__button md-logo" aria-label="ROS Package Manager" data-md-component="logo">
       
-  <img src="../media/rospkgmanager_white.svg" alt="logo">
+  <img src="../media/RailOSPkgManager_white.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -187,7 +188,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="ROS Package Manager" class="md-nav__button md-logo" aria-label="ROS Package Manager" data-md-component="logo">
       
-  <img src="../media/rospkgmanager_white.svg" alt="logo">
+  <img src="../media/RailOSPkgManager_white.svg" alt="logo">
 
     </a>
     ROS Package Manager
@@ -338,18 +339,27 @@
               
                 
 
+
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <h2 id="initial-setup">Initial Setup<a class="headerlink" href="#initial-setup" title="Permanent link">&para;</a></h2>
-<p>ROS Package Manager can be installed anywhere on your system. During the initial launch of the program you will be
+<p>Railway Operation Simulator Package Manager can be installed anywhere on your system. During the initial launch of the program you will be
 asked to provide the path to your local <code>railway.exe</code> executable which exists inside the <code>Railway/</code> folder of
 your <em>Railway Operation Manager</em> installation.</p>
 <p><img alt="ros_browser" src="../media/find_ros.png" /></p>
 <div class="admonition important">
 <p class="admonition-title">Updating <code>railway.exe</code> Location</p>
-<p>You can change this location at a later time using the relevant advanced option, see <a href="../advanced/#setting-ros-location">here</a>.</p>
+<p>As the program is still in beta, no functionality yet exists for altering the location of Railway Operation Simulator at a later
+point. In order to do this you will need to manually remove the cache file for the application, found at:   </p>
+<p><strong>Windows</strong></p>
+<pre><code>C:\Users\&lt;USER&gt;\AppData\Local\RailOSPkgManager\cache\ros_cfg
+</code></pre>
+<p><strong>UNIX</strong></p>
+<pre><code>/home/&lt;USER&gt;/.cache/RailOSPkgManager/ros_cfg
+</code></pre>
+<p>This will reset the application, and it will ask you to provide the location again.</p>
 </div>
 <h2 id="installing-a-package">Installing a Package<a class="headerlink" href="#installing-a-package" title="Permanent link">&para;</a></h2>
-<p>Packages are archive files downloaded from the ROS application <a href="https://www.railwayoperationsimulator.com/pc/community-projects">website</a>. These must be downloaded manually, as they require login into the website.</p>
+<p>Packages are archive files downloaded from the Railway Operation Simulator application <a href="https://www.railwayoperationsimulator.com/pc/community-projects">website</a>. These must be downloaded manually, as they require login into the website.</p>
 <p>Once a package has been downloaded, if it contains all the required file types it will be installed with the files
 placed in the correct locations for you to be able to launch the contained simulation.</p>
 <figure>
@@ -432,10 +442,10 @@ placed in the correct locations for you to be able to launch the contained simul
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": ["toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.22074ed6.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
     
     
-      <script src="../assets/javascripts/bundle.960e086b.min.js"></script>
+      <script src="../assets/javascripts/bundle.467223ff.min.js"></script>
       
     
   </body>
