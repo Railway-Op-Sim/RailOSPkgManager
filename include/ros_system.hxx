@@ -23,6 +23,7 @@
 #include "rostools/metadata.hxx"
 #include "digestpp.hpp"
 #include "elzip.hpp"
+
 #include "curl/curl.h"
 
 #include "ros_packager.hxx"

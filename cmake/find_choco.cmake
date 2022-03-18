@@ -1,0 +1,10 @@
+file( TO_CMAKE_PATH "$ENV{ALLUSERSPROFILE}/chocolatey/" CHOCOLATEY_DIR )
+if( EXISTS ${CHOCOLATEY_DIR} )
+    set( CHOCO_FOUND TRUE )
+endif()
+
+macro(ChocoFind_CURL)
+    file( GLOB CHOCO_CURL_DIRS LIST_DIRECTORIES TRUE ${CHOCOLATEY_DIR}/lib/curl/tools/curl-* )
+    list( GET CHOCO_CURL_DIRS 0 CHOCO_CURL_DIR )
+    list( APPEND CMAKE_PREFIX_PATH ${CHOCO_CURL_DIR} )
+endmacro()
