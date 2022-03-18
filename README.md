@@ -4,7 +4,7 @@
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="https://raw.githubusercontent.com/Railway-Op-Sim/RailOSPkgManager/main/img/RailOSPkgManager.svg"
+    src="https://raw.githubusercontent.com/Railway-Op-Sim/RailOSPkgManager/main/img/railospkgmanager.svg"
     alt="Our logo">
 </img>
 </p>
