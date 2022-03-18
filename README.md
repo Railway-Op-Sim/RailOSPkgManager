@@ -80,22 +80,20 @@ The application is built on Windows using packages/applications installed via th
 ```
 choco install mingw
 choco install cmake
-choco install openssl
+choco install curl
 ```
 It is built using the Git Bash terminal and the following commands:
 
 ```
-cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake/Qt<QT-VERSION-NUMBER>/ -DCURL_USE_OPENSSL=ON
+cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake/Qt<QT-VERSION-NUMBER>/
 cmake --build build
 ```
 
 You will need to include the required DLLs in the package:
 
 * `C:\Qt\<Qt-version>\mingw_<version>\translations`
-* `C:\Qt\<Qt-version>\mingw_<version>\plugins\platforms\qwindows.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Core.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Widgets.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Gui.dll`
-* `build/external/lib/libcurl.dll`
-* `build/external/rostools/cpp/librostools.dll`
-* `C:\Qt\<Qt-version>\mingw_<version>\bin\libwinpthread-1.dll`
+* `libssl-1_1-x64.dll`
+* `libcurl-x64.dll`
