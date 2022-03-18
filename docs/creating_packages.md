@@ -13,7 +13,7 @@ Those fields requiring one or more file path have buttons for browsing the local
 
 ## Mandatory Requirements
 Requirements for package creation are quite strict, the idea being a package should be accessible to
-all using ROS where possible:
+all using Raillway Operating Simulator where possible:
 
 - Documentation MUST be provided and should be either a markdown file `.md` or a PDF `.pdf`, formats like `.docx` are not accepted due to them not being universal.
 - You must provide only a single `.rly` file per package.

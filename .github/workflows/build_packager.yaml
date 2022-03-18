@@ -1,4 +1,4 @@
-name: Deploy ROSPkgManager
+name: Deploy RailOSPkgManager
 on:
   push:
     tags:
@@ -43,7 +43,7 @@ jobs:
       run: |
             cmake -Bbuild
             cmake --build build
-            mv build/ROSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
+            mv build/RailOSPkgManager build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}
 
     - uses: actions/upload-artifact@v1
       with:
@@ -82,7 +82,7 @@ jobs:
       run: |
             cmake -Bbuild -G "MinGW Makefiles"
             cmake --build build
-            mv build/ROSPkgManager.exe build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+            mv build/RailOSPkgManager.exe build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
   
     - uses: actions/upload-artifact@v1
       with:
@@ -130,7 +130,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ROSPkgManager Release ${{ steps.previoustag.outputs.tag }}
+          name: RailOSPkgManager Release ${{ steps.previoustag.outputs.tag }}
           token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           tag_name: ${{ steps.previoustag.outputs.tag }}

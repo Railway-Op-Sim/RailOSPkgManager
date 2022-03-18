@@ -9,8 +9,8 @@
  * of padckages for Railway Operation Simulator
  * 
  ****************************************************************************/
-#ifndef __ROSPKGMANAGER_HXX__
-#define __ROSPKGMANAGER_HXX__
+#ifndef __RailOSPkgManager_HXX__
+#define __RailOSPkgManager_HXX__
 
 #include <QWidget>
 #include <QFileDialog>
@@ -30,13 +30,13 @@
 #include "ros_system.hxx"
 #include "rostools/country_codes.hxx"
 
-#ifndef ROSPKGMANAGER_VERSION
+#ifndef RailOSPkgManager_VERSION
     #error "Version not specified during build"
 #endif
 
 /*! **********************************************************************
  * @namespace ROSPkg
- * @brief Contains all methods and classes relating to the ROSPkgManager
+ * @brief Contains all methods and classes relating to the RailOSPkgManager
  ************************************************************************/
 namespace ROSPkg {
 /*! **********************************************************************
@@ -207,4 +207,4 @@ public:
     ~Manager();
 };
 };
-#endif // ROSPKGMANAGER_HXX
+#endif // RailOSPkgManager_HXX

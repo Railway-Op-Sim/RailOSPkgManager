@@ -1,4 +1,4 @@
-site_name: ROS Package Manager
+site_name: Railway Operation Simulator Package Manager
 site_url:
 nav:
   - Home: index.md
@@ -14,7 +14,7 @@ markdown_extensions:
   tables: {}
 theme:
   name: material
-  logo: media/rospkgmanager_white.svg
+  logo: media/RailOSPkgManager_white.svg
   favicon: media/favicon.ico
   features:
     - toc.integrate

@@ -306,7 +306,7 @@ ROSPkg::Manager::Manager()
 
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(ROSPKGMANAGER_VERSION);
+    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(RailOSPkgManager_VERSION);
     this->setWindowTitle(title_);
 
     // Define the installed add-on table offsets

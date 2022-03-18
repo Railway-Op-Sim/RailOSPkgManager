@@ -4,18 +4,18 @@
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="https://raw.githubusercontent.com/Railway-Op-Sim/ROSPkgManager/main/img/rospkgmanager.svg"
+    src="https://raw.githubusercontent.com/Railway-Op-Sim/RailOSPkgManager/main/img/RailOSPkgManager.svg"
     alt="Our logo">
 </img>
 </p>
 
 # Railway Operation Simulator Package Manager
 
-[![Build & Test](https://github.com/Railway-Op-Sim/ROSPkgManager/actions/workflows/build_packager.yaml/badge.svg)](https://github.com/Railway-Op-Sim/ROSPkgManager/actions/workflows/build_packager.yaml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Railway-Op-Sim_ROSPkgManager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Railway-Op-Sim_ROSPkgManager)
+[![Build & Test](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml/badge.svg)](https://github.com/Railway-Op-Sim/RailOSPkgManager/actions/workflows/build_packager.yaml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Railway-Op-Sim_RailOSPkgManager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Railway-Op-Sim_RailOSPkgManager)
 
 This application aims to simplify the process of adding and removing route simulations to the local installation of [Railway Operation Simulator](https://railwayoperationsimulator.com/) (ROS), a railway signalling simulation by Albert Ball.
 
-Full documentation can be found on the [project website](https://railway-op-sim.github.io/ROSPkgManager/).
+Full documentation can be found on the [project website](https://railway-op-sim.github.io/RailOSPkgManager/).
 
 ## Getting Started
 On first launch you will need to specify the location of the `railway.exe` ROS executable on your system, this location is used to determine where add-ons should be installed. Once this is set the location will be cached and so no longer required. Functionality for altering the installation will be added at a later date. Within this manual `${ROS_HOME}` refers to the directory containing `railway.exe`.
@@ -89,11 +89,14 @@ cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_
 cmake --build build
 ```
 
-You will need to include the required DLLs in the package:
+You will need to include the required files in the package:
 
+* `C:\Qt\<Qt-version>\mingw_<version>\platforms\qwindows.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\translations`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Core.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Widgets.dll`
 * `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Gui.dll`
-* `libssl-1_1-x64.dll`
+* `libwinpthread-1.dll`
+* `libgcc_s_seh-1.dll`
 * `libcurl-x64.dll`
+* `libstdc++-6.dll`
