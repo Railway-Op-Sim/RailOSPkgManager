@@ -1,4 +1,5 @@
 #include "ros_pkgmanager.hxx"
+#include <fstream>
 
 void ROSPkg::Manager::buildPackageForm_() {
 
@@ -73,6 +74,28 @@ void ROSPkg::Manager::buildPackageForm_() {
         package_form_labels_[entry.first] = new QLabel(package_form_);
         package_form_labels_[entry.first]->setText(entry.second);
     }
+
+    const QList<QString> tab_order_ = {
+        "package_name",
+        "display_name",
+        "version",
+        "description",
+        "author",
+        "contributors",
+        "rly_file_path",
+        "ttb_file_paths",
+        "ssn_file_paths",
+        "doc_file_paths",
+        "img_file_paths",
+        "graphic_file_paths",
+    };
+
+    for(int i{0}; i < tab_order_.size()-1; ++i) {
+        setTabOrder(package_form_entry_[tab_order_[i]], package_form_entry_[tab_order_[i+1]]);
+    }
+
+    setTabOrder(package_form_entry_[tab_order_[tab_order_.size()-1]], country_code_label_);
+    setTabOrder(country_code_label_, year_box_);
 
     package_form_labels_["package_name"]->move(
         package_form_->width()/11,
