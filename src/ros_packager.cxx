@@ -235,6 +235,8 @@ QString ROSPkg::Packager::createPackage() {
 }
 
 void ROSPkg::copy_check(QWidget* parent, const QString in_file, const QString out_file) {
+    // Do not try to copy a file to itself!
+    if(in_file == out_file) return;
     const QString in_file_ = QDir::fromNativeSeparators(in_file);
     const QString out_file_ = QDir::fromNativeSeparators(out_file);
     if(QFile(out_file_).exists()) QFile(out_file_).remove();
