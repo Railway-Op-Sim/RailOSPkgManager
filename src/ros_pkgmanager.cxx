@@ -376,6 +376,14 @@ ROSPkg::Manager::Manager()
     connect(buttons_["ros_path"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
+	if (system_->getROSLocation().isEmpty())
+	{
+		 buttons_["install"]->setDisabled(true);
+		 buttons_["create"]->setDisabled(true);
+		 buttons_["uninstall"]->setDisabled(true);
+		 buttons_["github"]->setDisabled(true);
+	}
+
     installed_->update();
     populateTable_();
     installed_->show();
@@ -661,7 +669,13 @@ void ROSPkg::Manager::on_GitHubCancelClicked() {
 }
 
 void ROSPkg::Manager::on_ROSPathClicked() {
-    system_->createCache(false);
+	 if (system_->createCache(false)) {
+		 buttons_["install"]->setDisabled(false);
+		 buttons_["create"]->setDisabled(false);
+		 buttons_["uninstall"]->setDisabled(false);
+		 buttons_["github"]->setDisabled(false);
+		 system_->populateInstalled();
+	 }
 }
 
 void ROSPkg::Manager::on_GitHubOkClicked() {
