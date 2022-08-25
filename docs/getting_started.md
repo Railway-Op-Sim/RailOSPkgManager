@@ -7,18 +7,7 @@ your *Railway Operation Manager* installation.
 ![ros_browser](media/find_ros.png)
 
 !!! important "Updating `railway.exe` Location"
-    As the program is still in beta, no functionality yet exists for altering the location of Railway Operation Simulator at a later
-    point. In order to do this you will need to manually remove the cache file for the application, found at:   
-    
-    **Windows**
-
-        C:\Users\<USER>\AppData\Local\RailOSPkgManager\cache\ros_cfg
-    
-    **UNIX**
-
-        /home/<USER>/.cache/RailOSPkgManager/ros_cfg
-
-    This will reset the application, and it will ask you to provide the location again.
+    The location of Railway Operation Simulator can be updated by clicking the "advanced" checkbox and selecting "Set ROS" to provide a new path to the `railway.exe` binary.
 
 ## Installing a Package
 Packages are archive files downloaded from the Railway Operation Simulator application [website](https://www.railwayoperationsimulator.com/pc/community-projects). These must be downloaded manually, as they require login into the website.

@@ -3,9 +3,9 @@ Railway Operation Simulator Package Manager (RailOSPkgManager) comes with some a
 
 ## GitHub Repository Install
 RailOSPkgManager supports the ability to install packages directly from a repository. For example you can install
-projects from the Railway Operation Simulator Developer GitHub [Railway Operation SimulatorDGH](https://github.com/Railway-Op-Sim) by clicking the "GitHub" button after enabling advanced features.
+projects from the Railway Operation Simulator Developer GitHub ([ROSDGH](https://github.com/Railway-Op-Sim)) by clicking the "GitHub" button after enabling advanced features.
 
-To install from a repository you must provide the name in the form `<USER>/<REPOSITORY>`, by default the `USER` is set to be the Railway Operation SimulatorDGH `Railway-Op-Sim` username. Optionally you may specify the branch to install from if this is not `master`.
+To install from a repository you must provide the name in the form `<USER>/<REPOSITORY>`, by default the `USER` is set to be the ROSDGH `Railway-Op-Sim` username. Optionally you may specify the branch to install from if this is not `master`.
 
 !!! important "URL Download"
     The URL `https://github.com/<USER>/<PROJECT>/archive/refs/heads/<BRANCH>.zip` is used to retrieve the project files.
