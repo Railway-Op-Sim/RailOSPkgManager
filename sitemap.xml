@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://railway-op-sim.github.io/RailOSPkgManager/</loc>
-         <lastmod>2022-03-18</lastmod>
+         <lastmod>2022-08-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://railway-op-sim.github.io/RailOSPkgManager/advanced/</loc>
-         <lastmod>2022-03-18</lastmod>
+         <lastmod>2022-08-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://railway-op-sim.github.io/RailOSPkgManager/creating_packages/</loc>
-         <lastmod>2022-03-18</lastmod>
+         <lastmod>2022-08-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://railway-op-sim.github.io/RailOSPkgManager/getting_started/</loc>
-         <lastmod>2022-03-18</lastmod>
+         <lastmod>2022-08-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://railway-op-sim.github.io/RailOSPkgManager/upgrade/</loc>
-         <lastmod>2022-03-18</lastmod>
+         <lastmod>2022-08-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
