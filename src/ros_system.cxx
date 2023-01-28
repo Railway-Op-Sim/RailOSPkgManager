@@ -149,7 +149,7 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QList<QString> filter_toml_{"*.toml"};
     QList<QString> filter_docs_{"*.md", "*.pdf"};
     QList<QString> filter_imgs_{"*.bmp"};
-    QList<QString> filter_graphics_{"*.jpg"};
+    QList<QString> filter_graphics_{"*.jpg", "*.png", "*.gif"};
     QList<QString> filter_ros_exe_{"railway.exe"};
     QList<QString> filter_ros_files_{"*.dll", "*.chm", "*.bpl", "*.txt", "*.pdf"};
 
