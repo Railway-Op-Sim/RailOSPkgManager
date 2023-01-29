@@ -10,7 +10,6 @@ jobs:
   create-release:
     name: Create Release
     runs-on: windows-latest
-    needs: [create-pdf]
     steps:
       - uses: actions/checkout@v3
         with:
