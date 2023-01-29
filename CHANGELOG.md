@@ -1,3 +1,7 @@
+# 2023-01-29 [v1.1.2](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.2)
+- Fix graphics files not being copied
+# 2022-03-24 [v1.1.1](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.1)
+- Fixes an issue whereby a file may be copied to itself when building a package, also fixes tabbing through entries order.
 # 2021-02-10 [v1.1.0](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.0)
 - Add ability to change ROS location at a later point.
 # 2021-01-19 [v0.5.5](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v0.5.5)
