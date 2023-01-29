@@ -1,0 +1,83 @@
+name: RailOSConsist Release
+on:
+  push:
+    tags:
+      - "v*"
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: windows-latest
+    needs: [create-pdf]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - name: Set Output Directory
+        uses: mathiasvr/command-output@v1
+        id: outdir_name
+        with:
+          run: echo $GITHUB_REPOSITORY | cut -d '/' -f 2 | cut --complement -f1 -d '-' | xargs
+      - name: Set Version Suffix
+        uses: mathiasvr/command-output@v1
+        id: outver
+        with:
+          run: |
+            VERSION="${{ steps.previoustag.outputs.tag }}"
+            echo ${VERSION//./_} | xargs
+      - name: Install Qt
+      uses: jurplel/install-qt-action@v3.0.0
+      with:
+        version: '6.4.0'
+        arch: 'win64_mingw81'
+
+      - name: Upgrade GCC
+        run: choco upgrade mingw
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.13.1
+
+      - name: Install CURL
+        run: choco install curl
+
+      - name: Install ZLIB
+        run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
+
+      - name: Build RailOSPackageManager
+        run: |
+              DIR_NAME=$(echo "${{ steps.outdir_name.outputs.stdout }}" | xargs)_$(echo "${{ steps.outver.outputs.stdout }}" | xargs)
+              DIR_NAME=$(echo $DIR_NAME | xargs)
+              cmake -Bbuild -G "MinGW Makefiles"
+              cmake --build build
+              mkdir release
+              mv build/RailOSPkgManager.exe release/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+        shell: bash
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.0
+        with:
+          type: 'zip'
+          filename: 'release.zip'
+          path: 'release'
+
+      - name: Rename Release
+        run: |
+          DIR_NAME=$(echo "${{ steps.outdir_name.outputs.stdout }}" | xargs)_$(echo "${{ steps.outver.outputs.stdout }}" | xargs)
+          DIR_NAME=$(echo $DIR_NAME | xargs)
+          mv release.zip $DIR_NAME.zip
+        shell: bash
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          name: ${{ github.repository }} Release ${{ steps.previoustag.outputs.tag }}
+          tag_name: ${{ steps.previoustag.outputs.tag }}
+          files: |
+            *.zip

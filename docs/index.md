@@ -26,6 +26,9 @@ It is important to note RailOSPkgManager follows the strict metadata file standa
 is only possible if ALL requirements are satisfied, i.e. simulation files, documentation and basic information
 are provided.
 
+**NOTE**: Graphics files which are of type BMP will not be copied to the Graphics folder but rather to the Images folder
+this is because the wildcard `*.bmp` is associated with Image files.
+
 ## Developers
 - [Kristian Zarebski](https://github.com/artemis-beta/)
 

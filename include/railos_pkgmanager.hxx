@@ -1,5 +1,5 @@
 /*! **************************************************************************
- * @file ros_packager.hxx
+ * @file railos_packager.hxx
  * @author K. Zarebski
  * @date 2022-01-05
  * @brief Main application definition file
@@ -27,8 +27,8 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "ros_system.hxx"
-#include "rostools/country_codes.hxx"
+#include "railos_system.hxx"
+#include "railostools/country_codes.hxx"
 
 #ifndef RailOSPkgManager_VERSION
     #error "Version not specified during build"
@@ -83,7 +83,7 @@ private:
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
         {"github", new QPushButton(QPushButton::tr("GitHub"), this)},
-        {"ros_path", new QPushButton(QPushButton::tr("Set ROS"), this)}
+        {"railos_path", new QPushButton(QPushButton::tr("Set ROS"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);

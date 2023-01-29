@@ -85,7 +85,7 @@ choco install curl
 It is built using the Git Bash terminal and the following commands:
 
 ```
-cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake/Qt<QT-VERSION-NUMBER>/
+cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake
 cmake --build build
 ```
 

@@ -1,4 +1,4 @@
-#include "ros_pkgmanager.hxx"
+#include "railos_pkgmanager.hxx"
 #include <fstream>
 
 void ROSPkg::Manager::buildPackageForm_() {
@@ -20,7 +20,7 @@ void ROSPkg::Manager::buildPackageForm_() {
 
     country_code_ = new QComboBox(package_form_);
 
-    for(std::map<std::string, std::string>::const_iterator it = ROSTools::COUNTRY_CODES.begin(); it != ROSTools::COUNTRY_CODES.end(); it++) {
+    for(std::map<std::string, std::string>::const_iterator it = RailOSTools::COUNTRY_CODES.begin(); it != RailOSTools::COUNTRY_CODES.end(); it++) {
         country_code_->addItem(QString::fromStdString(it->first));
     }
 
@@ -359,7 +359,7 @@ ROSPkg::Manager::Manager()
     buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
     buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
-    buttons_["ros_path"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["railospath"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
 
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
@@ -367,13 +367,13 @@ ROSPkg::Manager::Manager()
     advanced_str_->setText("Advanced");
     advanced_->setChecked(false);
     buttons_["github"]->hide();
-    buttons_["ros_path"]->hide();
+    buttons_["railospath"]->hide();
 
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
     connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
-    connect(buttons_["ros_path"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
+    connect(buttons_["railospath"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
     installed_->update();
@@ -647,8 +647,8 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
 void ROSPkg::Manager::on_CheckBoxClicked() {
     buttons_["github"]->setVisible(advanced_->isChecked());
     buttons_["github"]->setEnabled(advanced_->isChecked());
-    buttons_["ros_path"]->setVisible(advanced_->isChecked());
-    buttons_["ros_path"]->setEnabled(advanced_->isChecked());
+    buttons_["railospath"]->setVisible(advanced_->isChecked());
+    buttons_["railospath"]->setEnabled(advanced_->isChecked());
 }
 
 void ROSPkg::Manager::on_GitHubClicked() {

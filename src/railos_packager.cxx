@@ -1,4 +1,4 @@
-#include "ros_packager.hxx"
+#include "railos_packager.hxx"
 
 void ROSPkg::Packager::packageFailure() {
     QMessageBox::critical(parent_, QMessageBox::tr("Package build failure"), QMessageBox::tr("Failed to build package due to missing data."));
@@ -8,9 +8,9 @@ QString ROSPkg::Packager::buildTOML(bool imported) {
     QString file_name_ = QString(package_name_);
     file_name_.replace(" ", "_");
 
-    QDir ros_loc_dir_(ros_loc_);
+    QDir railos_loc_dir_(railos_loc_);
 
-    QDir metadata_dir_(ros_loc_dir_.filePath("Railway/Metadata"));
+    QDir metadata_dir_(railos_loc_dir_.filePath("Railway/Metadata"));
 
     if(!metadata_dir_.exists()) {
         QDir().mkpath(metadata_dir_.path());
@@ -23,7 +23,7 @@ QString ROSPkg::Packager::buildTOML(bool imported) {
         version_ = now_.toString("yy.M.d");
     }
 
-    ROSTools::Metadata new_meta_;
+    RailOSTools::Metadata new_meta_;
 
     try {
         if(!description_.isEmpty()) new_meta_.setDescription(description_.toStdString());
@@ -104,7 +104,7 @@ QString ROSPkg::Packager::buildTOML(bool imported) {
 
 QString ROSPkg::Packager::createPackage() {
     const QString new_toml_ = buildTOML();
-    const QString build_dir_ = QDir(ros_loc_).filePath("Railway/Packages");
+    const QString build_dir_ = QDir(railos_loc_).filePath("Railway/Packages");
     if(!QDir(build_dir_).exists()) {
         QDir().mkpath(build_dir_);
     }
@@ -130,7 +130,7 @@ QString ROSPkg::Packager::createPackage() {
     const QString out_toml_file_ = QDir(out_dir_).filePath(
         "Metadata/" + QFileInfo(toml_file_).fileName()
     );
-    const QString loc_rly_file_ = QDir(ros_loc_).filePath(
+    const QString loc_rly_file_ = QDir(railos_loc_).filePath(
         "Railway/Railways/" + QFileInfo(rly_file_).fileName()
     );
 
@@ -145,7 +145,7 @@ QString ROSPkg::Packager::createPackage() {
             const QString out_ttb_file_ = QDir(out_dir_).filePath(
                 "Program_Timetables/" + QFileInfo(ttb_file).fileName()
             );
-            const QString loc_ttb_file_ = QDir(ros_loc_).filePath(
+            const QString loc_ttb_file_ = QDir(railos_loc_).filePath(
                 "Railway/Program timetables/" + QFileInfo(ttb_file).fileName()
             );
             copy_check(parent_, ttb_file, out_ttb_file_);
@@ -156,14 +156,14 @@ QString ROSPkg::Packager::createPackage() {
             const QString out_ssn_file_ = QDir(out_dir_).filePath(
                 "Sessions/" + QFileInfo(ssn_file).fileName()
             );
-            const QString loc_ssn_file_ = QDir(ros_loc_).filePath(
+            const QString loc_ssn_file_ = QDir(railos_loc_).filePath(
                 "Railway/Sessions/" + QFileInfo(ssn_file).fileName()
             );
             copy_check(parent_, ssn_file, out_ssn_file_);
             copy_check(parent_, ssn_file, loc_ssn_file_);
         }
 
-        const QDir loc_doc_dir_(QDir(ros_loc_).filePath("Railway/Documentation/"+display_name_.replace(" ", "_")));
+        const QDir loc_doc_dir_(QDir(railos_loc_).filePath("Railway/Documentation/"+display_name_.replace(" ", "_")));
         if(!loc_doc_dir_.exists()) QDir().mkpath(loc_doc_dir_.path());
 
         for(const QString& doc_file : doc_files_) {
@@ -181,7 +181,7 @@ QString ROSPkg::Packager::createPackage() {
             const QString out_img_file_ = QDir(out_dir_).filePath(
                 "Images/" + QFileInfo(img_file).fileName()
             );
-            const QString loc_img_file_ = QDir(ros_loc_).filePath(
+            const QString loc_img_file_ = QDir(railos_loc_).filePath(
                 "Railway/Images/" + QFileInfo(img_file).fileName()
             );
             copy_check(parent_, img_file, out_img_file_);
@@ -192,7 +192,7 @@ QString ROSPkg::Packager::createPackage() {
             const QString out_graphic_file_ = QDir(out_dir_).filePath(
                 "Graphics/" + QFileInfo(graphic_file).fileName()
             );
-            const QString loc_graphic_file_ = QDir(ros_loc_).filePath(
+            const QString loc_graphic_file_ = QDir(railos_loc_).filePath(
                 "Railway/Graphics/" + QFileInfo(graphic_file).fileName()
             );
             copy_check(parent_, graphic_file, out_graphic_file_);

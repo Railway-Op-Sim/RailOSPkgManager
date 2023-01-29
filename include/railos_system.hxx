@@ -20,13 +20,13 @@
 #include <filesystem>
 #include <sstream>
 
-#include "rostools/metadata.hxx"
+#include "railostools/metadata.hxx"
 #include "digestpp.hpp"
 #include "elzip.hpp"
 
 #include "curl/curl.h"
 
-#include "ros_packager.hxx"
+#include "railos_packager.hxx"
 
 namespace ROSPkg {
     size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -42,9 +42,9 @@ namespace ROSPkg {
 class System {
 private:
     QWidget* parent_ = nullptr;
-    QMap<QString, ROSTools::Metadata> installed_;
-    QString ros_loc_ = "";
-    const QString cache_file_ = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("ros_cfg");
+    QMap<QString, RailOSTools::Metadata> installed_;
+    QString railos_loc_ = "";
+    const QString cache_file_ = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("railos_cfg");
 
 /*! **************************************************************************
  * @brief Parse an existing metadata file for information on a package
@@ -127,7 +127,7 @@ public:
 /*! **************************************************************************
  * @brief Retrieve the location of railway.exe on the file system
  * **************************************************************************/
-    QString getROSLocation() const {return ros_loc_;}
+    QString getROSLocation() const {return railos_loc_;}
 
 /*! **************************************************************************
  * @brief Retrieve archive from a GitHub repository

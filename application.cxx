@@ -1,4 +1,4 @@
-#include "ros_pkgmanager.hxx"
+#include "railos_pkgmanager.hxx"
 
 #include <QApplication>
 #include <QLocale>
