@@ -2,7 +2,7 @@
  * @file railos_packager.hxx
  * @author K. Zarebski
  * @date 2022-01-05
- * @brief File containing method related to ROS package creation
+ * @brief File containing method related to RailOS package creation
  *
  * This file contains the Packager class used for handling and creating
  * packages for Railway Operation Simulator. A package is defined as a single
@@ -19,8 +19,8 @@
  * definition file.
  *
  ****************************************************************************/
-#ifndef __ROSPACKAGER_HXX__
-#define __ROSPACKAGER_HXX__
+#ifndef __RAILOSPACKAGER_HXX__
+#define __RAILOSPACKAGER_HXX__
 
 #include <QDir>
 #include <QString>
@@ -44,7 +44,7 @@ namespace Qt {
 };
 #endif
 
-namespace ROSPkg {
+namespace RailOSPkg {
 /*! **********************************************************************
  * @class Packager
  * @brief Performs assembly of files into a single package directory
@@ -99,7 +99,7 @@ class Packager {
  * @brief Initialise a new packager for a given parent widget
  *
  * @param parent pointer of parent widget for application
- * @param railos_loc full path to directory containing railway.exe
+ * @param railos_loc full path to directory containing binary
  * @param package_name name to give final package
  * **************************************************************************/
     Packager(QWidget* parent, const QString& railos_loc, const QString& package_name) :

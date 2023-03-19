@@ -1,10 +1,10 @@
 #include "railos_packager.hxx"
 
-void ROSPkg::Packager::packageFailure() {
+void RailOSPkg::Packager::packageFailure() {
     QMessageBox::critical(parent_, QMessageBox::tr("Package build failure"), QMessageBox::tr("Failed to build package due to missing data."));
 }
 
-QString ROSPkg::Packager::buildTOML(bool imported) {
+QString RailOSPkg::Packager::buildTOML(bool imported) {
     QString file_name_ = QString(package_name_);
     file_name_.replace(" ", "_");
 
@@ -102,7 +102,7 @@ QString ROSPkg::Packager::buildTOML(bool imported) {
     return toml_file_;
 }
 
-QString ROSPkg::Packager::createPackage() {
+QString RailOSPkg::Packager::createPackage() {
     const QString new_toml_ = buildTOML();
     const QString build_dir_ = QDir(railos_loc_).filePath("Railway/Packages");
     if(!QDir(build_dir_).exists()) {
@@ -234,7 +234,7 @@ QString ROSPkg::Packager::createPackage() {
     return zip_file_;
 }
 
-void ROSPkg::copy_check(QWidget* parent, const QString in_file, const QString out_file) {
+void RailOSPkg::copy_check(QWidget* parent, const QString in_file, const QString out_file) {
     // Do not try to copy a file to itself!
     if(in_file == out_file) return;
     const QString in_file_ = QDir::fromNativeSeparators(in_file);

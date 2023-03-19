@@ -1,7 +1,7 @@
 #include "railos_pkgmanager.hxx"
 #include <fstream>
 
-void ROSPkg::Manager::buildPackageForm_() {
+void RailOSPkg::Manager::buildPackageForm_() {
 
     const int window_x_ = this->geometry().x()+this->width()/4;
     const int window_y_ = this->geometry().y()+this->height()/4;
@@ -280,7 +280,7 @@ void ROSPkg::Manager::buildPackageForm_() {
     package_form_entry_["package_name"]->setMaxLength(100);
 }
 
-void ROSPkg::Manager::buildURLForm_() {
+void RailOSPkg::Manager::buildURLForm_() {
     const int window_x_ = this->geometry().x()+this->width()/4;
     const int window_y_ = this->geometry().y()+this->height()/4;
 
@@ -310,38 +310,42 @@ void ROSPkg::Manager::buildURLForm_() {
     url_entry_->setGeometry(20, 50, 350, url_entry_->height());
 
     branch_label_->move(20, 100);
-    branch_entry_->setText("master");
+    branch_entry_->setText("main");
     branch_entry_->setGeometry(20, 130, 200, branch_entry_->height());
 
     url_form_->hide();
 }
 
 
-void ROSPkg::Manager::clearPackageForm_() {
+void RailOSPkg::Manager::clearPackageForm_() {
     for(const auto& entry : package_form_entry_.keys()) {
         if(entry == "version") continue; // Keep default version in form
         package_form_entry_[entry]->clear();
     }
 }
 
-ROSPkg::Manager::Manager()
+RailOSPkg::Manager::Manager()
 {
-
+    std::cout << "Starting manager..." << std::endl;
+    std::cout << "Setting main window size..." << std::endl;
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(RailOSPkgManager_VERSION);
+    const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(RAILOSPKGMANAGER_VERSION);
     this->setWindowTitle(title_);
 
     // Define the installed add-on table offsets
     const int table_x_ = (WINDOW_WIDTH-TABLE_WIDTH)/2;
     const int table_y_ = (WINDOW_HEIGHT-TABLE_HEIGHT)/3;
 
+    std::cout << "Setting infotext..." << std::endl;
     // Title string setup
     info_str_->setText("Installed Packages");
     info_str_->setGeometry(table_x_, table_y_-50, TABLE_WIDTH, 50);
 
+    std::cout << "Setting selection behaviour..." << std::endl;
     installed_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    std::cout << "Setting installed packages panel size..." << std::endl;
     // Construct the table for displaying installed packages
     installed_->setGeometry(table_x_, table_y_, TABLE_WIDTH, TABLE_HEIGHT);
     installed_->setColumnCount(TABLE_NCOLS);
@@ -354,13 +358,20 @@ ROSPkg::Manager::Manager()
     installed_->setGridStyle(Qt::NoPen);
     installed_->setAlternatingRowColors(true);
 
+    std::cout << "Setting up buttons..." << std::endl;
     // Arrange buttons
+    std::cout << "Setting Install Button..." << std::endl;
     buttons_["install"]->setGeometry(table_x_, table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    std::cout << "Setting Create Button..." << std::endl;
     buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    std::cout << "Setting Uninstall Button..." << std::endl;
     buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
+    std::cout << "Setting GitHub Button..." << std::endl;
     buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
+    std::cout << "Setting Path Button..." << std::endl;
     buttons_["railospath"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
 
+    std::cout << "Creating advanced features..." << std::endl;
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
     advanced_str_->move(table_x_+20, table_y_+TABLE_HEIGHT+70);
@@ -369,13 +380,15 @@ ROSPkg::Manager::Manager()
     buttons_["github"]->hide();
     buttons_["railospath"]->hide();
 
+    std::cout << "Linking buttons..." << std::endl;
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
     connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
-    connect(buttons_["railospath"], &QPushButton::clicked, this, &Manager::on_ROSPathClicked);
+    connect(buttons_["railospath"], &QPushButton::clicked, this, &Manager::on_RailOSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
 
+    std::cout << "Updating manager..." << std::endl;
     installed_->update();
     populateTable_();
     installed_->show();
@@ -387,7 +400,7 @@ ROSPkg::Manager::Manager()
 
 }
 
-void ROSPkg::Manager::populateTable_() {
+void RailOSPkg::Manager::populateTable_() {
     const QList<QList<QTableWidgetItem*>> table_items_ = system_->getTableInfo();
     installed_->setRowCount(0);
     installed_->setRowCount(table_items_.size());
@@ -400,7 +413,7 @@ void ROSPkg::Manager::populateTable_() {
     this->update();
 }
 
-ROSPkg::Manager::~Manager()
+RailOSPkg::Manager::~Manager()
 {
     for(auto& button: buttons_) {
         delete button;
@@ -410,7 +423,7 @@ ROSPkg::Manager::~Manager()
     delete system_;
 }
 
-void ROSPkg::Manager::on_InstallButtonClicked() {
+void RailOSPkg::Manager::on_InstallButtonClicked() {
     const QString zip_file_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Open Zip Archive"),
@@ -422,7 +435,7 @@ void ROSPkg::Manager::on_InstallButtonClicked() {
     populateTable_();
 }
 
-void ROSPkg::Manager::on_UninstallButtonClicked() {
+void RailOSPkg::Manager::on_UninstallButtonClicked() {
     QItemSelectionModel *select_ = installed_->selectionModel();
     if(!select_->hasSelection()) return;
     QModelIndexList selected_rows_ = select_->selectedRows();
@@ -434,16 +447,16 @@ void ROSPkg::Manager::on_UninstallButtonClicked() {
     populateTable_();
 }
 
-void ROSPkg::Manager::on_CreateButtonClicked() {
+void RailOSPkg::Manager::on_CreateButtonClicked() {
     package_form_->show();
 }
 
-void ROSPkg::Manager::on_CreateCancelClicked() {
+void RailOSPkg::Manager::on_CreateCancelClicked() {
     clearPackageForm_();
     package_form_->hide();
 }
 
-void ROSPkg::Manager::on_CreateConfirmClicked() {
+void RailOSPkg::Manager::on_CreateConfirmClicked() {
     QMap<QString,QString> data_;
     try {
         data_ = checkPackageForm_();
@@ -451,7 +464,7 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     catch(const std::invalid_argument&) {
         return;
     }
-    ROSPkg::Packager* package_ = new ROSPkg::Packager(this, system_->getROSLocation(), data_["package_name"]);
+    RailOSPkg::Packager* package_ = new RailOSPkg::Packager(this, system_->getRailOSLocation(), data_["package_name"]);
     package_->setAuthor(data_["author"]);
     package_->setCountryCode(data_["country_code"]);
     package_->setDisplayName(data_["display_name"]);
@@ -531,22 +544,22 @@ void ROSPkg::Manager::on_CreateConfirmClicked() {
     populateTable_();
 }
 
-void ROSPkg::Manager::on_BrowseRlyFilesClicked() {
+void RailOSPkg::Manager::on_BrowseRlyFilesClicked() {
     const QString rly_file_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Railway File"),
-        QString(QDir(system_->getROSLocation()).filePath("Railways")), QFileDialog::tr("Railway Files (*.rly)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Railways")), QFileDialog::tr("Railway Files (*.rly)")
     );
 	if(rly_file_.isEmpty()) return;
     package_form_entry_["rly_file_path"]->setText(rly_file_);
     package_form_entry_["rly_file_path"]->update();
 }
 
-void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
+void RailOSPkg::Manager::on_BrowseSSNFilesClicked() {
     QString ssn_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Session File"),
-        QString(QDir(system_->getROSLocation()).filePath("Sessions")), QFileDialog::tr("Session Files (*.ssn)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Sessions")), QFileDialog::tr("Session Files (*.ssn)")
     );
 	if(ssn_file_path_.isEmpty()) return;
     if(!package_form_entry_["ssn_file_paths"]->text().isEmpty()) {
@@ -556,11 +569,11 @@ void ROSPkg::Manager::on_BrowseSSNFilesClicked() {
     package_form_entry_["ssn_file_paths"]->update();
 }
 
-void ROSPkg::Manager::on_BrowseImgFilesClicked() {
+void RailOSPkg::Manager::on_BrowseImgFilesClicked() {
     QString img_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Image File"),
-        QString(QDir(system_->getROSLocation()).filePath("Images")), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Images")), QFileDialog::tr("Image Files (*.bmp *.png *.jpg *.pdf)")
     );
 	if(img_file_path_.isEmpty()) return;
     if(!package_form_entry_["img_file_paths"]->text().isEmpty()) {
@@ -570,11 +583,11 @@ void ROSPkg::Manager::on_BrowseImgFilesClicked() {
     package_form_entry_["img_file_paths"]->update();
 }
 
-void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
+void RailOSPkg::Manager::on_BrowseGraphicFilesClicked() {
     QString graphic_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Graphics File"),
-        QString(QDir(system_->getROSLocation()).filePath("Graphics")), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Graphics")), QFileDialog::tr("Graphic Files (*.bmp *.png *.jpg)")
     );
 	if(graphic_file_path_.isEmpty()) return;
     if(!package_form_entry_["graphic_file_paths"]->text().isEmpty()) {
@@ -584,11 +597,11 @@ void ROSPkg::Manager::on_BrowseGraphicFilesClicked() {
     package_form_entry_["graphic_file_paths"]->update();
 }
 
-void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
+void RailOSPkg::Manager::on_BrowseTTBFilesClicked() {
     QString ttb_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Timetable File"),
-        QString(QDir(system_->getROSLocation()).filePath("Program timetables")), QFileDialog::tr("Timetable Files (*.ttb)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Program timetables")), QFileDialog::tr("Timetable Files (*.ttb)")
     );
 	if(ttb_file_path_.isEmpty()) return;
     if(!package_form_entry_["ttb_file_paths"]->text().isEmpty()) {
@@ -598,11 +611,11 @@ void ROSPkg::Manager::on_BrowseTTBFilesClicked() {
     package_form_entry_["ttb_file_paths"]->update();
 }
 
-void ROSPkg::Manager::on_BrowseDocFilesClicked() {
+void RailOSPkg::Manager::on_BrowseDocFilesClicked() {
     QString doc_file_path_ = QFileDialog::getOpenFileName(
         this,
         QFileDialog::tr("Find Documentation File"),
-        QString(QDir(system_->getROSLocation()).filePath("Documentation")), QFileDialog::tr("Documentation Files (*.pdf *.md)")
+        QString(QDir(system_->getRailOSLocation()).filePath("Documentation")), QFileDialog::tr("Documentation Files (*.pdf *.md)")
     );
 	if(doc_file_path_.isEmpty()) return;
     if(!package_form_entry_["doc_file_paths"]->text().isEmpty()) {
@@ -612,7 +625,7 @@ void ROSPkg::Manager::on_BrowseDocFilesClicked() {
     package_form_entry_["doc_file_paths"]->update();
 }
 
-QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
+QMap<QString,QString>  RailOSPkg::Manager::checkPackageForm_() {
     QMap<QString,QString> data_;
     for(const auto& e : package_form_entry_.toStdMap()) {
         // Session files are not mandatory
@@ -644,27 +657,27 @@ QMap<QString,QString>  ROSPkg::Manager::checkPackageForm_() {
     return data_;
 }
 
-void ROSPkg::Manager::on_CheckBoxClicked() {
+void RailOSPkg::Manager::on_CheckBoxClicked() {
     buttons_["github"]->setVisible(advanced_->isChecked());
     buttons_["github"]->setEnabled(advanced_->isChecked());
     buttons_["railospath"]->setVisible(advanced_->isChecked());
     buttons_["railospath"]->setEnabled(advanced_->isChecked());
 }
 
-void ROSPkg::Manager::on_GitHubClicked() {
+void RailOSPkg::Manager::on_GitHubClicked() {
     url_form_->show();
 }
 
-void ROSPkg::Manager::on_GitHubCancelClicked() {
+void RailOSPkg::Manager::on_GitHubCancelClicked() {
     url_entry_->clear();
     url_form_->hide();
 }
 
-void ROSPkg::Manager::on_ROSPathClicked() {
+void RailOSPkg::Manager::on_RailOSPathClicked() {
     system_->createCache(false);
 }
 
-void ROSPkg::Manager::on_GitHubOkClicked() {
+void RailOSPkg::Manager::on_GitHubOkClicked() {
     const QString path_ = url_entry_->text();
     const QString branch_ = branch_entry_->text();
     url_entry_->setText("Railway-Op-Sim/");

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.20 )
 
-project( RailOSPkgManager VERSION 1.1.2 LANGUAGES CXX )
+project( RailOSPkgManager VERSION 1.1.3 LANGUAGES CXX )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
@@ -28,7 +28,7 @@ set( DIGESTPP digestpp )
 set( 11ZIP elzip )
 set( RAILOSTOOLS railostools )
 
-set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DRailOSPkgManager_VERSION=\\\"${CMAKE_PROJECT_VERSION}\\\" " )
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DRAILOSPKGMANAGER_VERSION=\\\"${CMAKE_PROJECT_VERSION}\\\" " )
 
 add_library( ${RailOSPkgManager_LIBRARY} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${RailOSPkgManager_LIBRARY} PROPERTIES AUTOMOC ON )

@@ -7,10 +7,10 @@
  * This file contains code for the construction of the main GUI application
  * which forms the central interface for the install/uninstall and creation
  * of padckages for Railway Operation Simulator
- * 
+ *
  ****************************************************************************/
-#ifndef __RailOSPkgManager_HXX__
-#define __RailOSPkgManager_HXX__
+#ifndef __RAILOSPKGMANAGER_HXX__
+#define __RAILOSPKGMANAGER_HXX__
 
 #include <QWidget>
 #include <QFileDialog>
@@ -26,23 +26,24 @@
 #include <QMap>
 #include <QLabel>
 #include <QPushButton>
+#include <iostream>
 
 #include "railos_system.hxx"
 #include "railostools/country_codes.hxx"
 
-#ifndef RailOSPkgManager_VERSION
+#ifndef RAILOSPKGMANAGER_VERSION
     #error "Version not specified during build"
 #endif
 
 /*! **********************************************************************
- * @namespace ROSPkg
- * @brief Contains all methods and classes relating to the RailOSPkgManager
+ * @namespace RailOSPkg
+ * @brief Contains all methods and classes relating to the RailOSPkg::Manager
  ************************************************************************/
-namespace ROSPkg {
+namespace RailOSPkg {
 /*! **********************************************************************
  * @class Manager
  * @brief Constructs the main GUI interface for the package manager
- * 
+ *
  * Creates the windows and widgets with which the user interacts acting
  * as the central interface for the install/uninstall and creation of
  * packages. GUI is built using Qt widgets consisting of Buttons,
@@ -83,7 +84,7 @@ private:
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
         {"github", new QPushButton(QPushButton::tr("GitHub"), this)},
-        {"railos_path", new QPushButton(QPushButton::tr("Set ROS"), this)}
+        {"railospath", new QPushButton(QPushButton::tr("Set RailOS"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);
@@ -191,9 +192,9 @@ private slots:
     void on_GitHubCancelClicked();
 
 /*! **************************************************************************
- * @brief Action associated with the "ROS Path" button
+ * @brief Action associated with the "RailOS Path" button
  * **************************************************************************/
-    void on_ROSPathClicked();
+    void on_RailOSPathClicked();
 
 public:
 /*! **************************************************************************
@@ -207,4 +208,4 @@ public:
     ~Manager();
 };
 };
-#endif // RailOSPkgManager_HXX
+#endif // RailOSPkg::Manager_HXX

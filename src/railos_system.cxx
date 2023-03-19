@@ -1,10 +1,10 @@
 #include "railos_system.hxx"
 
-size_t ROSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+size_t RailOSPkg::download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return fwrite(ptr, size, nmemb, stream);
 }
 
-void ROSPkg::System::createCache(bool startup) {
+void RailOSPkg::System::createCache(bool startup) {
     const QString cache_dir_ = QFileInfo(cache_file_).absolutePath();
     if(!QDir(cache_dir_).exists()) {
         QDir().mkpath(cache_dir_);
@@ -12,7 +12,7 @@ void ROSPkg::System::createCache(bool startup) {
     const QString railosexe_ = QFileDialog::getOpenFileName(
         parent_,
         QFileDialog::tr("Locate") + QString(" Railway Operation Simulator"),
-        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("ROS Exe (railway.exe)")
+        QString(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)), QFileDialog::tr("RailOS Exe (railway.exe RailOS64.exe RailOS32.exe)")
     );
 
     if(railosexe_.isNull())
@@ -20,10 +20,10 @@ void ROSPkg::System::createCache(bool startup) {
         if(!startup) return;
         QMessageBox::critical(
 	    parent_,
-	    QMessageBox::tr("Missing ROS Location"),
-	    QMessageBox::tr("Railway Operation Simulator executable 'railway.exe' location is required, aborting.")
+	    QMessageBox::tr("Missing RailOS Location"),
+	    QMessageBox::tr("Railway Operation Simulator executable location is required, aborting.")
 	);
-	throw std::runtime_error("No ROS location set");
+	throw std::runtime_error("No RailOS location set");
     }
 
     railos_loc_ = QFileInfo(railosexe_).absolutePath();
@@ -36,7 +36,7 @@ void ROSPkg::System::createCache(bool startup) {
     }
 }
 
-ROSPkg::System::System(QWidget* parent) {
+RailOSPkg::System::System(QWidget* parent) {
     parent_ = parent;
 
     if(railos_loc_.isEmpty() && QFile::exists(cache_file_)) {
@@ -46,7 +46,18 @@ ROSPkg::System::System(QWidget* parent) {
         }
     }
 
-    QFileInfo loc_info_(railos_loc_ + QDir::separator() + "Railway" + QDir::separator() + "railway.exe");
+    const QVector<QString> railos_binaries_{
+        "railway.exe",
+        "RailOS64.exe",
+        "RailOS32.exe"
+    };
+
+    QFileInfo loc_info_;
+
+    for(const QString& binary : railos_binaries_) {
+        loc_info_ = QFileInfo(railos_loc_ + QDir::separator() + "Railway" + QDir::separator() + binary);
+        if(loc_info_.exists()) break;
+    }
 
     if(!loc_info_.exists() || !loc_info_.isFile()) {
         createCache(true);
@@ -56,7 +67,7 @@ ROSPkg::System::System(QWidget* parent) {
 		QMessageBox::tr("Railway Operation Simulator EXE unset"),
 		QMessageBox::tr("Cannot load package manager without setting Railway Operation Simulator executable path")
 	    );
-	    throw std::runtime_error("No ROS location set");
+	    throw std::runtime_error("No RailOS location set");
 	}
         QFile file_(cache_file_);
         if(file_.open(QIODevice::ReadOnly)) {
@@ -67,7 +78,7 @@ ROSPkg::System::System(QWidget* parent) {
     populateInstalled();
 }
 
-void ROSPkg::System::parseMetaFile_(const QString& file_name) {
+void RailOSPkg::System::parseMetaFile_(const QString& file_name) {
     if(!QFile::exists(file_name)) {
         return;
     }
@@ -79,7 +90,7 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
     } catch(std::runtime_error& e) {
         const QString err_ = QString("Cannot import package from '") +
         file_name +
-        QString("' due to missing content:\n") + 
+        QString("' due to missing content:\n") +
         QString(e.what()) +
         QString(" in metadata.");
 
@@ -106,7 +117,7 @@ void ROSPkg::System::parseMetaFile_(const QString& file_name) {
 
 }
 
-void ROSPkg::System::populateInstalled() {
+void RailOSPkg::System::populateInstalled() {
     QDir meta_dir_(QDir(railos_loc_).filePath("Railway/Metadata"));
     QList<QString> filters_ = {"*.toml"};
     QList<QString> toml_files_;
@@ -121,7 +132,7 @@ void ROSPkg::System::populateInstalled() {
     }
 }
 
-QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
+QList<QList<QTableWidgetItem*>> RailOSPkg::System::getTableInfo() const {
     QList<QList<QTableWidgetItem*>> info_;
 
     for(auto& table : installed_.toStdMap()) {
@@ -141,7 +152,7 @@ QList<QList<QTableWidgetItem*>> ROSPkg::System::getTableInfo() const {
     return info_;
 }
 
-QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& unzip_directory) const {
+QMap<QString, QList<QString>> RailOSPkg::System::getZipFileListing_(const QString& unzip_directory) const {
     // File path filters
     QList<QString> filter_ssn_{"*.ssn", "*.SSN"};
     QList<QString> filter_rly_{"*.rly", "*.RLY"};
@@ -150,7 +161,7 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QList<QString> filter_docs_{"*.md", "*.pdf"};
     QList<QString> filter_imgs_{"*.bmp"};
     QList<QString> filter_graphics_{"*.jpg", "*.png", "*.gif"};
-    QList<QString> filter_railosexe_{"railway.exe"};
+    QList<QString> filter_railosexe_{"railway.exe", "RailOS64.exe", "RailOS32.exe"};
     QList<QString> filter_railosfiles_{"*.dll", "*.chm", "*.bpl", "*.txt", "*.pdf"};
 
     // File result containers
@@ -176,12 +187,12 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     QDirIterator it_graphics(unzip_directory, filter_graphics_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QDirIterator it_railosfiles(unzip_directory, filter_railosfiles_, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
-    // Check if package is an ROS upgrade
+    // Check if package is an RailOS upgrade
     if(it_railosexe.hasNext()) {
         QMap<QString, QList<QString>>railosfiles_{{"ros", {it_railosexe.next()}}};
         QDir unzip_dir(unzip_directory);
         railosfiles_["source_loc"] = {unzip_dir.path()};
-        
+
         while(it_railosfiles.hasNext()) {
             const QString railosfile_{it_railosfiles.next()};
             railosfiles_["railosfiles"] << railosfile_;
@@ -229,7 +240,7 @@ QMap<QString, QList<QString>> ROSPkg::System::getZipFileListing_(const QString& 
     return files_;
 }
 
-void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list) const {
+void RailOSPkg::System::upgradeRailOS_(const QMap<QString, QList<QString>>& files_list) const {
     QMessageBox railosinstall_dialog(parent_);
 
     railosinstall_dialog.setWindowTitle("Upgrade Railway Operation Simulator?");
@@ -274,7 +285,7 @@ void ROSPkg::System::upgradeROS_(const QMap<QString, QList<QString>>& files_list
     );
 }
 
-void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list, bool legacy_package) const {
+void RailOSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list, bool legacy_package) const {
     QString info_text_ = "";
     const QDir railos_loc_dir_(railos_loc_);
     for(const QString& rly_file : files_list["rly"] ) {
@@ -379,7 +390,7 @@ void ROSPkg::System::unpackZip_(const QMap<QString, QList<QString>>& files_list,
     QMessageBox::information(parent_, QMessageBox::tr("Add-on installed successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
-void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, const QString& pkg_name, const QString& country_code) const {
+void RailOSPkg::System::unzipFile(const QString& file_name, const QString& author, const QString& pkg_name, const QString& country_code) const {
     QTemporaryDir temp_dir_;
     QDir().mkpath(temp_dir_.path());
     bool no_toml_ = false;
@@ -388,19 +399,19 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
 
     qDebug() << "Zip File Contents: " << files_list_ << Qt::endl;
 
-    // If there is an ROS executable in the zip file assume that it is
-    // an upgrade to ROS to be installed
+    // If there is an RailOS executable in the zip file assume that it is
+    // an upgrade to RailOS to be installed
     if(files_list_.contains("ros")) {
-        upgradeROS_(files_list_);
+        upgradeRailOS_(files_list_);
         return;
     }
 
-    // If no TOML file is found then archive is not an ROS package yet so one needs to be created
+    // If no TOML file is found then archive is not an RailOS package yet so one needs to be created
     if(files_list_["toml"].empty()) {
 
         const QString package_name_ = (!pkg_name.isEmpty()) ? pkg_name : QString(QFileInfo(file_name).baseName()).replace("_", " ");
 
-        ROSPkg::Packager packager_{parent_, railos_loc_, package_name_};
+        RailOSPkg::Packager packager_{parent_, railos_loc_, package_name_};
 
         if(!author.isEmpty()) packager_.setAuthor(author);
         if(!country_code.isEmpty()) packager_.setCountryCode(country_code);
@@ -484,7 +495,7 @@ void ROSPkg::System::unzipFile(const QString& file_name, const QString& author, 
     unpackZip_(files_list_, no_toml_);
 }
 
-void ROSPkg::System::uninstall(const QString& sha) {
+void RailOSPkg::System::uninstall(const QString& sha) {
     QString info_text_ = "";
     const RailOSTools::Metadata meta_data_ = installed_[sha];
     const QDir data_dir_(railos_loc_);
@@ -539,7 +550,7 @@ void ROSPkg::System::uninstall(const QString& sha) {
     QMessageBox::information(parent_, QMessageBox::tr("Add-on uninstalled successfully"), QMessageBox::tr(info_text_.toStdString().c_str()));
 }
 
-void ROSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) const {
+void RailOSPkg::System::fetchGitHub(const QString& repository_path, const QString& branch) const {
     const QString GitHub_URL_ = "https://github.com/" + repository_path + "/archive/refs/heads/" + branch + ".zip";
     QTemporaryDir temp_dir_;
     QDir().mkpath(temp_dir_.path());

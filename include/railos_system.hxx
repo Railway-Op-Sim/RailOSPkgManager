@@ -1,5 +1,5 @@
-#ifndef __ROSSYSTEM_HXX__
-#define __ROSSYSTEM_HXX__
+#ifndef __RailOSSYSTEM_HXX__
+#define __RailOSSYSTEM_HXX__
 
 #include <QString>
 #include <QWidget>
@@ -28,7 +28,7 @@
 
 #include "railos_packager.hxx"
 
-namespace ROSPkg {
+namespace RailOSPkg {
     size_t download_write_file_(void *ptr, size_t size, size_t nmemb, FILE *stream);
 /*! **********************************************************************
  * @class System
@@ -60,20 +60,20 @@ private:
     QMap<QString, QList<QString>> getZipFileListing_(const QString& directory) const;
 
 /*! **************************************************************************
- * @brief Copy files from zip to ROS directories
+ * @brief Copy files from zip to RailOS directories
  * **************************************************************************/
     void unpackZip_(const QMap<QString, QList<QString>>& file_listing, bool legacy_package=false) const;
 
 /*! **************************************************************************
- * @brief Upgrade the local ROS installation from the contents of a zip file
+ * @brief Upgrade the local RailOS installation from the contents of a zip file
  * **************************************************************************/
-    void upgradeROS_(const QMap<QString, QList<QString>>& files_list) const;
+    void upgradeRailOS_(const QMap<QString, QList<QString>>& files_list) const;
 
 public:
 /*! **************************************************************************
-* @brief Locate the ROS installation on the local system and cache it
+* @brief Locate the RailOS installation on the local system and cache it
 *
-* Opens a user dialog requesting the location of railway.exe on the system
+* Opens a user dialog requesting the location of the binary on the system
 * and stores the location for future use.
 *
 * @param startup whether this is called at program opening
@@ -125,16 +125,16 @@ public:
     void uninstall(const QString& sha);
 
 /*! **************************************************************************
- * @brief Retrieve the location of railway.exe on the file system
+ * @brief Retrieve the location of binary on the file system
  * **************************************************************************/
-    QString getROSLocation() const {return railos_loc_;}
+    QString getRailOSLocation() const {return railos_loc_;}
 
 /*! **************************************************************************
  * @brief Retrieve archive from a GitHub repository
  *
  * @param repository_path GitHub repository path in the form "user/repo"
  * **************************************************************************/
-    void fetchGitHub(const QString& repository_path, const QString& branch = "master") const;
+    void fetchGitHub(const QString& repository_path, const QString& branch = "main") const;
 };
 };
 

@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    ROSPkg::Manager w;
+    RailOSPkg::Manager w;
     w.show();
     return a.exec();
 }

@@ -18,7 +18,7 @@ This application aims to simplify the process of adding and removing route simul
 Full documentation can be found on the [project website](https://railway-op-sim.github.io/RailOSPkgManager/).
 
 ## Getting Started
-On first launch you will need to specify the location of the `railway.exe` ROS executable on your system, this location is used to determine where add-ons should be installed. Once this is set the location will be cached and so no longer required. Functionality for altering the installation will be added at a later date. Within this manual `${ROS_HOME}` refers to the directory containing `railway.exe`.
+On first launch you will need to specify the location of the RailOS executable on your system, this location is used to determine where add-ons should be installed. Once this is set the location will be cached and so no longer required. Functionality for altering the installation will be added at a later date. Within this manual `${ROS_HOME}` refers to the directory containing `railway.exe`/`RailOS64.exe`/`RailOS32.exe`.
 
 ## Installing Packages
 Packages are installed by selecting "Install Package" and pointing to a downloaded archive containing the project files. These files will be extracted to the relevant locations. If a package/route metadata TOML file is not present within the archive one will be created and saved in `${ROS_HOME}/Metadata`, this file is formatted in the standard described on the ROS project template GitHub repository [here](https://github.com/Railway-Op-Sim/UN-Template/blob/master/README.md). Only add-ons installed using this application, and so having a metadata file, will be listed in the package manager.
@@ -50,7 +50,7 @@ The buttons next to the file declaration fields allow you to browse for files to
 |Year|Year for which this simulation is a representation (can be any value if fictional).|
 
 ## Upgrading Railway Operation Simulator
-If select a zip file containing a `railway.exe` executable the program will assume it to be a copy of the main ROS program and ask if you wish to
+If a zip file containing a RailOS executable is selected the program will assume it to be a copy of the main ROS program and ask if you wish to
 upgrade your local installation with the files contained.
 
 ## Advanced
@@ -78,25 +78,11 @@ you can also speed up the build process by installing `libcurl-dev`/`libcurl-dev
 ### Windows
 The application is built on Windows using packages/applications installed via the [Chocolatey package manager](https://community.chocolatey.org):
 ```
-choco install mingw
 choco install cmake
 choco install curl
 ```
-It is built using the Git Bash terminal and the following commands:
+It can be built using the included script **from within the source root directory**:
 
+```sh
+bash release/build.sh
 ```
-cmake -G "MinGW Makefiles" -Bbuild -DCMAKE_PREFIX_PATH=/c/Qt/<Qt-version>/mingw_<MINGW-VERSION>/lib/cmake
-cmake --build build
-```
-
-You will need to include the required files in the package:
-
-* `C:\Qt\<Qt-version>\mingw_<version>\platforms\qwindows.dll`
-* `C:\Qt\<Qt-version>\mingw_<version>\translations`
-* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Core.dll`
-* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Widgets.dll`
-* `C:\Qt\<Qt-version>\mingw_<version>\bin\Qt<Qt-version>Gui.dll`
-* `libwinpthread-1.dll`
-* `libgcc_s_seh-1.dll`
-* `libcurl-x64.dll`
-* `libstdc++-6.dll`

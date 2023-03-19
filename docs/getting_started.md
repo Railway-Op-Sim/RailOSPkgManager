@@ -6,8 +6,8 @@ your *Railway Operation Manager* installation.
 
 ![ros_browser](media/find_ros.png)
 
-!!! important "Updating `railway.exe` Location"
-    The location of Railway Operation Simulator can be updated by clicking the "advanced" checkbox and selecting "Set ROS" to provide a new path to the `railway.exe` binary.
+!!! important "Updating RailOS Location"
+    The location of Railway Operation Simulator can be updated by clicking the "advanced" checkbox and selecting "Set ROS" to provide a new path to the RailOS binary.
 
 ## Installing a Package
 Packages are archive files downloaded from the Railway Operation Simulator application [website](https://www.railwayoperationsimulator.com/pc/community-projects). These must be downloaded manually, as they require login into the website.

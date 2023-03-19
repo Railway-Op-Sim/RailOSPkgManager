@@ -1,7 +1,7 @@
 # Upgrading Railway Operation Simulator
 In addition to the installation of add-ons, RailOSPkgManager can handle the switching of base program version,
 performing a pseudo-upgrade.
-If the user specifies a downloaded zip file containing an Railway Operation Simulator version (recognised by the presence of a `railway.exe` file), the program offers to replace the files in the local system installation with the new files. The term "pseudo" refers
+If the user specifies a downloaded zip file containing an Railway Operation Simulator version (recognised by the presence of a `railway.exe`/`RailOS64.exe`/`RailOS32.exe` file), the program offers to replace the files in the local system installation with the new files. The term "pseudo" refers
 to the fact that the program does not recognise one version as newer than another, as such this method can also be used
 to perform a downgrade.
 <figure markdown>
