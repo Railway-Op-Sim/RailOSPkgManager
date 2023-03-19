@@ -61,8 +61,6 @@ jobs:
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
 
     - name: Build ROSPackageManager
-      run: |
-            cmake -Bbuild -G "MinGW Makefiles"
-            cmake --build build
-            mv build/RailOSPkgManager.exe build/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+      run: bash release/build.sh
+      shell: bash
 
