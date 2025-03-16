@@ -32,3 +32,6 @@ this is because the wildcard `*.bmp` is associated with Image files.
 ## Developers
 - [Kristian Zarebski](https://github.com/artemis-beta/)
 
+## Contributors
+- [jkwok678](https://github.com/jkwok678)
+

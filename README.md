@@ -65,6 +65,14 @@ There is also the option to specify an alternative branch to "master". Clicking 
 project and install it.
 
 ## Building from Source
+
+RailOSPkgManager uses the following external libraries:
+
+- [Qt6](https://www.qt.io/product/qt6)
+- [libcurl](https://curl.se/libcurl/)
+- [Quazip](https://github.com/stachenov/quazip)
+- [RailOSTools](https://github.com/Railway-Op-Sim/railostools)
+
 To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
 
 ### Linux

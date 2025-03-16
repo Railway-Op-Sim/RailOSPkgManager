@@ -2,7 +2,7 @@ site_name: Railway Operation Simulator Package Manager
 site_description: Documentation for Railway Operation Simulator Package Manager
 site_author: Kristian Zarebski
 site_url: https://railway-op-sim.github.io/RailOSPkgManager/
-copyright: © Kristian Zarebski, 2022
+copyright: © Kristian Zarebski, 2025
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
