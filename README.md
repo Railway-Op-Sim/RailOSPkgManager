@@ -68,9 +68,11 @@ project and install it.
 To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
 
 ### Linux
-Install `openssl` using the relevant package manager for your distribution. Build using:
-```
-cmake -Bbuild -DCURL_USE_OPENSSL=ON
+Install `openssl` using the relevant package manager for your distribution. Build using Qt MinGW:
+```sh
+CC="<qt-install-dir>/Tools/<mingw-version>/bin/gcc" \
+CXX="<qt-install-dir>/Qt/Tools/<mingw-version>/bin/g++" \
+cmake -Bbuild -DCURL_USE_OPENSSL=ON -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="<qt-install-dir>/<qt-version>/mingw_64\"
 cmake --build build
 ```
 you can also speed up the build process by installing `libcurl-dev`/`libcurl-devel`, make sure to do this after OpenSSL, you will not need the `CURL_USE_OPENSSL` argument if you do this.

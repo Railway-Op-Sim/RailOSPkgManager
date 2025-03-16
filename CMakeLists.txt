@@ -1,14 +1,17 @@
-cmake_minimum_required( VERSION 3.20 )
+cmake_minimum_required( VERSION 3.30 )
 
-project( RailOSPkgManager VERSION 1.1.3 LANGUAGES CXX )
+project( RailOSPkgManager VERSION 2.0.0 LANGUAGES CXX )
 
-set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD 23 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set( RailOSPkgManager_LIBRARY railospkg )
 set( RAILOSTOOLS_STATIC_LIBRARY ON )
 
-find_package( QT NAMES Qt6 Qt5 )
+find_package( QT NAMES Qt6 )
 find_package( Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Core Gui REQUIRED )
+get_filename_component( QtPath "${Qt6_DIR}" PATH )
+get_filename_component( QtBinPath "${QtPath}/../../bin" REALPATH )
 
 set( MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/application.cxx )
 set( EXTERNAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/external )
@@ -25,16 +28,15 @@ file( GLOB TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/lang/*.ts )
 file( GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hxx )
 
 set( DIGESTPP digestpp )
-set( 11ZIP elzip )
 set( RAILOSTOOLS railostools )
+set( QUAZIP QuaZip::QuaZip )
+option( CURL_USE_OPENSSL "Use OpenSSL Code" OFF )
+set( QUAZIP_BZIP2 OFF )
 
 set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DRAILOSPKGMANAGER_VERSION=\\\"${CMAKE_PROJECT_VERSION}\\\" " )
 
 add_library( ${RailOSPkgManager_LIBRARY} STATIC ${SRC_FILES} ${HEADERS} )
 set_target_properties( ${RailOSPkgManager_LIBRARY} PROPERTIES AUTOMOC ON )
-add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/external/11Zip )
-
-set( ELZIP_TESTS OFF )
 
 if( CHOCO_FOUND )
     ChocoFind_CURL()
@@ -47,6 +49,7 @@ SET( CMAKE_FIND_LIBRARY_SUFFIXES ".a;.dll.a" )
 set( BUILD_SHARED_LIBS OFF )
 
 add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/external/rostools/cpp )
+add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/external/quazip )
 
 include(FetchContent)
 FetchContent_Declare(
@@ -56,20 +59,21 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable( ${DIGESTPP} )
 
-target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC ${11ZIP} )
 target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC ${CURL_LIBRARIES} )
 target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC -static )
 target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui )
 target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC ${RAILOSTOOLS} )
-target_include_directories( ${RailOSPkgManager_LIBRARY} PRIVATE ${CMAKE_SOURCE_DIR}/include )
+target_link_libraries( ${RailOSPkgManager_LIBRARY} PUBLIC ${QUAZIP} )
+target_include_directories( ${RailOSPkgManager_LIBRARY} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include )
 target_include_directories( ${RailOSPkgManager_LIBRARY} PUBLIC ${CURL_INCLUDE_DIR} )
 target_include_directories( ${RailOSPkgManager_LIBRARY} PUBLIC ${tomlplusplus_SOURCE_DIR} )
 target_include_directories( ${RailOSPkgManager_LIBRARY} PUBLIC ${digestpp_SOURCE_DIR} )
+target_include_directories( ${RailOSPkgManager_LIBRARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/quazip )
 
 add_executable( ${PROJECT_NAME} ${MAIN_SRC} ${APP_ICON_RESOURCE_WINDOWS} )
 set_target_properties( ${PROJECT_NAME} PROPERTIES AUTOMOC ON )
 target_link_libraries( ${PROJECT_NAME} PRIVATE ${RailOSPkgManager_LIBRARY} )
-target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include )
+target_include_directories( ${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 if( BUILD_RailOSPkgManager_TESTS )
     add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/tests )
@@ -79,3 +83,14 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
  )
+
+if(WIN32)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${QtBinPath}/windeployqt.exe
+        --release
+        --no-compiler-runtime
+        $<TARGET_FILE:${PROJECT_NAME}>
+        COMMENT "Running windeployqt to deploy Qt libraries"
+    )
+endif()
+ 

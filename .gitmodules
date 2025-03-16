@@ -4,6 +4,6 @@
 [submodule "external/curl"]
 	path = external/curl
 	url = https://github.com/curl/curl.git
-[submodule "external/11Zip"]
-	path = external/11Zip
-	url = https://github.com/Sygmei/11Zip.git
+[submodule "external/quazip"]
+	path = external/quazip
+	url = https://github.com/stachenov/quazip.git

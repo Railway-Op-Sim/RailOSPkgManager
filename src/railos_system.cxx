@@ -394,7 +394,9 @@ void RailOSPkg::System::unzipFile(const QString& file_name, const QString& autho
     QTemporaryDir temp_dir_;
     QDir().mkpath(temp_dir_.path());
     bool no_toml_ = false;
-    elz::extractZip(file_name.toStdString(), temp_dir_.path().toStdString());
+
+    JlCompress::extractDir(file_name, temp_dir_.path());
+
     QMap<QString, QList<QString>> files_list_ = getZipFileListing_(temp_dir_.path());
 
     qDebug() << "Zip File Contents: " << files_list_ << Qt::endl;

@@ -138,7 +138,6 @@ QString RailOSPkg::Packager::createPackage() {
 
         copy_check(parent_, rly_file_, out_rly_file_);
         copy_check(parent_, toml_file_, out_toml_file_);
-
         copy_check(parent_, rly_file_, loc_rly_file_);
 
         for(const QString& ttb_file : ttb_files_) {
@@ -210,7 +209,7 @@ QString RailOSPkg::Packager::createPackage() {
 
     const QString zip_file_ = out_dir_ + ".zip";
 
-    elz::zipFolder(out_dir_.toStdString(), zip_file_.toStdString());
+    JlCompress::compressDir(zip_file_, out_dir_);
 
     if(!QFile::exists(zip_file_)) {
         QMessageBox::critical(

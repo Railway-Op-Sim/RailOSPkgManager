@@ -22,7 +22,7 @@
 
 #include "railostools/metadata.hxx"
 #include "digestpp.hpp"
-#include "elzip.hpp"
+#include "quazip/JlCompress.h"
 
 #include "curl/curl.h"
 

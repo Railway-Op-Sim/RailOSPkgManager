@@ -35,7 +35,8 @@
 #include <QStandardPaths>
 #include <QList>
 
-#include "elzip.hpp"
+#include "quazip/JlCompress.h"
+
 #include "railostools/metadata.hxx"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
