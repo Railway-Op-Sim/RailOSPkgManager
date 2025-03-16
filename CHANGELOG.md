@@ -1,3 +1,6 @@
+# Unreleased
+- Switch from 11zip to Quazip for package creation backend.
+
 # 2023-01-29 [v1.1.2](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.2)
 - Fix graphics files not being copied
 # 2022-03-24 [v1.1.1](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.1)
