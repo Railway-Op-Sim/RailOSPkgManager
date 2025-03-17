@@ -12,7 +12,13 @@ jobs:
         submodules: recursive
 
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
+      uses: lukka/get-cmake@latest
+
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 12
+        platform: x64
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4.1.1
@@ -24,9 +30,12 @@ jobs:
     - name: Install Curl
       run: sudo apt install -y sudo curl libssl-dev libcurl4-openssl-dev
 
-    - name: Build ROSPackageManager
+    - name: Build RailOSPackageManager
+      env:
+        CXX: g++-12
+        CC: gcc-12
       run: |
-            cmake -Bbuild -DCURL_USE_OPENSSL=ON
+            cmake -Bbuild -DCURL_USE_OPENSSL=ON -G Ninja
             cmake --build build -j 8
 
   build-test-windows:
@@ -40,11 +49,15 @@ jobs:
       uses: jurplel/install-qt-action@v4.1.1
       with:
         version: '6.9.0'
-        setup_python: false
+        setup-python: false
         modules: qt5compat
+        arch: 'win64_mingw'
+
+    - name: Upgrade GCC
+      run: choco upgrade mingw
 
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
+      uses: lukka/get-cmake@latest
 
     - name: Install CURL
       run: choco install curl
@@ -53,8 +66,11 @@ jobs:
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
 
     - name: Build RailOSPackageManager
+      env:
+        CXX: g++
+        CC: gcc
       run: |
-        cmake -Bbuild -DCURL_USE_OPENSSL=ON 
-        cmake --build -j 8
+        cmake -Bbuild -DCURL_USE_OPENSSL=ON -G "MinGW Makefiles"
+        cmake --build build -j 8
       shell: bash
 
