@@ -13,11 +13,7 @@ jobs:
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 12
-        platform: x64
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v4.1.1
       with:
@@ -29,7 +25,7 @@ jobs:
 
     - name: Build ROSPackageManager
       run: |
-            cmake -Bbuild -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" -DCURL_USE_OPENSSL=ON
+            cmake -Bbuild -DCURL_USE_OPENSSL=ON
             cmake --build build -j 8
 
   build-test-windows:
@@ -43,10 +39,7 @@ jobs:
       uses: jurplel/install-qt-action@v4.1.1
       with:
         version: '6.9.0'
-        arch: 'win64_mingw'
-
-    - name: Upgrade GCC
-      run: choco upgrade mingw
+        setup_python: false
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
@@ -59,7 +52,7 @@ jobs:
 
     - name: Build RailOSPackageManager
       run: |
-        cmake -Bbuild -DCURL_USE_OPENSSL=ON -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR"
+        cmake -Bbuild -DCURL_USE_OPENSSL=ON 
         cmake --build -j 8
       shell: bash
 
