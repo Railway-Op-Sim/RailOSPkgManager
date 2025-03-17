@@ -7,21 +7,21 @@ jobs:
   build-test-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
+      uses: jwlawson/actions-setup-cmake@v2
     - name: Set up GCC
       uses: egor-tensin/setup-gcc@v1
       with:
         version: 12
         platform: x64
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v4.1.1
       with:
-        version: '6.2.0'
+        version: '6.9.0'
         setup-python: false
 
     - name: Install Curl
@@ -29,8 +29,8 @@ jobs:
 
     - name: Build ROSPackageManager
       env:
-        CC: gcc-11
-        CXX: g++-11
+        CC: gcc-12
+        CXX: g++-12
       run: |
             cmake -Bbuild
             cmake --build build
@@ -38,21 +38,21 @@ jobs:
   build-test-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3.0.0
+      uses: jurplel/install-qt-action@v4.1.1
       with:
-        version: '6.2.0'
-        arch: 'win64_mingw81'
+        version: '6.9.0'
+        arch: 'win64_mingw'
 
     - name: Upgrade GCC
       run: choco upgrade mingw
 
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.13.1
+      uses: jwlawson/actions-setup-cmake@v2
 
     - name: Install CURL
       run: choco install curl
@@ -60,7 +60,7 @@ jobs:
     - name: Install ZLIB
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
 
-    - name: Build ROSPackageManager
+    - name: Build RailOSPackageManager
       run: bash release/build.sh
       shell: bash
 

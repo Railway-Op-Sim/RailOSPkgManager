@@ -326,8 +326,8 @@ void RailOSPkg::Manager::clearPackageForm_() {
 
 RailOSPkg::Manager::Manager()
 {
-    std::cout << "Starting manager..." << std::endl;
-    std::cout << "Setting main window size..." << std::endl;
+    qDebug() << "Starting manager...";
+    qDebug() << "Setting main window size...";
     // Set the Window Dimensions and Properties
     this->setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     const QString title_ = QString("Railway Operation Simulator Package Manager v")+QString(RAILOSPKGMANAGER_VERSION);
@@ -337,15 +337,15 @@ RailOSPkg::Manager::Manager()
     const int table_x_ = (WINDOW_WIDTH-TABLE_WIDTH)/2;
     const int table_y_ = (WINDOW_HEIGHT-TABLE_HEIGHT)/3;
 
-    std::cout << "Setting infotext..." << std::endl;
+    qDebug() << "Setting infotext...";
     // Title string setup
     info_str_->setText("Installed Packages");
     info_str_->setGeometry(table_x_, table_y_-50, TABLE_WIDTH, 50);
 
-    std::cout << "Setting selection behaviour..." << std::endl;
+    qDebug() << "Setting selection behaviour...";
     installed_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    std::cout << "Setting installed packages panel size..." << std::endl;
+    qDebug() << "Setting installed packages panel size...";
     // Construct the table for displaying installed packages
     installed_->setGeometry(table_x_, table_y_, TABLE_WIDTH, TABLE_HEIGHT);
     installed_->setColumnCount(TABLE_NCOLS);
@@ -358,20 +358,26 @@ RailOSPkg::Manager::Manager()
     installed_->setGridStyle(Qt::NoPen);
     installed_->setAlternatingRowColors(true);
 
-    std::cout << "Setting up buttons..." << std::endl;
+    qDebug() << "Setting up buttons...";
     // Arrange buttons
-    std::cout << "Setting Install Button..." << std::endl;
+    qDebug() << "Setting Install Button...";
     buttons_["install"]->setGeometry(table_x_, table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
-    std::cout << "Setting Create Button..." << std::endl;
+    qDebug() << "Setting Create Button...";
     buttons_["create"]->setGeometry(table_x_ + (BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
-    std::cout << "Setting Uninstall Button..." << std::endl;
+    qDebug() << "Setting Uninstall Button...";
     buttons_["uninstall"]->setGeometry(table_x_ + 2*(BUTTON_WIDTH/3+TABLE_WIDTH/TABLE_NCOLS), table_y_+TABLE_HEIGHT+20, BUTTON_WIDTH, BUTTON_HEIGHT);
-    std::cout << "Setting GitHub Button..." << std::endl;
-    buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
-    std::cout << "Setting Path Button..." << std::endl;
-    buttons_["railospath"]->setGeometry(table_x_+300, table_y_+TABLE_HEIGHT+65, BUTTON_WIDTH, BUTTON_HEIGHT);
+    qDebug() << "Setting GitHub Button...";
+    buttons_["github"]->setGeometry(table_x_+100, table_y_+TABLE_HEIGHT+65, 0.8 * BUTTON_WIDTH, BUTTON_HEIGHT);
+    qDebug() << "Setting Path Button...";
+    buttons_["railospath"]->setGeometry(table_x_+250, table_y_+TABLE_HEIGHT+65, 0.8 * BUTTON_WIDTH, BUTTON_HEIGHT);
+    qDebug() << "Setting RailOS Directory Button...";
+    buttons_["open_railos_dir"]->setGeometry(table_x_ + 400, table_y_ + TABLE_HEIGHT + 65, 0.8 * BUTTON_WIDTH, BUTTON_HEIGHT);
+    qDebug() << "Setting RailOS Launch Button...";
+    buttons_["launch_railos"]->setGeometry(table_x_ + 390, table_y_ - 40, 0.8 * BUTTON_WIDTH, BUTTON_HEIGHT);
+    buttons_["launch_railos"]->raise();
 
-    std::cout << "Creating advanced features..." << std::endl;
+
+    qDebug() << "Creating advanced features...";
     // Enable Advanced Features
     advanced_->move(table_x_, table_y_+TABLE_HEIGHT+70);
     advanced_str_->move(table_x_+20, table_y_+TABLE_HEIGHT+70);
@@ -379,16 +385,23 @@ RailOSPkg::Manager::Manager()
     advanced_->setChecked(false);
     buttons_["github"]->hide();
     buttons_["railospath"]->hide();
+    buttons_["open_railos_dir"]->hide();
+    buttons_["github"]->setEnabled(false);
+    buttons_["railospath"]->setEnabled(false);
+    buttons_["open_railos_dir"]->setEnabled(false);
 
-    std::cout << "Linking buttons..." << std::endl;
+
+    qDebug() << "Linking buttons...";
     connect(buttons_["install"], &QPushButton::clicked, this, &Manager::on_InstallButtonClicked);
     connect(buttons_["uninstall"], &QPushButton::clicked, this, &Manager::on_UninstallButtonClicked);
     connect(buttons_["create"], &QPushButton::clicked, this, &Manager::on_CreateButtonClicked);
     connect(buttons_["github"], &QPushButton::clicked, this, &Manager::on_GitHubClicked);
     connect(buttons_["railospath"], &QPushButton::clicked, this, &Manager::on_RailOSPathClicked);
     connect(advanced_, &QCheckBox::clicked, this, &Manager::on_CheckBoxClicked);
+    connect(buttons_["open_railos_dir"], &QPushButton::clicked, this, &Manager::on_RailOSDirOpenClicked);
+    connect(buttons_["launch_railos"], &QPushButton::clicked, this, &Manager::on_RailOSLaunchClicked);
 
-    std::cout << "Updating manager..." << std::endl;
+    qDebug() << "Updating manager...";
     installed_->update();
     populateTable_();
     installed_->show();
@@ -454,6 +467,33 @@ void RailOSPkg::Manager::on_CreateButtonClicked() {
 void RailOSPkg::Manager::on_CreateCancelClicked() {
     clearPackageForm_();
     package_form_->hide();
+}
+
+void RailOSPkg::Manager::on_RailOSDirOpenClicked() {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(QDir(system_->getRailOSLocation()).filePath("Railway")));
+}
+
+void RailOSPkg::Manager::on_RailOSLaunchClicked() {
+    const QString railos_64_{QDir(system_->getRailOSLocation()).filePath("Railway/RailOS64.exe")};
+    const QString railos_32_{QDir(system_->getRailOSLocation()).filePath("Railway/RailOS32.exe")};
+    const QString railos_{QDir(system_->getRailOSLocation()).filePath("Railway/railway.exe")};
+    QString railos_exe_;
+
+    if(QFile(railos_64_).exists()) railos_exe_ = railos_64_;
+    if(QFile(railos_32_).exists()) railos_exe_ = railos_32_;
+    if(QFile(railos_).exists()) railos_exe_ = railos_;
+
+    if(railos_exe_.isEmpty()) {
+        QMessageBox::critical(
+            this,
+            QMessageBox::tr("RailOS executable not found"),
+            QMessageBox::tr(
+                ("Failed to locate a valid RailOS executable at '" + system_->getRailOSLocation() + QDir::separator() + "Railway'").toStdString().c_str()
+            )
+        );
+    }
+
+    QProcess::startDetached(railos_exe_);
 }
 
 void RailOSPkg::Manager::on_CreateConfirmClicked() {
@@ -662,6 +702,8 @@ void RailOSPkg::Manager::on_CheckBoxClicked() {
     buttons_["github"]->setEnabled(advanced_->isChecked());
     buttons_["railospath"]->setVisible(advanced_->isChecked());
     buttons_["railospath"]->setEnabled(advanced_->isChecked());
+    buttons_["open_railos_dir"]->setVisible(advanced_->isChecked());
+    buttons_["open_railos_dir"]->setEnabled(advanced_->isChecked());
 }
 
 void RailOSPkg::Manager::on_GitHubClicked() {

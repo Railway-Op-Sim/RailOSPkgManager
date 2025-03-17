@@ -1,5 +1,6 @@
-# Unreleased
+# 2025-03-17 [v2.0.0](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v2.0.0)
 - Switch from 11zip to Quazip for package creation backend.
+- Added launch RailOS and open RailOS directory buttons.
 
 # 2023-01-29 [v1.1.2](https://github.com/Railway-Op-Sim/RailOSPkgManager/releases/tag/v1.1.2)
 - Fix graphics files not being copied

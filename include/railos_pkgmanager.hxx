@@ -13,6 +13,8 @@
 #define __RAILOSPKGMANAGER_HXX__
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QProcess>
 #include <QFileDialog>
 #include <QTableWidget>
 #include <QtMath>
@@ -84,7 +86,9 @@ private:
         {"create", new QPushButton(QPushButton::tr("Create Package"), this)},
         {"uninstall", new QPushButton(QPushButton::tr("Uninstall Package"), this)},
         {"github", new QPushButton(QPushButton::tr("GitHub"), this)},
-        {"railospath", new QPushButton(QPushButton::tr("Set RailOS"), this)}
+        {"railospath", new QPushButton(QPushButton::tr("Set RailOS"), this)},
+        {"open_railos_dir", new QPushButton(QPushButton::tr("Open RailOS Folder"), this)},
+        {"launch_railos", new QPushButton(QPushButton::tr("Launch RailOS"), this)}
     };
     QLabel* info_str_ = new QLabel(this);
     QTableWidget* installed_ = new QTableWidget(this);
@@ -195,6 +199,16 @@ private slots:
  * @brief Action associated with the "RailOS Path" button
  * **************************************************************************/
     void on_RailOSPathClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "RailOS Directory Open" button
+ * **************************************************************************/
+    void on_RailOSDirOpenClicked();
+
+/*! **************************************************************************
+ * @brief Action associated with the "RailOS Launch" button
+ * **************************************************************************/
+    void on_RailOSLaunchClicked();
 
 public:
 /*! **************************************************************************

@@ -11,35 +11,35 @@ jobs:
     name: Create Release
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Get Previous tag
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
       - name: Set Output Directory
-        uses: mathiasvr/command-output@v1
+        uses: mathiasvr/command-output@v2.0.0
         id: outdir_name
         with:
           run: echo $GITHUB_REPOSITORY | cut -d '/' -f 2 | cut --complement -f1 -d '-' | xargs
       - name: Set Version Suffix
-        uses: mathiasvr/command-output@v1
+        uses: mathiasvr/command-output@v2.0.0
         id: outver
         with:
           run: |
             VERSION="${{ steps.previoustag.outputs.tag }}"
             echo ${VERSION//./_} | xargs
       - name: Install Qt
-      uses: jurplel/install-qt-action@v3.0.0
+      uses: jurplel/install-qt-action@v4.1.1
       with:
-        version: '6.2.0'
-        arch: 'win64_mingw81'
+        version: '6.9.0'
+        arch: 'win64_mingw'
 
       - name: Upgrade GCC
         run: choco upgrade mingw
 
       - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v1.13.1
+        uses: jwlawson/actions-setup-cmake@v2
 
       - name: Install CURL
         run: choco install curl
@@ -54,11 +54,11 @@ jobs:
               cmake -Bbuild -G "MinGW Makefiles"
               cmake --build build
               mkdir release
-              mv build/RailOSPkgManager.exe release/ROSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
+              mv build/RailOSPkgManager.exe release/RailOSPackageManager-${{ steps.previoustag.outputs.tag }}.exe
         shell: bash
 
       - name: Archive Release
-        uses: thedoctor0/zip-release@0.7.0
+        uses: thedoctor0/zip-release@0.7.6
         with:
           type: 'zip'
           filename: 'release.zip'
@@ -72,7 +72,7 @@ jobs:
         shell: bash
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false

@@ -108,11 +108,8 @@ QString RailOSPkg::Packager::createPackage() {
     if(!QDir(build_dir_).exists()) {
         QDir().mkpath(build_dir_);
     }
-    QString package_file_name_ = package_name_;
-    QString package_name_version_ = version_;
-    version_.replace(".", "_");
-    package_file_name_ += version_;
-    package_file_name_.replace(" ", "_");
+    QString package_file_name_{package_name_ + "_" + version_};
+    package_file_name_.replace(" ", "_").replace(".", "_");
 
     const QString out_dir_ = QDir(build_dir_).filePath(package_file_name_);
 
