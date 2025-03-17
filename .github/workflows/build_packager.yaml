@@ -28,12 +28,9 @@ jobs:
       run: sudo apt install -y sudo curl libssl-dev libcurl4-openssl-dev
 
     - name: Build ROSPackageManager
-      env:
-        CC: gcc-12
-        CXX: g++-12
       run: |
-            cmake -Bbuild
-            cmake --build build
+            cmake -Bbuild -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" -DCURL_USE_OPENSSL=ON
+            cmake --build build -j 8
 
   build-test-windows:
     runs-on: windows-latest
@@ -61,6 +58,8 @@ jobs:
       run: powershell -Command "(Invoke-WebRequest -Uri https://git.io/JnHTY -OutFile install_zlib.bat)"; ./install_zlib.bat; del install_zlib.bat
 
     - name: Build RailOSPackageManager
-      run: bash release/build.sh
+      run: |
+        cmake -Bbuild -DCURL_USE_OPENSSL=ON -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR"
+        cmake --build -j 8
       shell: bash
 
