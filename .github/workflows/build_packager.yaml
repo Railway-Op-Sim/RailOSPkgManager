@@ -19,6 +19,7 @@ jobs:
       with:
         version: '6.9.0'
         setup-python: false
+        modules: qt5compat
 
     - name: Install Curl
       run: sudo apt install -y sudo curl libssl-dev libcurl4-openssl-dev
@@ -40,6 +41,7 @@ jobs:
       with:
         version: '6.9.0'
         setup_python: false
+        modules: qt5compat
 
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v2
