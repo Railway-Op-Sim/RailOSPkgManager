@@ -22,7 +22,6 @@ jobs:
               run: |
                   mkdir -p data/
                   page=1
-                  all_candidates="[]"
                     
                   while :; do
                     # 1. Fetch 100 candidates per page (using CI token to avoid rate limits)
@@ -38,7 +37,7 @@ jobs:
                     fi
                     
                     # 3. Merge this page into the master JSON array
-                    all_candidates=$(echo "$all_candidates" | jq ". + $response")
+                    echo $response | jq -r '.[].name' | grep -oE '^\w{2}-.*' >> temp.dat
                     
                     # If we got less than 100, this is the last page anyway; we can exit early
                     if [ "$len" -lt 100 ]; then
@@ -49,7 +48,7 @@ jobs:
                   done
                     
                   # Save the complete list of candidates
-                  echo "$all_candidates" | jq -r '.[].name' | grep -oE '^\w{2}-.*' > data/github_registry.dat
+                  cat temp.dat | sort -n > data/github_registry.dat
 
             - name: Commit data to a separate branch
               run: |
