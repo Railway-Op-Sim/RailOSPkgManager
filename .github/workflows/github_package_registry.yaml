@@ -21,7 +21,35 @@ jobs:
             - name: Fetch and filter repositories
               run: |
                   mkdir -p data/
-                  curl -s "https://api.github.com/orgs/Railway-Op-Sim/repos?per_page=1000" | jq -r '.[].name' | grep -oE '^\w{2}-.*' > data/github_registry.dat
+                  page=1
+                  all_candidates="[]"
+                    
+                  while :; do
+                    # 1. Fetch 100 candidates per page (using CI token to avoid rate limits)
+                    response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                      "https://api.github.com/orgs/Railway-Op-Sim/repos?per_page=100&page=${page}")
+                    
+                    # 2. Get the number of items returned in this page
+                    len=$(echo "$response" | jq '. | length' 2>/dev/null || echo 0)
+                    
+                    # If we get 0 items, we've reached the end
+                    if [ "$len" -eq 0 ]; then
+                      break
+                    fi
+                    
+                    # 3. Merge this page into the master JSON array
+                    all_candidates=$(echo "$all_candidates" | jq ". + $response")
+                    
+                    # If we got less than 100, this is the last page anyway; we can exit early
+                    if [ "$len" -lt 100 ]; then
+                      break
+                    fi
+                    
+                    page=$((page + 1))
+                  done
+                    
+                  # Save the complete list of candidates
+                  echo "$all_candidates" | jq -r '.[].name' | grep -oE '^\w{2}-.*' > data/github_registry.dat
 
             - name: Commit data to a separate branch
               run: |
