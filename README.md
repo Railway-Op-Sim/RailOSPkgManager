@@ -74,6 +74,7 @@ RailOSPkgManager uses the following external libraries:
 - [RailOSTools](https://github.com/Railway-Op-Sim/railostools)
 
 To build this application you will need an installation of Qt5 or Qt6 on your system, you will need to also ensure `openssl` is installed on the system.
+If using Qt6 you will need to ensure the "Qt5 Compatibility Module" is available as the `qazip` dependency requires it (use the Qt Maintenance Tool to fetch it if it is not in your Qt6 install).
 
 ### Linux
 Install `openssl` using the relevant package manager for your distribution. Build using Qt MinGW:
