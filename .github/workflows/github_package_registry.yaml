@@ -48,38 +48,30 @@ jobs:
                   done
                     
                   # Save the complete list of candidates
-                  cat temp.dat | sort -n > data/github_registry.dat
+                  cat temp.dat | sort -n > /tmp/github_registry.dat
 
             - name: Commit data to a separate branch
               run: |
-                  git config --global user.name "github-actions[bot]"
-                  git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-                  TARGET_BRANCH="registry-data"
-                  FILE_TO_COMMIT="data/github_registry.dat"
-
-
-                  git stash --include-untracked
-
-
-                  if git show-ref --verify --quiet "refs/remotes/origin/$TARGET_BRANCH"; then
-                    echo "Branch $TARGET_BRANCH exists. Switching to it..."
-                    git checkout $TARGET_BRANCH
-                  else
-                    echo "Branch $TARGET_BRANCH does not exist. Creating orphan branch..."
-                    
-                    git checkout --orphan $TARGET_BRANCH
-                    
-                    git rm -rf .
-                  fi
-
-
-                  git stash pop || true
-
-                  if [ -f "$FILE_TO_COMMIT" ] && [ -n "$(git status --porcelain $FILE_TO_COMMIT)" ]; then
-                    git add $FILE_TO_COMMIT
-                    git commit -m "Auto-update: Refresh repository list [skip ci]"
-                    git push origin $TARGET_BRANCH
-                  else
-                    echo "No changes in repository list. Nothing to commit."
-                  fi
+                git fetch origin
+                git checkout registry-data || git checkout -b registry-data
+                git reset --hard origin/registry-data
+                
+                # 3. Create the data directory if it doesn't exist on this branch
+                mkdir -p data
+                
+                # 4. Move the file from the temp directory into the repo
+                mv /tmp/github_registry.dat data/github_registry.dat
+                
+                # 5. Stage, commit, and push
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
+                
+                git add data/github_registry.dat
+                
+                # Only commit and push if the file actually changed to avoid empty commit loops
+                if ! git diff --cached --quiet; then
+                  git commit -m "chore: auto-update github registry data [skip ci]"
+                  git push origin registry-data
+                else
+                  echo "No changes detected in registry data."
+                fi
